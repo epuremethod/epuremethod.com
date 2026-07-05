@@ -1,0 +1,141 @@
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Warm paper and ink */
+  --color-paper: #f7f5f1;
+  --color-card: #fffefc;
+  --color-ink: #191612;
+  --color-muted: #57503f;
+  --color-faint: #8b8172;
+  --color-line: #e3ded5;
+  --color-shade: #efece6;
+
+  /* Adjuster identities: cyan (Ana) and pink (Ben) */
+  --color-ana: #0d7797;
+  --color-ana-soft: #e0f0f5;
+  --color-ben: #ba3d78;
+  --color-ben-soft: #f8e5ee;
+
+  /* Muted semantic status tints */
+  --color-new-bg: #f3ead2;
+  --color-new-fg: #64500e;
+  --color-assigned-bg: #e0eaf5;
+  --color-assigned-fg: #274e78;
+  --color-inspected-bg: #e1efe3;
+  --color-inspected-fg: #235c31;
+  --color-closed-bg: #eae7e1;
+  --color-closed-fg: #57503f;
+
+  /* Warnings (offline, rejected writes) */
+  --color-warn-bg: #f8ecdd;
+  --color-warn-fg: #8a5a1d;
+
+  --radius-md: 6px;
+}
+
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+  font-feature-settings: "tnum";
+}
+
+/* Server card animations: cards carry --tone / --tone-soft for the acting
+   user; a changed React key restarts the animation. */
+@keyframes blink {
+  0% {
+    background-color: var(--tone-soft);
+    box-shadow: inset 0 0 0 1px var(--tone);
+  }
+  100% {
+    background-color: var(--color-card);
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+}
+
+@keyframes pulse-read {
+  0% {
+    box-shadow: 0 0 0 2px var(--tone);
+  }
+  100% {
+    box-shadow: 0 0 0 2px transparent;
+  }
+}
+
+.touch-write {
+  animation: blink 1.4s ease-out both;
+}
+
+.touch-read {
+  animation: pulse-read 0.9s ease-out both;
+}
+
+/* Writer dot: flashes once on write, then fades off gently. */
+@keyframes dot-flash {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.dot-write {
+  animation: dot-flash 1.8s ease-out both;
+}
+
+.settings-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 16px;
+  background: transparent;
+}
+
+.settings-slider:focus {
+  outline: none;
+}
+
+.settings-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-line);
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  margin-top: -4px;
+  border-radius: 999px;
+  border: 1px solid var(--color-card);
+  background: var(--color-faint);
+}
+
+.settings-slider::-moz-range-track {
+  height: 3px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-line);
+}
+
+.settings-slider::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  border: 1px solid var(--color-card);
+  background: var(--color-faint);
+}
