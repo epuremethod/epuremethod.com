@@ -1,0 +1,21 @@
+{
+  "name": "tilia-docs",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node src/build.mjs",
+    "dev": "node src/dev.mjs",
+    "check": "node src/build.mjs"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.0",
+    "markdown-it-container": "^4.0.0",
+    "shiki": "^4.3.1",
+    "sury": "11.0.0-alpha.9"
+  }
+}
