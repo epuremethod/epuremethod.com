@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en" data-lang="ts">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The tilia guide — a reading path through the mental model, tracking, computed values, observers, and React integration.">
+<title>The Guide — tilia</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232e7d3a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3C7.2 4.9 4.6 8.8 5.5 13.3 6.3 17 9 20.1 12 21c3-0.9 5.7-4 6.5-7.7C19.4 8.8 16.8 4.9 12 3Z'/%3E%3Cpath d='M12 7v10M12 11.5 9.2 9.7M12 11.5l2.8-1.8M12 15.5 8.8 13.4M12 15.5l3.2-2.1' stroke-width='1.1'/%3E%3C/svg%3E">
+
+<script>
+/* Language choice, resolved before first paint.
+   Priority: ?lang= query param > localStorage > "ts". */
+(function () {
+  var q = new URLSearchParams(location.search).get("lang");
+  var saved = null;
+  try { saved = localStorage.getItem("tilia-lang"); } catch (e) {}
+  var lang = (q === "ts" || q === "res") ? q : (saved === "res" ? "res" : "ts");
+  document.documentElement.setAttribute("data-lang", lang);
+})();
+</script>
+
+<style>
+/* ============================================================
+   docs.html — self-contained stylesheet.
+
+   ASSUMPTIONS about api.html, to reconcile against style.css:
+   - Tokens (--paper #fbf6e9, --card #fffdf4, --ink #1d1a14,
+     --muted #5c5544, --faint #8d8371, --line #e8e1cc,
+     --shade #f4eedc, --accent #2e7d3a, --accent-ink #25612f,
+     --accent-soft #e5efe0, honey pair #a3691a/#8a5410) and the
+     base/.k/.wrap/.top/.nav/.eyebrow/.foot/syntax-token rules
+     below are copied VERBATIM from tiliajs/style.css as of this
+     writing. If style.css changes, re-copy — or better, move the
+     docs-specific rules (marked "docs page" below) into style.css
+     and drop this inline block.
+   - Fonts are assumed to live at ./fonts/ next to this file
+     (verified: they do).
+   ============================================================ */
+
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("./fonts/ibm-plex-sans-400.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("./fonts/ibm-plex-sans-500.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("./fonts/ibm-plex-sans-600.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("./fonts/ibm-plex-mono-400.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("./fonts/ibm-plex-mono-500.woff2") format("woff2"); }
+
+:root {
+  --paper: #fbf6e9;
+  --card: #fffdf4;
+  --ink: #1d1a14;
+  --muted: #5c5544;
+  --faint: #8d8371;
+  --line: #e8e1cc;
+  --shade: #f4eedc;
+
+  --leaf: #2e7d3a;
+  --leaf-ink: #25612f;
+  --honey: #a3691a;
+  --honey-ink: #8a5410;
+  --honey-soft: #f5ecd9;
+
+  --accent: #2e7d3a;
+  --accent-ink: #25612f;
+  --accent-soft: #e5efe0;
+  --accent-deep: #1e5227;
+  --btn-label: #fdfbf4;
+
+  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* ---------- base (shared with api.html) ---------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum";
+}
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+figure { margin: 0; }
+a { color: inherit; }
+::selection { background: var(--accent-soft); }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+.k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: clamp(20px, 4vw, 36px);
+  padding-right: clamp(20px, 4vw, 36px);
+}
+
+/* skip link */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 18px;
+}
+.skip:focus { left: 0; }
+
+/* ---------- header (shared) ---------- */
+.top { border-bottom: 1px solid var(--line); }
+.top .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+}
+.wordmark svg { display: block; color: var(--leaf); }
+.nav { display: flex; gap: clamp(14px, 3vw, 26px); }
+.nav a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+}
+.nav a:hover { color: var(--accent-ink); border-bottom-color: var(--accent-ink); }
+.nav a[aria-current="page"] { color: var(--accent-ink); border-bottom-color: var(--accent-ink); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 14px;
+}
+.eyebrow .sep { color: var(--faint); padding: 0 6px; }
+
+/* hand-set syntax tokens (shared) */
+.tk { color: var(--leaf-ink); }
+.ts { color: var(--honey-ink); }
+.tc { color: var(--faint); font-style: italic; }
+.tf { font-weight: 500; }
+
+/* ---------- footer (shared) ---------- */
+.foot { border-top: 1.5px solid var(--ink); background: var(--paper); }
+.foot .wrap {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  justify-content: space-between;
+  gap: 12px 28px;
+  padding-top: 18px;
+  padding-bottom: 22px;
+}
+.fcell { min-width: 0; }
+.fcell .lbl {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 3px;
+}
+.fcell .val { font-family: var(--mono); font-size: 12.5px; color: var(--ink); overflow-wrap: anywhere; }
+.fcell .val a { text-decoration: none; color: var(--accent-ink); }
+.fcell .val a:hover { text-decoration: underline; }
+
+/* ============================================================
+   docs page — new rules from here down
+   ============================================================ */
+
+.docs-head {
+  padding-top: clamp(40px, 6vw, 64px);
+  padding-bottom: clamp(28px, 4vw, 40px);
+  border-bottom: 1px solid var(--line);
+}
+.docs-head h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.015em; }
+.standfirst {
+  margin-top: 12px;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 16.5px;
+}
+.standfirst a { color: var(--accent-ink); }
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+  padding-top: clamp(32px, 5vw, 52px);
+  padding-bottom: clamp(52px, 8vw, 88px);
+}
+
+/* toc — numbered reading path */
+.toc { position: sticky; top: 24px; }
+.toc .idx-group {
+  color: var(--faint);
+  margin: 0 0 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--line);
+}
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ch;
+}
+.toc li { counter-increment: ch; }
+.toc a {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 5px 0 5px 10px;
+  border-left: 2px solid transparent;
+}
+.toc a::before {
+  content: counter(ch, decimal-leading-zero);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+.toc a:hover { color: var(--accent-ink); border-left-color: var(--accent); }
+.toc a[aria-current="true"] {
+  color: var(--accent-ink);
+  border-left-color: var(--accent);
+}
+.toc a[aria-current="true"]::before { color: var(--accent-ink); }
+
+/* chapters */
+.chapters { max-width: 70ch; }
+.chapter { scroll-margin-top: 24px; }
+.chapter + .chapter {
+  margin-top: clamp(44px, 6vw, 64px);
+  padding-top: clamp(44px, 6vw, 64px);
+  border-top: 1px solid var(--line);
+}
+.ch-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.ch-kicker .no {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-ink);
+  letter-spacing: 0.14em;
+}
+.ch-kicker .rule { flex: 1; height: 1px; background: var(--line); }
+.chapter h2 { font-size: clamp(22px, 3vw, 27px); font-weight: 600; letter-spacing: -0.01em; }
+.chapter h2 a { text-decoration: none; }
+.chapter h2 a:hover { color: var(--accent-ink); }
+.chapter h2 a:hover::after { content: " #"; color: var(--line); }
+.chapter h3 { font-size: 17.5px; font-weight: 600; margin-top: 34px; }
+
+.chapter p.body { margin-top: 16px; font-size: 15.5px; color: var(--muted); }
+.chapter p.body strong { color: var(--ink); font-weight: 600; }
+.chapter p.body code, .story code, .pro code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  background: var(--shade);
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+}
+.chapter p.body a { color: var(--accent-ink); }
+
+/* example — white card, thin border, EXAMPLE label (matches api.html .ex) */
+.example {
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.exbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.exbar .k { color: var(--faint); }
+.example pre {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+/* dual-language visibility — one attribute on <html> drives everything */
+html[data-lang="ts"] [data-pair] pre.language-rescript { display: none; }
+html[data-lang="res"] [data-pair] pre.language-typescript { display: none; }
+
+/* toggle — stateless: rendered from the same html[data-lang] attribute */
+.lang-toggle {
+  appearance: none;
+  display: inline-flex;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+.lang-toggle .lt {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  color: var(--muted);
+}
+.lang-toggle .lt + .lt { border-left: 1px solid var(--line); }
+html[data-lang="ts"] .lang-toggle .lt-ts { background: var(--ink); color: var(--paper); }
+html[data-lang="res"] .lang-toggle .lt-res {
+  background: var(--honey-soft);
+  color: var(--honey-ink);
+  box-shadow: inset 0 0 0 1px var(--honey);
+}
+
+/* story — italic, quiet aside for narrative beats */
+.story {
+  margin-top: 22px;
+  padding: 2px 0 2px 20px;
+  border-left: 2px solid var(--line);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--muted);
+}
+.story .k {
+  display: block;
+  font-style: normal;
+  color: var(--faint);
+  margin-bottom: 4px;
+}
+
+/* pro — bordered tip, small-caps PRO TIP label, no emoji */
+.pro {
+  margin-top: 22px;
+  padding: 14px 18px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: var(--card);
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.pro .k { display: block; color: var(--accent-ink); font-weight: 500; margin-bottom: 6px; }
+
+/* end-of-chapter reference cross-link */
+.xref {
+  margin-top: 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.xref a {
+  color: var(--accent-ink);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 12px;
+}
+.xref a:hover { text-decoration: underline; }
+.xref .arrow { color: var(--accent-ink); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 820px) {
+  .docs-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .toc { position: static; }
+  .toc ol { column-count: 2; column-gap: 24px; }
+}
+@media (max-width: 680px) {
+  .toc ol { column-count: 1; }
+  .foot .wrap { grid-template-columns: 1fr 1fr; }
+  .nav a:not([href$="api.html"]):not([href*="github"]) { display: none; }
+}
+@media print {
+  body { background: #fff; }
+  .lang-toggle { display: none; }
+  .example, .pro { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#content">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="wordmark" href="./index.html" aria-label="tilia — home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3C7.2 4.9 4.6 8.8 5.5 13.3 6.3 17 9 20.1 12 21c3-0.9 5.7-4 6.5-7.7C19.4 8.8 16.8 4.9 12 3Z"/>
+        <path d="M12 7v10M12 11.5 9.2 9.7M12 11.5l2.8-1.8M12 15.5 8.8 13.4M12 15.5l3.2-2.1" stroke-width="1.1"/>
+      </svg>
+      tilia
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="./index.html">Home</a>
+      <a href="./docs.html" aria-current="page">Docs</a>
+      <a href="./api.html">API</a>
+      <a href="#">Compare</a>
+      <a href="https://github.com/tiliajs/tilia">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="content">
+
+  <div class="docs-head">
+    <div class="wrap">
+      <p class="eyebrow">Docs<span class="sep">·</span>v1.x<span class="sep">·</span>Guided tour</p>
+      <h1>The Guide</h1>
+      <p class="standfirst">A reading path through tilia, in order: the mental model first, then tracking, computed values, observers, and React. Read it top to bottom once. When you need to look something up later, use the <a href="./api.html">API reference</a> instead — it is flat, complete, and made for that.</p>
+    </div>
+  </div>
+
+  <div class="wrap docs-layout">
+
+    <nav class="toc" aria-label="Chapters">
+      <p class="k idx-group">Read in order</p>
+      <ol>
+        <li><a href="#mental-model">The mental model</a></li>
+        <li><a href="#getting-started">Getting started</a></li>
+        <li><a href="#tracking">Tracking</a></li>
+        <li><a href="#computed">Computed values</a></li>
+        <li><a href="#observing">Observing</a></li>
+        <li><a href="#collections">Arrays and nesting</a></li>
+        <li><a href="#react">React integration</a></li>
+        <li><a href="#next">Where to go next</a></li>
+      </ol>
+    </nav>
+
+    <div class="chapters">
+      <!-- NOTE (blueprint): prose and code are realistic placeholders set for
+           layout. Verify behavior claims against the tilia implementation
+           repo before publishing. -->
+
+      <section class="chapter" id="mental-model">
+        <div class="ch-kicker"><span class="no">01</span><span class="rule"></span></div>
+        <h2><a href="#mental-model">The mental model</a></h2>
+        <p class="body">Here is all of tilia, in one sentence: <strong><a href="./api.html#tilia"><code>tilia(value)</code></a> returns a reactive proxy with the same type and the same shape as <code>value</code></strong>. Reads and writes are ordinary property access. There is no wrapper API to learn, no <code>.get()</code>, no <code>.set()</code>, nothing to unwrap. Your domain model stays your domain model — it just becomes observable.</p>
+        <p class="body">Reactivity is <strong>pull-based</strong>: a value is computed when something reads it, and invalidated when one of its dependencies changes. Nothing recomputes eagerly in the background. Nested objects become reactive on first access, so one call at the root of your model is enough.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">const</span> forest = <span class="tf">tilia</span>({ trees: <span class="ts">120</span>, health: <span class="ts">'good'</span> })
+
+forest.trees        <span class="tc">// read: plain property access</span>
+forest.trees += <span class="ts">1</span>   <span class="tc">// write: plain assignment</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">let</span> forest = <span class="tf">tilia</span>({trees: <span class="ts">120</span>, health: <span class="ts">"good"</span>})
+
+forest.trees                    <span class="tc">// read: plain field access</span>
+forest.trees = forest.trees + <span class="ts">1</span> <span class="tc">// write: plain assignment</span></code></pre>
+        </figure>
+        <p class="body">If you keep one thing from this page, keep this: <strong>you never talk to tilia, you talk to your data</strong>. Everything that follows — tracking, computed values, observers — is just what happens around ordinary reads and writes.</p>
+        <p class="xref">Reference: <a href="./api.html#tilia">tilia(value)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="getting-started">
+        <div class="ch-kicker"><span class="no">02</span><span class="rule"></span></div>
+        <h2><a href="#getting-started">Getting started</a></h2>
+        <p class="body">Install the package:</p>
+        <figure class="example">
+          <figcaption class="exbar"><span class="k">Shell</span></figcaption>
+          <pre><code>npm install tilia   <span class="tc"># or: pnpm add tilia</span></code></pre>
+        </figure>
+        <p class="body">The smallest complete loop is three steps: create a tilia object, observe it, change it. The observer runs once immediately, then re-runs whenever a value it read changes.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">import</span> { tilia, observe } <span class="tk">from</span> <span class="ts">'tilia'</span>
+
+<span class="tk">const</span> forest = <span class="tf">tilia</span>({ trees: <span class="ts">120</span> })
+
+<span class="tf">observe</span>(() =&gt; {
+  console.<span class="tf">log</span>(<span class="ts">`</span>${forest.trees}<span class="ts"> trees`</span>)
+})
+<span class="tc">// logs "120 trees" immediately</span>
+
+forest.trees += <span class="ts">1</span>
+<span class="tc">// logs "121 trees"</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">open</span> <span class="tf">Tilia</span>
+
+<span class="tk">let</span> forest = <span class="tf">tilia</span>({trees: <span class="ts">120</span>})
+
+<span class="tf">observe</span>(() =&gt; {
+  Console.<span class="tf">log</span>(<span class="ts">`</span>${forest.trees-&gt;Int.toString}<span class="ts"> trees`</span>)
+})
+<span class="tc">// logs "120 trees" immediately</span>
+
+forest.trees = forest.trees + <span class="ts">1</span>
+<span class="tc">// logs "121 trees"</span></code></pre>
+        </figure>
+        <p class="body">That is the whole ceremony. No store setup, no provider, no action definitions — the rest of this guide is about what tilia does with the reads and writes you were already making.</p>
+        <p class="xref">Reference: <a href="./api.html#tilia">tilia(value)</a>, <a href="./api.html#observe">observe(fn)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="tracking">
+        <div class="ch-kicker"><span class="no">03</span><span class="rule"></span></div>
+        <h2><a href="#tracking">Tracking</a></h2>
+        <p class="body">How does tilia know what to re-run? While an observer runs, tilia records every property it reads. Those reads become the observer's dependencies. When any of those properties is written, the observer re-runs — and its dependencies are recorded again, from scratch.</p>
+        <p class="body">Re-recording on every run matters more than it sounds: <strong>tracking follows your control flow</strong>. A branch that stops reading a value stops depending on it.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tf">observe</span>(() =&gt; {
+  <span class="tk">if</span> (forest.health === <span class="ts">'poor'</span>) {
+    console.<span class="tf">log</span>(<span class="ts">`only </span>${forest.trees}<span class="ts"> trees left`</span>)
+  }
+})
+<span class="tc">// while health is 'good', writes to `trees` do nothing:</span>
+<span class="tc">// this run never read `trees`, so it does not depend on it</span></code></pre>
+          <pre class="language-rescript"><code><span class="tf">observe</span>(() =&gt; {
+  <span class="tk">if</span> forest.health == <span class="ts">"poor"</span> {
+    Console.<span class="tf">log</span>(<span class="ts">`only </span>${forest.trees-&gt;Int.toString}<span class="ts"> trees left`</span>)
+  }
+})
+<span class="tc">// while health is "good", writes to `trees` do nothing:</span>
+<span class="tc">// this run never read `trees`, so it does not depend on it</span></code></pre>
+        </figure>
+        <div class="pro">
+          <span class="k">Pro tip</span>
+          Tracking is per-property, not per-object. Writing <code>forest.health</code> only wakes observers that actually read <code>health</code>. You get fine-grained updates without selectors, simply by reading what you need and nothing more.
+        </div>
+        <p class="xref">Reference: <a href="./api.html#observe">observe(fn)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="computed">
+        <div class="ch-kicker"><span class="no">04</span><span class="rule"></span></div>
+        <h2><a href="#computed">Computed values</a></h2>
+        <p class="body">A <a href="./api.html#computed"><code>computed</code></a> is a property whose value is derived from other reactive values. You declare it in place, inside the object, and read it like any other field. Pull reactivity applies: the function runs when the property is read, and its result is cached until a dependency changes.</p>
+        <p class="body">Meet Alice. Her <code>age</code> is not stored anywhere — it is derived from her birth date and a shared <code>now</code>.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">import</span> { tilia, computed } <span class="tk">from</span> <span class="ts">'tilia'</span>
+
+<span class="tk">const</span> time = <span class="tf">tilia</span>({ now: Date.<span class="tf">now</span>() })
+
+<span class="tk">const</span> born = Date.<span class="tf">parse</span>(<span class="ts">'2012-04-30'</span>)
+<span class="tk">const</span> alice = <span class="tf">tilia</span>({
+  born,
+  age: <span class="tf">computed</span>(() =&gt; Math.<span class="tf">floor</span>((time.now - born) / YEAR)),
+})
+
+alice.age      <span class="tc">// 14 — computed on read</span>
+time.now += <span class="ts">2</span> * YEAR
+alice.age      <span class="tc">// 16 — recomputed, `now` changed</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">open</span> <span class="tf">Tilia</span>
+
+<span class="tk">let</span> time = <span class="tf">tilia</span>({now: Date.<span class="tf">now</span>()})
+
+<span class="tk">let</span> born = Date.<span class="tf">parse</span>(<span class="ts">"2012-04-30"</span>)
+<span class="tk">let</span> alice = <span class="tf">tilia</span>({
+  born,
+  age: <span class="tf">computed</span>(() =&gt; Math.<span class="tf">floor</span>((time.now -. born) /. year)),
+})
+
+alice.age            <span class="tc">// 14. — computed on read</span>
+time.now = time.now +. <span class="ts">2.</span> *. year
+alice.age            <span class="tc">// 16. — recomputed, `now` changed</span></code></pre>
+        </figure>
+        <div class="story">
+          <span class="k">Story</span>
+          Alice can grow older :-) — nothing set her age; the world moved, and the value followed. That is the whole promise of derived state: you describe what a value <em>is</em>, and stop writing the code that keeps it up to date.
+        </div>
+
+        <h3>Chaining computed values</h3>
+        <p class="body">Computed values can read other computed values, and tilia tracks the whole chain. A small store: the <code>subtotal</code> sums the items, the <code>discount</code> depends on the subtotal, the <code>total</code> depends on both. Change a quantity and every downstream value is invalidated — but nothing recomputes until somebody reads it.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">const</span> store = <span class="tf">tilia</span>({
+  items: [
+    { name: <span class="ts">'chair'</span>, price: <span class="ts">55</span>, qty: <span class="ts">2</span> },
+    { name: <span class="ts">'lamp'</span>,  price: <span class="ts">30</span>, qty: <span class="ts">1</span> },
+  ],
+  subtotal: <span class="tf">computed</span>(() =&gt;
+    store.items.<span class="tf">reduce</span>((sum, i) =&gt; sum + i.price * i.qty, <span class="ts">0</span>)
+  ),
+  discount: <span class="tf">computed</span>(() =&gt; store.subtotal &gt; <span class="ts">100</span> ? <span class="ts">0.1</span> : <span class="ts">0</span>),
+  total:    <span class="tf">computed</span>(() =&gt; store.subtotal * (<span class="ts">1</span> - store.discount)),
+})
+
+store.total          <span class="tc">// 126 — subtotal 140, 10% off</span>
+store.items[<span class="ts">0</span>].qty = <span class="ts">1</span>
+store.total          <span class="tc">// 85 — under 100, discount gone</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">let</span> store = Tilia.<span class="tf">make</span>(self =&gt; {
+  items: [
+    {name: <span class="ts">"chair"</span>, price: <span class="ts">55.</span>, qty: <span class="ts">2.</span>},
+    {name: <span class="ts">"lamp"</span>, price: <span class="ts">30.</span>, qty: <span class="ts">1.</span>},
+  ],
+  subtotal: <span class="tf">computed</span>(() =&gt;
+    self.items-&gt;Array.<span class="tf">reduce</span>(<span class="ts">0.</span>, (sum, i) =&gt; sum +. i.price *. i.qty)
+  ),
+  discount: <span class="tf">computed</span>(() =&gt; self.subtotal &gt; <span class="ts">100.</span> ? <span class="ts">0.1</span> : <span class="ts">0.</span>),
+  total: <span class="tf">computed</span>(() =&gt; self.subtotal *. (<span class="ts">1.</span> -. self.discount)),
+})
+
+store.total                <span class="tc">// 126. — subtotal 140., 10% off</span>
+store.items[<span class="ts">0</span>].qty = <span class="ts">1.</span>
+store.total                <span class="tc">// 85. — under 100., discount gone</span></code></pre>
+        </figure>
+        <div class="pro">
+          <span class="k">Pro tip</span>
+          Because computed values are lazy, a long chain costs nothing while nobody looks at it. Do not hesitate to derive freely — the price is paid on read, once, and cached.
+        </div>
+        <p class="xref">Reference: <a href="./api.html#computed">computed(fn)</a>, <a href="./api.html#tilia">tilia(value)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="observing">
+        <div class="ch-kicker"><span class="no">05</span><span class="rule"></span></div>
+        <h2><a href="#observing">Observing</a></h2>
+        <p class="body">Where computed values derive data from data, <a href="./api.html#observe"><code>observe(fn)</code></a> pushes data out into the world: the document title, a websocket, localStorage. The function runs once immediately, and re-runs whenever a reactive value it read during its last run changes.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">const</span> stop = <span class="tf">observe</span>(() =&gt; {
+  document.title = <span class="ts">`</span>${forest.trees}<span class="ts"> trees`</span>
+})
+
+<span class="tc">// later, when the effect should end:</span>
+<span class="tf">stop</span>()</code></pre>
+          <pre class="language-rescript"><code><span class="tk">let</span> stop = <span class="tf">observe</span>(() =&gt; {
+  Document.<span class="tf">setTitle</span>(<span class="ts">`</span>${forest.trees-&gt;Int.toString}<span class="ts"> trees`</span>)
+})
+
+<span class="tc">// later, when the effect should end:</span>
+<span class="tf">stop</span>()</code></pre>
+        </figure>
+        <p class="body">Two rules of thumb keep observers healthy. First, <strong>read inside, write outside</strong>: an observer that writes a value it also reads is a loop. Second, keep each observer about one effect — small observers have small dependency sets, and small dependency sets re-run rarely.</p>
+        <p class="xref">Reference: <a href="./api.html#observe">observe(fn)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="collections">
+        <div class="ch-kicker"><span class="no">06</span><span class="rule"></span></div>
+        <h2><a href="#collections">Arrays and nesting</a></h2>
+        <p class="body">tilia does not stop at the first level. Arrays, and objects inside arrays, become reactive on first access — the proxy spreads through your model as you read it. Mutating methods like <code>push</code> and index assignment are tracked like any other write.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">const</span> grove = <span class="tf">tilia</span>({
+  trees: [
+    { species: <span class="ts">'linden'</span>, height: <span class="ts">12</span> },
+    { species: <span class="ts">'oak'</span>,    height: <span class="ts">18</span> },
+  ],
+})
+
+<span class="tf">observe</span>(() =&gt; {
+  console.<span class="tf">log</span>(<span class="ts">`tallest: </span>${Math.max(...grove.trees.map(t =&gt; t.height))}<span class="ts">m`</span>)
+})
+
+grove.trees[<span class="ts">0</span>].height = <span class="ts">13</span>              <span class="tc">// deep write: re-runs</span>
+grove.trees.<span class="tf">push</span>({ species: <span class="ts">'ash'</span>, height: <span class="ts">21</span> }) <span class="tc">// re-runs too</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">let</span> grove = <span class="tf">tilia</span>({
+  trees: [
+    {species: <span class="ts">"linden"</span>, height: <span class="ts">12.</span>},
+    {species: <span class="ts">"oak"</span>, height: <span class="ts">18.</span>},
+  ],
+})
+
+<span class="tf">observe</span>(() =&gt; {
+  <span class="tk">let</span> tallest = grove.trees-&gt;Array.<span class="tf">reduce</span>(<span class="ts">0.</span>, (m, t) =&gt; Math.<span class="tf">max</span>(m, t.height))
+  Console.<span class="tf">log</span>(<span class="ts">`tallest: </span>${tallest-&gt;Float.toString}<span class="ts">m`</span>)
+})
+
+grove.trees[<span class="ts">0</span>].height = <span class="ts">13.</span>                    <span class="tc">// deep write: re-runs</span>
+grove.trees-&gt;Array.<span class="tf">push</span>({species: <span class="ts">"ash"</span>, height: <span class="ts">21.</span>}) <span class="tc">// re-runs too</span></code></pre>
+        </figure>
+        <div class="pro">
+          <span class="k">Pro tip</span>
+          An observer that iterates a whole array depends on the whole array. If a view only needs one row, read that one row — <code>grove.trees[3].height</code> — and other rows can change without waking it.
+        </div>
+        <p class="xref">Reference: <a href="./api.html#tilia">tilia(value)</a>, <a href="./api.html#observe">observe(fn)</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="react">
+        <div class="ch-kicker"><span class="no">07</span><span class="rule"></span></div>
+        <h2><a href="#react">React integration</a></h2>
+        <p class="body">A React component is, from tilia's point of view, just another observer — one whose effect is rendering. <a href="./api.html#usetilia"><code>useTilia()</code></a>, called once at the top of a component, tracks the render exactly like an <code>observe</code> run: the component re-renders when a property it read changes, and never otherwise.</p>
+        <figure class="example" data-pair>
+          <figcaption class="exbar">
+            <span class="k">Example</span>
+            <button class="lang-toggle" type="button" aria-label="Switch example language">
+              <span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span>
+            </button>
+          </figcaption>
+          <pre class="language-typescript"><code><span class="tk">import</span> { useTilia } <span class="tk">from</span> <span class="ts">'@tilia/react'</span>
+
+<span class="tk">function</span> <span class="tf">Forest</span>() {
+  <span class="tf">useTilia</span>()
+  <span class="tk">return</span> &lt;p&gt;{forest.trees} trees&lt;/p&gt;
+}
+
+<span class="tc">// re-renders when `trees` changes; a write to</span>
+<span class="tc">// `forest.health` does not touch this component</span></code></pre>
+          <pre class="language-rescript"><code><span class="tk">@react.component</span>
+<span class="tk">let</span> make = () =&gt; {
+  <span class="tf">useTilia</span>()
+  &lt;p&gt; {React.string(<span class="ts">`</span>${forest.trees-&gt;Int.toString}<span class="ts"> trees`</span>)} &lt;/p&gt;
+}
+
+<span class="tc">// re-renders when `trees` changes; a write to</span>
+<span class="tc">// `forest.health` does not touch this component</span></code></pre>
+        </figure>
+        <p class="body">Notice what is absent: no selector functions, no context provider, no memoization to get right. Components read the domain directly, and precision comes from the same tracking rule as everywhere else — you depend on what you read.</p>
+        <p class="xref">Reference: <a href="./api.html#usetilia">useTilia()</a> <span class="arrow">→</span></p>
+      </section>
+
+      <section class="chapter" id="next">
+        <div class="ch-kicker"><span class="no">08</span><span class="rule"></span></div>
+        <h2><a href="#next">Where to go next</a></h2>
+        <p class="body">You now have the whole mental model: one call makes your data observable, tracking follows your reads, computed values derive, observers push outward, React renders are tracked runs. From here:</p>
+        <p class="body"><strong><a href="./api.html">API reference</a></strong> — the complete public surface, one entry per symbol, with signatures and edge cases. This is where you look things up from now on.</p>
+        <p class="body"><strong>Recipes</strong> <em>(coming soon)</em> — task-shaped guides: persisting state, undo, forms, talking to a server with <a href="./query.html">@tilia/query</a>.</p>
+        <p class="xref">Reference: <a href="./api.html">api.html</a> <span class="arrow">→</span></p>
+      </section>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcell"><span class="lbl">Package</span><span class="val"><a href="https://www.npmjs.com/package/tilia">tilia on npm</a></span></div>
+    <div class="fcell"><span class="lbl">Source</span><span class="val"><a href="https://github.com/tiliajs/tilia">github.com/tiliajs/tilia</a></span></div>
+    <div class="fcell"><span class="lbl">License</span><span class="val">MIT</span></div>
+    <div class="fcell"><span class="lbl">Method</span><span class="val"><a href="https://epure.dev">épure</a></span></div>
+    <div class="fcell"><span class="lbl">Site</span><span class="val">tiliajs.com</span></div>
+  </div>
+</footer>
+
+<script>
+/* Language toggle: one delegated listener flips html[data-lang] and persists.
+   The buttons carry no state — CSS renders them from the attribute. */
+document.addEventListener("click", function (e) {
+  if (!e.target.closest(".lang-toggle")) return;
+  var next = document.documentElement.getAttribute("data-lang") === "ts" ? "res" : "ts";
+  document.documentElement.setAttribute("data-lang", next);
+  try { localStorage.setItem("tilia-lang", next); } catch (err) {}
+});
+
+/* Scroll-spy: highlight the current chapter in the reading path. */
+(function () {
+  var links = {};
+  document.querySelectorAll(".toc a[href^='#']").forEach(function (a) {
+    links[a.hash.slice(1)] = a;
+  });
+  var spy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      Object.keys(links).forEach(function (id) { links[id].removeAttribute("aria-current"); });
+      links[en.target.id].setAttribute("aria-current", "true");
+    });
+  }, { rootMargin: "-10% 0px -75% 0px" });
+  document.querySelectorAll(".chapter[id]").forEach(function (s) { spy.observe(s); });
+})();
+</script>
+
+</body>
+</html>
