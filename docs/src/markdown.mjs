@@ -21,7 +21,7 @@ export function highlightCode(highlighter, code, lang) {
 }
 
 export const toggleButton =
-  '<button class="toggle" type="button" aria-label="Switch example language"><span class="ts">ts</span> | <span class="res">res</span></button>';
+  '<button class="lang-toggle" type="button" aria-label="Switch example language"><span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span></button>';
 
 function markCallouts(file, body) {
   const re = /^:::[ \t]*(\S*)$/gm;
@@ -71,14 +71,14 @@ export function createMarkdown(highlighter) {
 
   md.use(container, "story", {
     render(tokens, idx) {
-      return tokens[idx].nesting === 1 ? '<aside class="story">\n' : "</aside>\n";
+      return tokens[idx].nesting === 1 ? '<div class="story">\n<span class="k">Story</span>\n' : "</div>\n";
     },
   });
   md.use(container, "pro", {
     render(tokens, idx) {
       return tokens[idx].nesting === 1
-        ? '<aside class="pro"><p class="k pro-label">Pro tip</p>\n'
-        : "</aside>\n";
+        ? '<div class="pro">\n<span class="k">Pro tip</span>\n'
+        : "</div>\n";
     },
   });
 
@@ -93,6 +93,31 @@ export function createMarkdown(highlighter) {
     const codeHtml = highlightCode(highlighter, token.content.replace(/\n$/, ""), lang);
     const pair = token.meta && token.meta.pair;
     let out = "";
+    if (env.page === "docs") {
+      if (pair === "start") {
+        out += `<figure class="example" data-pair><figcaption class="exbar"><span class="k">Example</span>${toggleButton}</figcaption>`;
+      } else if (!pair) {
+        out += `<figure class="example"><figcaption class="exbar"><span class="k">Example</span></figcaption>`;
+      }
+      out += codeHtml;
+      if (pair === "end" || !pair) out += `</figure>`;
+      return out;
+    }
+    if (env.page === "api") {
+      if (pair === "start") {
+        out += `<figure class="ex" data-pair><figcaption class="exbar"><span class="k">Example</span>${toggleButton}</figcaption>`;
+        out += codeHtml;
+        return out;
+      }
+      if (pair === "end") {
+        out += codeHtml;
+        out += `</figure>`;
+        return out;
+      }
+      const plain = codeHtml.replace(/^<pre class="language-[^"]+">/, '<pre class="code">');
+      out += `<figure class="ex"><figcaption class="k">Example</figcaption>${plain}</figure>`;
+      return out;
+    }
     if (pair === "start") out += `<div class="example" data-pair>${toggleButton}`;
     else if (!pair) out += `<div class="example">`;
     out += codeHtml;
@@ -103,9 +128,9 @@ export function createMarkdown(highlighter) {
   return md;
 }
 
-export function renderBody(md, file, body, { allowHeadings }) {
+export function renderBody(md, file, body, { allowHeadings, page = "api" }) {
   markCallouts(file, body);
-  const env = { file };
+  const env = { file, page };
   const tokens = md.parse(body, env);
   if (!allowHeadings) assertNoHeadings(file, tokens);
   markFencePairs(tokens);

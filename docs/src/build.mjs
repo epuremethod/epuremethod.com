@@ -103,14 +103,20 @@ function crossValidate(entries, chapters, errors) {
 function renderBodies(md, entries, chapters, errors) {
   for (const e of entries) {
     try {
-      e.bodyHtml = renderBody(md, `content/api/${e.file}`, e.body, { allowHeadings: false });
+      e.bodyHtml = renderBody(md, `content/api/${e.file}`, e.body, {
+        allowHeadings: false,
+        page: "api",
+      });
     } catch (err) {
       errors.push(err.message);
     }
   }
   for (const c of chapters) {
     try {
-      c.bodyHtml = renderBody(md, `content/guide/${c.file}`, c.body, { allowHeadings: true });
+      c.bodyHtml = renderBody(md, `content/guide/${c.file}`, c.body, {
+        allowHeadings: true,
+        page: "docs",
+      });
     } catch (err) {
       errors.push(err.message);
     }
