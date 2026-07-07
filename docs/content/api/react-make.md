@@ -28,10 +28,7 @@ void reactApi.useTilia;
 ```
 
 ```rescript
-open Tilia
-open TiliaReact
-
-let ctx = make()
-let reactApi = make(ctx)
+let ctx = Tilia.make()
+let reactApi = TiliaReact.make(ctx)
 ignore(reactApi.useTilia)
 ```

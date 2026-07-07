@@ -2,7 +2,7 @@
 title: What keeps it honest
 slug: what-keeps-it-honest
 sort: 9
-refs: [computed, observe]
+refs: [computed, make]
 ---
 
 A library that promises "the running program stays true to the declaration" owes you an account of the failure modes: what happens when a computation is declared in the wrong place, when a callback throws, when observers come and go by the thousands. tilia's answers are specific, and they are the reason the rest of this guide could be so confident.
@@ -60,7 +60,7 @@ The default suits most applications; an app with heavy mount/unmount churn can r
 ```typescript
 import { make } from "tilia";
 
-const ctx = make(); // a separate context: its own forest, its own observers
+const ctx = make(100); // a separate context: its own forest, its own observers
 const card = ctx.tilia({ front: "gato" });
 ```
 

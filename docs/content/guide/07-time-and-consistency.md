@@ -2,7 +2,7 @@
 title: Time and consistency
 slug: time-and-consistency
 sort: 7
-refs: [observe, computed]
+refs: [batch, watch, observe]
 ---
 
 Reactivity is easy to demonstrate and subtle to schedule. *When* does an observer run — immediately, or once things settle? tilia has one clear rule, one tool for the exception, and one function whose whole purpose is separating cause from effect. This chapter is the guide's most technical, and the one that pays off longest.

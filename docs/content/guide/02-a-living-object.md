@@ -57,7 +57,7 @@ card.interval = 3; // ✨ triggers the observe callback
 open Tilia
 
 observe(() => {
-  Js.log(`"${card.front}" comes back in ${Int.toString(card.interval)} day(s)`)
+  Js.log(`"${card.front}" comes back in ${card.interval->Int.toString} day(s)`)
 })
 
 card.interval = 3 // ✨ triggers the observe callback
@@ -74,7 +74,10 @@ Two details complete the picture. Writing a value that is *equal* to the current
 Reactive objects do not need to share a root. Separate `tilia` objects live in one shared context, and a single observer can depend on several of them:
 
 ```typescript
-const alice = tilia({ name: "Alice", streak: 0 });
+const alice = tilia({
+  name: "Alice",
+  streak: 0,
+});
 const settings = tilia({ dailyGoal: 10 });
 
 observe(() => {
@@ -86,11 +89,14 @@ settings.dailyGoal = 20; // ✨ also triggers
 ```
 
 ```rescript
-let alice = tilia({name: "Alice", streak: 0})
+let alice = tilia({
+  name: "Alice",
+  streak: 0,
+})
 let settings = tilia({dailyGoal: 10})
 
 observe(() => {
-  Js.log(`${alice.name}: ${Int.toString(alice.streak)} / ${Int.toString(settings.dailyGoal)}`)
+  Js.log(`${alice.name}: ${alice.streak->Int.toString} / ${settings.dailyGoal->Int.toString}`)
 })
 
 alice.streak = 1 // ✨ triggers

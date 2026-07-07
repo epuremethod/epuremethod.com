@@ -16,12 +16,15 @@ tags: []
 
 Nested batches are supported. While inside a batch, writes update state immediately but observers are notified only after unlock. This prevents transient intermediate notifications.
 
-`observe`, `watch` effects, and computed rebuilds already run under deferred flushing. Use `batch` for grouped writes from non-reactive callbacks. See [watch](api.html#watch) and guide chapter [Time and Consistency](docs.html#time-and-consistency).
+`observe`, `watch` effects, and computed rebuilds already run under deferred flushing. Use `batch` for grouped writes from non-reactive callbacks. See [watch](api.html#watch) and guide chapter [Time and consistency](docs.html#time-and-consistency).
 
 ```typescript
 import { batch, tilia } from "tilia";
 
-const rect = tilia({ width: 100, height: 50 });
+const rect = tilia({
+  width: 100,
+  height: 50,
+});
 
 batch(() => {
   rect.width = 200;
@@ -32,7 +35,10 @@ batch(() => {
 ```rescript
 open Tilia
 
-let rect = tilia({width: 100, height: 50})
+let rect = tilia({
+  width: 100,
+  height: 50,
+})
 
 batch(() => {
   rect.width = 200

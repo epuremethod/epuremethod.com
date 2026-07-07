@@ -29,7 +29,9 @@ void build;
 ```rescript
 open Tilia
 
-let build = (d: deriver<{value: int}>) => {
+type counter = {value: int, double: int}
+
+let build = (d: deriver<counter>) => {
   value: 1,
   double: d.derived(self => self.value * 2),
 }

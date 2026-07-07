@@ -16,12 +16,12 @@ tags: []
 
 When tracked keys change, the wrapped component re-renders. The API is equivalent to a higher-order component and is the preferred React integration over [useTilia](api.html#use-tilia).
 
-See guide chapter [Tilia in React](docs.html#tilia-in-react) and [useComputed](api.html#use-computed).
+See guide chapter [tilia in React](docs.html#tilia-in-react) and [useComputed](api.html#use-computed).
 
 ```typescript
 import { leaf } from "@tilia/react";
 
-export const Counter = leaf(() => {
+const Counter = leaf(() => {
   return <p>{app.count}</p>;
 });
 ```
@@ -31,6 +31,6 @@ open TiliaReact
 
 @react.component
 let make = leaf(() => {
-  <p> {React.int(app.count)} </p>
+  <p> {app.count->React.int} </p>
 })
 ```

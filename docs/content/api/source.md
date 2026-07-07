@@ -16,32 +16,34 @@ tags: []
 
 `previous` is the latest value held by the source, and `set` updates it. If `fn` does asynchronous work, dependencies must still be read synchronously before awaiting; only synchronous reads are tracked.
 
-If dependencies change, the current value stays available until `set` is called again. See [store](api.html#store), [carve](api.html#carve), and guide chapter [Letting the World In](docs.html#letting-the-world-in).
+If dependencies change, the current value stays available until `set` is called again — below, the previous cards stay visible while the new deck loads. See [store](api.html#store), [carve](api.html#carve), and guide chapter [Letting the world in](docs.html#letting-the-world-in).
 
 ```typescript
 import { signal, source, tilia } from "tilia";
 
-const [url, setUrl] = signal("helena");
+const [deckId, setDeckId] = signal("spanish");
+
 const app = tilia({
-  name: source("Medea", (previous, set) => {
-    set(url.value === "helena" ? `${previous}+Helena` : `${previous}+Other`);
+  cards: source([], (_previous, set) => {
+    const id = deckId.value; // synchronous read: tracked
+    fetchCards(id).then(set);
   }),
 });
 
-setUrl("other");
-app.name;
+setDeckId("french"); // setup re-runs, cards reload
 ```
 
 ```rescript
 open Tilia
 
-let (url, setUrl) = signal("helena")
+let (deckId, setDeckId) = signal("spanish")
+
 let app = tilia({
-  name: source("Medea", (previous, set) => {
-    set(url.value === "helena" ? `${previous}+Helena` : `${previous}+Other`)
+  cards: source([], (_previous, set) => {
+    let id = deckId.value // synchronous read: tracked
+    fetchCards(id)->Promise.thenResolve(set)->ignore
   }),
 })
 
-setUrl("other")
-ignore(app.name)
+setDeckId("french") // setup re-runs, cards reload
 ```

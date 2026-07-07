@@ -28,7 +28,6 @@ void reactApi.leaf;
 ```
 
 ```rescript
-open Tilia
 open TiliaReact
 
 let reactApi: tilia_react = make(Tilia.make())

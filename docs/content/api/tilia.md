@@ -21,14 +21,21 @@ Writing the same value (or the same underlying target object) does not notify ob
 ```typescript
 import { tilia } from "tilia";
 
-const alice = tilia({ name: "Alice", age: 10 });
+const alice = tilia({
+  name: "Alice",
+  age: 10,
+});
+
 alice.age = 11;
 ```
 
 ```rescript
 open Tilia
 
-let alice = tilia({name: "Alice", age: 10})
-alice.age = 11
+let alice = tilia({
+  name: "Alice",
+  age: 10,
+})
 
+alice.age = 11
 ```

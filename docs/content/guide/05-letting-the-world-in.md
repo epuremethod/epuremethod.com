@@ -2,7 +2,7 @@
 title: Letting the world in
 slug: letting-the-world-in
 sort: 5
-refs: [tilia, computed]
+refs: [source, store]
 ---
 
 Everything so far was synchronous and self-contained. Real applications load data, wait for servers, and move through states over time. tilia's answer is two primitives that put external and asynchronous values *inside* the reactive object, where the rest of the system can treat them like any other value: `source` and `store`.
@@ -14,6 +14,8 @@ A `source` is like a computed, but instead of returning a value, its setup funct
 The setup runs on first read of the key, and again whenever a reactive value it read synchronously has changed. That re-run rule is what turns a plain loader into a *reactive* loader. The deck can load its cards from the repo, and reload them whenever Alice picks another deck:
 
 ```typescript
+import { carve, source } from "tilia";
+
 const loader =
   (repo: Repo) =>
   (deck: Deck) =>
@@ -42,7 +44,7 @@ let loader = repo => deck => (_previous, set) => {
   // 1. Synchronous read (tracked)
   let id = deck.deckId
   // 2. Delegate async work
-  let _ = repo.fetchCards(id)->Promise.thenResolve(set)
+  repo.fetchCards(id)->Promise.thenResolve(set)->ignore
 }
 
 let makeDeck = repo =>

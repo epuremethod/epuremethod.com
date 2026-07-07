@@ -8,7 +8,7 @@ sort: 10
 summary: Create an isolated Tilia context with its own reactive world.
 signature:
   ts: "function make(gc?: number): Tilia"
-  res: "let make = (~gc=50): tilia"
+  res: "let make: (~gc: int=?, unit) => tilia"
 tags: []
 ---
 
@@ -16,7 +16,7 @@ tags: []
 
 Each context is isolated: observers and proxies from one context do not share tracking with another context. Use this for uncorrelated reactive worlds.
 
-`gc` sets the cleared-watcher garbage-collection threshold. Default is `50`. See [tilia](api.html#tilia), [Tilia](api.html#tilia-type), and guide chapter [What Keeps It Honest](docs.html#what-keeps-it-honest).
+`gc` sets the cleared-watcher garbage-collection threshold. Default is `50`. See [tilia](api.html#tilia), [Tilia](api.html#tilia-type), and guide chapter [What keeps it honest](docs.html#what-keeps-it-honest).
 
 ```typescript
 import { make } from "tilia";

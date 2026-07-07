@@ -16,22 +16,36 @@ tags: []
 
 The setup runs on first access and can re-run when tracked dependencies used during setup change. This is suitable for finite-state values where transitions call `set`.
 
-Use [source](api.html#source) when setup needs the previous value. See guide chapter [Letting the World In](docs.html#letting-the-world-in).
+Use [source](api.html#source) when setup needs the previous value. See guide chapter [Letting the world in](docs.html#letting-the-world-in).
 
 ```typescript
 import { store, tilia } from "tilia";
+import type { Setter } from "tilia";
 
-type Auth = { tag: "out"; login: () => void } | { tag: "in"; logout: () => void };
-const app = tilia({
-  auth: store<Auth>((set) => ({ tag: "out", login: () => set({ tag: "in", logout: () => set({ tag: "out", login: () => {} }) }) })),
+type Session =
+  | { t: "Idle"; start: () => void }
+  | { t: "Running"; stop: () => void };
+
+const idle = (set: Setter<Session>): Session => ({
+  t: "Idle",
+  start: () => set(running(set)),
 });
+
+const running = (set: Setter<Session>): Session => ({
+  t: "Running",
+  stop: () => set(idle(set)),
+});
+
+const app = tilia({ session: store(idle) });
 ```
 
 ```rescript
 open Tilia
 
-type auth = Out({login: unit => unit}) | In({logout: unit => unit})
-let app = tilia({
-  auth: store(set => Out({login: () => set(In({logout: () => set(Out({login: () => ()}))}))})),
-})
+type session = Idle({start: unit => unit}) | Running({stop: unit => unit})
+
+let rec idle = set => Idle({start: () => set(running(set))})
+and running = set => Running({stop: () => set(idle(set))})
+
+let app = tilia({session: store(idle)})
 ```

@@ -16,22 +16,28 @@ tags: []
 
 Writes performed inside `fn` are deferred while `fn` is running. If `fn` writes to keys it also tracks, it is scheduled to run again after the current run finishes. This makes `observe` suitable for state-machine style transitions.
 
-`observe` has no return value. For two-phase capture/effect behavior, use [watch](api.html#watch). For pull reactivity, use [computed](api.html#computed). See guide chapters [A Living Object](docs.html#a-living-object) and [Time and Consistency](docs.html#time-and-consistency).
+`observe` has no return value. For two-phase capture/effect behavior, use [watch](api.html#watch). For pull reactivity, use [computed](api.html#computed). See guide chapters [A living object](docs.html#a-living-object) and [Time and consistency](docs.html#time-and-consistency).
 
 ```typescript
 import { observe, tilia } from "tilia";
 
-const alice = tilia({ name: "Alice", username: "alice" });
+const alice = tilia({
+  name: "Alice",
+  username: "alice",
+});
 
 observe(() => {
   alice.username = alice.name.toLowerCase();
-})
+});
 ```
 
 ```rescript
 open Tilia
 
-let alice = tilia({name: "Alice", username: "alice"})
+let alice = tilia({
+  name: "Alice",
+  username: "alice",
+})
 
 observe(() => {
   alice.username = alice.name->String.toLowerCase

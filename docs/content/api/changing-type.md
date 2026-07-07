@@ -12,7 +12,7 @@ signature:
 tags: [deprecated]
 ---
 
-`Changing<T>`/`changing<'a>` is deprecated with [changing](api.html#changing). Prefer carved mutate actions and `tilia/query`.
+`Changing<T>`/`changing<'a>` is deprecated, along with [changing](api.html#changing). Prefer explicit mutate actions in carved features and `tilia/query` for data flow.
 
 `Changing<T>`/`changing<'a>` is the return type of [changing](api.html#changing).
 
@@ -30,7 +30,9 @@ void tracker.mute;
 ```rescript
 open Tilia
 
-let rows = tilia(Dict.make())
-let tracker: changing<{qty: int}> = changing(() => rows)
+type row = {qty: int}
+
+let rows: dict<row> = tilia(Dict.make())
+let tracker: changing<row> = changing(() => rows)
 ignore(tracker.mute)
 ```

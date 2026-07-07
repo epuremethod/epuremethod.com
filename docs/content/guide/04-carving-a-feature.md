@@ -2,7 +2,7 @@
 title: Carving a feature
 slug: carving-a-feature
 sort: 4
-refs: [tilia, computed]
+refs: [carve, computed]
 ---
 
 A feature is more than a bag of values. Alice's deck has state (the cards), derived state (which cards are due, in what order), and actions (record a review). These belong together, speak the same domain language, and should be testable as a unit. `carve` is tilia's way of building exactly that — and it is where tilia truly shines.

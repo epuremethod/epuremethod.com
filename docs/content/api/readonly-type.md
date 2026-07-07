@@ -28,6 +28,8 @@ void ro.data.version;
 ```rescript
 open Tilia
 
-let ro: readonly<{version: int}> = {data: {version: 1}}
+type schema = {version: int}
+
+let ro: readonly<schema> = {data: {version: 1}}
 ignore(ro.data.version)
 ```

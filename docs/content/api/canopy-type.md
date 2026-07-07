@@ -21,13 +21,19 @@ This type is part of the developer helper surface.
 ```typescript
 import type { Canopy } from "tilia";
 
-const c: Canopy = { live: new Set(["name"]), idle: new Set(["age"]) };
+const c: Canopy = {
+  live: new Set(["name"]),
+  idle: new Set(["age"]),
+};
 void c;
 ```
 
 ```rescript
 open Tilia
 
-let c: canopy = {live: Set.make()->Set.add("name"), idle: Set.make()->Set.add("age")}
+let c: canopy = {
+  live: Set.fromArray(["name"]),
+  idle: Set.fromArray(["age"]),
+}
 ignore(c)
 ```

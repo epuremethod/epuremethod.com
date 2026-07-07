@@ -2,7 +2,7 @@
 title: tilia in React
 slug: tilia-in-react
 sort: 8
-refs: [use-tilia]
+refs: [leaf, use-tilia, use-computed]
 ---
 
 Views are observers. That one idea is the entire React integration: a component reads reactive values while rendering, and it should re-render exactly when one of those values changes. The `@tilia/react` package (installed separately) offers three tools, in a deliberate order of preference.
@@ -28,7 +28,7 @@ open TiliaReact
 let make = leaf(() => {
   let {deck} = useApp()
   switch deck.queue[0] {
-  | Some(card) => <div> {React.string(card.front)} </div>
+  | Some(card) => <div> {card.front->React.string} </div>
   | None => <AllDone />
   }
 })
@@ -67,13 +67,13 @@ open TiliaReact
 let make = () => {
   useTilia()
   switch app.deck.queue[0] {
-  | Some(card) => <div> {React.string(card.front)} </div>
+  | Some(card) => <div> {card.front->React.string} </div>
   | None => <AllDone />
   }
 }
 ```
 
-It is the fastest way to make an existing component reactive, and that is its role: a retrofit. Hooks cannot see the exact end of a render, so `useTilia` needs an extra `useEffect` to close dependency tracking — a small cost `leaf` does not pay. Prefer `leaf`; keep `useTilia` for gradual adoption.
+It is the fastest way to make an existing component reactive, and that is its role: a retrofit. A hook cannot see the end of the render it belongs to, so tracking stays open until React runs the effects — by then the children have rendered too, and their reads are swept into the parent's dependencies. `leaf` closes tracking itself, at the exact end of the wrapped render, which is why its dependencies are exact. Both still lean on `useEffect` for the rest: notifications are armed only once the component is mounted, and the observer is cleared on unmount. Prefer `leaf`; keep `useTilia` for gradual adoption.
 
 ### useComputed: re-render on the answer, not the question
 
@@ -105,7 +105,7 @@ let make = (~card) => {
     }
   })
 
-  <div className={current ? "current" : ""}> {React.string(card.front)} </div>
+  <div className={current ? "current" : ""}> {card.front->React.string} </div>
 }
 ```
 

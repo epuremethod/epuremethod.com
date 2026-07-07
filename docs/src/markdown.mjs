@@ -131,6 +131,17 @@ export function createMarkdown(highlighter) {
     return out;
   };
 
+  const paragraphOpen = md.renderer.rules.paragraph_open;
+  md.renderer.rules.paragraph_open = (tokens, idx, options, env, self) => {
+    if (env.page === "docs" && tokens[idx].level === 0) {
+      const cls = tokens[idx].attrGet("class");
+      if (!cls) tokens[idx].attrSet("class", "body");
+      else if (!cls.split(/\s+/).includes("body")) tokens[idx].attrSet("class", `${cls} body`);
+    }
+    if (paragraphOpen) return paragraphOpen(tokens, idx, options, env, self);
+    return self.renderToken(tokens, idx, options);
+  };
+
   return md;
 }
 

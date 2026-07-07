@@ -29,7 +29,7 @@ Each feature is a bounded piece of the domain: its state, its derived values, an
 
 ### What it costs
 
-Very little, by design. tilia has zero dependencies and weighs around 8&nbsp;KB. It is optimized for stability and speed: reactivity is highly granular (a view re-renders only when a value it actually read has changed), computed values are cached until a dependency changes, and tracking follows objects even when they are moved or copied. It combines **push** reactivity (react when something changes) and **pull** reactivity (compute only when someone asks), so work happens exactly when it is needed and not before. The same API serves TypeScript and ReScript.
+Very little, by design. tilia has zero dependencies and weighs around 10&nbsp;KB. It is optimized for stability and speed: reactivity is highly granular (a view re-renders only when a value it actually read has changed), computed values are cached until a dependency changes, and tracking follows objects even when they are moved or copied. It combines **push** reactivity (react when something changes) and **pull** reactivity (compute only when someone asks), so work happens exactly when it is needed and not before. The same API serves TypeScript and ReScript.
 
 ### How this guide works
 

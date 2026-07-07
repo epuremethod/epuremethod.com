@@ -10,9 +10,11 @@ const root = path.resolve(here, "..");
 const apiDir = path.join(root, "content/api");
 const guideDir = path.join(root, "content/guide");
 const distDir = path.join(root, "dist");
+const indexFile = path.join(root, "content/index.html");
 
 export async function copyAssets() {
   await mkdir(distDir, { recursive: true });
+  await copyFile(indexFile, path.join(distDir, "index.html"));
   await copyFile(path.join(root, "assets/style.css"), path.join(distDir, "style.css"));
   // Keep font paths in style.css valid in dist output.
   await cp(path.join(root, "assets/fonts"), path.join(distDir, "fonts"), { recursive: true });

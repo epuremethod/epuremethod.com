@@ -12,7 +12,7 @@ signature:
 tags: [deprecated]
 ---
 
-`changing` is deprecated. Prefer explicit mutate actions in carved features and use `tilia/query` for outbound/inbound data flow.
+`changing` is deprecated. Prefer explicit mutate actions in carved features and `tilia/query` for data flow.
 
 `changing` tracks key-level writes on a Tilia-proxied dictionary returned by `accessor`.
 
@@ -42,7 +42,9 @@ mute(() => {
 ```rescript
 open Tilia
 
-let rows = tilia(Dict.make())
+type row = {qty: int}
+
+let rows: dict<row> = tilia(Dict.make())
 let {changes, mute} = changing(() => rows)
 
 watch(changes, ({upsert, remove}) => {
@@ -50,8 +52,8 @@ watch(changes, ({upsert, remove}) => {
   ignore(remove)
 })
 
-Dict.set(rows, "a", {qty: 1})
+rows->Dict.set("a", {qty: 1})
 mute(() => {
-  Dict.set(rows, "b", {qty: 2})
+  rows->Dict.set("b", {qty: 2})
 })
 ```

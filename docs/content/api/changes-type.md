@@ -8,19 +8,19 @@ sort: 260
 summary: Batched write payload containing upserted rows and removed keys.
 signature:
   ts: |-
-    type Changes<T> {
+    type Changes<T> = {
       upsert: T[];
-      remove: string[]
+      remove: string[];
     }
   res: |-
     type changes<'a> = {
       upsert: array<'a>,
-      remove: array<string>
+      remove: array<string>,
     }
 tags: [deprecated]
 ---
 
-`Changes<T>`/`changes<'a>` is deprecated with [changing](api.html#changing). Prefer feature-level mutate actions and `tilia/query` flows.
+`Changes<T>`/`changes<'a>` is deprecated, along with [changing](api.html#changing). Prefer explicit mutate actions in carved features and `tilia/query` for data flow.
 
 `Changes<T>`/`changes<'a>` is the payload produced by `changing().changes()` and delivered through [watch](api.html#watch).
 
@@ -31,13 +31,21 @@ See [changing](api.html#changing) and [Changing](api.html#changing-type).
 ```typescript
 import type { Changes } from "tilia";
 
-const c: Changes<{ qty: number }> = { upsert: [{ qty: 1 }], remove: ["old"] };
+const c: Changes<{ qty: number }> = {
+  upsert: [{ qty: 1 }],
+  remove: ["old"],
+};
 void c;
 ```
 
 ```rescript
 open Tilia
 
-let c: changes<{qty: int}> = {upsert: [{qty: 1}], remove: ["old"]}
+type row = {qty: int}
+
+let c: changes<row> = {
+  upsert: [{qty: 1}],
+  remove: ["old"],
+}
 ignore(c)
 ```

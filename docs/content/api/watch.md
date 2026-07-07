@@ -16,7 +16,7 @@ tags: []
 
 A watch never re-triggers itself from its own writes, in capture or effect; the effect runs untracked, and its writes notify other observers deferred, as one batch. On initial registration, `fn` runs once to install dependencies and `effect` is not called.
 
-Use [observe](api.html#observe) when a single tracked callback is needed. See guide chapter [Time and Consistency](docs.html#time-and-consistency).
+Use [observe](api.html#observe) when a single tracked callback is needed. See guide chapter [Time and consistency](docs.html#time-and-consistency).
 
 ```typescript
 import { signal, watch } from "tilia";

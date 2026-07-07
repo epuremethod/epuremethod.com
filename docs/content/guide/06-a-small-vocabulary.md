@@ -2,7 +2,7 @@
 title: A small vocabulary
 slug: a-small-vocabulary
 sort: 6
-refs: [tilia, computed]
+refs: [signal, derived, lift, readonly]
 ---
 
 Four more words complete tilia's vocabulary: `signal`, `derived` (standalone), `lift`, and `readonly`. Three of them are syntactic sugar — each is a one-liner over what you already know. They earn their place not by adding power but by naming intentions, and knowing they are thin keeps the mental model honest: there is still only one mechanism underneath.
@@ -51,7 +51,7 @@ let (streak, setStreak) = signal(0)
 // setStreak stays inside the review logic
 
 let stats = tilia({
-  streak: lift(streak), // ✅ readable by anyone, writable by no one else
+  streak: streak->lift, // ✅ readable by anyone, writable by no one else
 })
 ```
 
