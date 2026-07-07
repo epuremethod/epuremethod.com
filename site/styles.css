@@ -365,6 +365,25 @@ section + section { border-top: 1.5px solid var(--ink); }
   margin-left: auto;
 }
 
+/* ---------- scope note ---------- */
+.sec-note { padding-top: clamp(32px, 5vw, 48px); padding-bottom: clamp(32px, 5vw, 48px); }
+.sec-note .sec-head { margin-bottom: 18px; }
+.sec-note h2 { font-size: clamp(18px, 2.4vw, 21px); }
+.bounds { max-width: 62ch; }
+.bounds p { font-size: 14.5px; color: var(--muted); }
+.bound-list { list-style: none; margin: 16px 0; padding: 0; }
+.bound-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.bound-list li:last-child { border-bottom: 1px solid var(--line); }
+.bound-list .actor { min-width: 104px; text-align: center; margin-top: 0; }
+
 /* ---------- projects ---------- */
 .tools {
   display: grid;
