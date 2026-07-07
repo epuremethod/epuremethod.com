@@ -3,28 +3,36 @@ name: useTilia
 slug: use-tilia
 kind: hook
 module: react
-since: "1.0"
-sort: 1
-summary: Subscribe a React component to the reactive values it reads during render.
+since: "2.0"
+sort: 150
+summary: Track reactive reads in a React component render.
 signature:
   ts: "function useTilia(): void"
   res: "let useTilia: unit => unit"
 tags: []
 ---
 
-Call it once at the top of a component. The render is tracked like an `observe` run: the component re-renders exactly when a property it read changes, and never otherwise. No selectors, no context providers, no memoization to get right — components read the domain directly.
+`useTilia` enables reactive tracking for the current component render. Call it at the top of the component.
+
+Reads of Tilia proxies during render become dependencies. When one of those dependencies changes, the component re-renders. `useTilia` is the hook form; [leaf](api.html#leaf) is the preferred wrapper when possible.
+
+See guide chapter [Tilia in React](docs.html#tilia-in-react) and related hook [useComputed](api.html#use-computed).
 
 ```typescript
-function Forest() {
+import { useTilia } from "@tilia/react";
+
+function Counter() {
   useTilia()
-  return <p>{forest.trees} trees</p>
+  return <p>{app.count}</p>
 }
 ```
 
 ```rescript
+open TiliaReact
+
 @react.component
 let make = () => {
   useTilia()
-  <p> {React.int(forest.trees)} </p>
+  <p> {React.int(app.count)} </p>
 }
 ```

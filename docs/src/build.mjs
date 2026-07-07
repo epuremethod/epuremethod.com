@@ -2,7 +2,7 @@ import { readFile, readdir, mkdir, writeFile, copyFile, cp } from "node:fs/promi
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseApiEntry, parseGuideChapter } from "./schema.mjs";
-import { createShikiHighlighter, createMarkdown, renderBody } from "./markdown.mjs";
+import { createPrismHighlighter, createMarkdown, renderBody } from "./markdown.mjs";
 import { renderApiPage, renderDocsPage } from "./templates.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -10,7 +10,14 @@ const root = path.resolve(here, "..");
 const apiDir = path.join(root, "content/api");
 const guideDir = path.join(root, "content/guide");
 const distDir = path.join(root, "dist");
-const grammarPath = path.join(here, "vendor/rescript.tmLanguage.json");
+
+export async function copyAssets() {
+  await mkdir(distDir, { recursive: true });
+  await copyFile(path.join(root, "assets/style.css"), path.join(distDir, "style.css"));
+  // Keep font paths in style.css valid in dist output.
+  await cp(path.join(root, "assets/fonts"), path.join(distDir, "fonts"), { recursive: true });
+  console.log("Copied assets to dist/");
+}
 
 async function collect(dir) {
   const files = (await readdir(dir)).filter((f) => f.endsWith(".md")).sort();
@@ -131,7 +138,7 @@ export async function runBuild() {
   const chapters = collectGuideChapters(guideFiles, errors);
   crossValidate(entries, chapters, errors);
 
-  const highlighter = await createShikiHighlighter(grammarPath);
+  const highlighter = await createPrismHighlighter();
   const md = createMarkdown(highlighter);
   renderBodies(md, entries, chapters, errors);
 
@@ -147,10 +154,7 @@ export async function runBuild() {
   await mkdir(distDir, { recursive: true });
   await writeFile(path.join(distDir, "api.html"), apiHtml);
   await writeFile(path.join(distDir, "docs.html"), docsHtml);
-  await copyFile(path.join(root, "assets/style.css"), path.join(distDir, "style.css"));
-  // NOTE: plan §5.8 only mentions copying style.css, but the stylesheet's
-  // @font-face rules point at ./fonts/ — copy it too or self-hosted fonts 404.
-  await cp(path.join(root, "assets/fonts"), path.join(distDir, "fonts"), { recursive: true });
+  await copyAssets();
 
   const bytes = Buffer.byteLength(apiHtml) + Buffer.byteLength(docsHtml);
   console.log(

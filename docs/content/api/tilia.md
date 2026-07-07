@@ -3,35 +3,32 @@ name: tilia
 slug: tilia
 kind: function
 module: core
-since: "1.0"
-sort: 1
-summary: Create a reactive object from a plain object.
+since: "2.0"
+sort: 20
+summary: Wrap an object or array in a reactive proxy.
 signature:
-  ts: "function tilia<T>(value: T): T"
+  ts: "function tilia<T>(branch: T): T"
   res: "let tilia: 'a => 'a"
 tags: []
 ---
 
-Returns a reactive proxy of `value` with the same type and the same shape. Reads and writes go through ordinary property access; there is no wrapper API to learn and nothing to unwrap. Nested objects become reactive on first access, so a whole domain model can be made observable with a single call at its root.
+`tilia` converts a plain object or array into a proxy that tracks property reads and writes. The return value keeps the same shape and type as the input.
 
-::: pro
-Call `tilia` once at the root of a domain object. Nested plain objects and arrays assigned later are wrapped lazily the first time they are read, so you never need to call it again as the tree grows.
-:::
+Nested plain objects and arrays are proxied lazily when read. Values with non-plain prototypes (for example class instances) are returned as-is. Calling `tilia` on a value that is not an object or array throws. Calling `tilia` on an already proxied value returns the same proxy.
+
+Writing the same value (or the same underlying target object) does not notify observers. See also [observe](api.html#observe), [computed](api.html#computed), and guide chapter [A Living Object](docs.html#a-living-object).
 
 ```typescript
-const forest = tilia({
-  trees: 120,
-  health: 'good'
-})
+import { tilia } from "tilia";
 
-forest.trees += 1 // observers of `trees` re-run
+const alice = tilia({ name: "Alice", age: 10 });
+alice.age = 11;
 ```
 
 ```rescript
-let forest = tilia({
-  trees: 120,
-  health: "good",
-})
+open Tilia
 
-forest.trees = forest.trees + 1 // observers of `trees` re-run
+let alice = tilia({name: "Alice", age: 10})
+alice.age = 11
+
 ```

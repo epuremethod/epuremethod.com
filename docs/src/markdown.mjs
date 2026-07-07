@@ -1,23 +1,29 @@
 import MarkdownIt from "markdown-it";
 import container from "markdown-it-container";
-import { createHighlighter } from "shiki";
-import { readFile } from "node:fs/promises";
+import Prism from "prismjs";
+import "prismjs/components/prism-typescript.js";
+import "prismjs/components/prism-rescript.js";
 
-const THEME = "github-light";
-const ALLOWED_LANGS = ["typescript", "rescript"];
+const ALLOWED_LANGS = ["typescript", "rescript", "res"];
 
-export async function createShikiHighlighter(grammarPath) {
-  const grammar = JSON.parse(await readFile(grammarPath, "utf8"));
-  grammar.name = "rescript";
-  return createHighlighter({
-    themes: [THEME],
-    langs: ["typescript", grammar],
-  });
+export async function createPrismHighlighter() {
+  return Prism;
+}
+
+function normalizeLang(lang) {
+  if (lang === "res") return "rescript";
+  return lang;
 }
 
 export function highlightCode(highlighter, code, lang) {
-  const raw = highlighter.codeToHtml(code, { lang, theme: THEME });
-  return raw.replace(/^<pre[^>]*>/, `<pre class="language-${lang}">`);
+  const prism = highlighter || Prism;
+  const prismLang = normalizeLang(lang);
+  const grammar = prism.languages[prismLang];
+  if (!grammar) {
+    throw new Error(`Unsupported Prism language "${prismLang}"`);
+  }
+  const html = prism.highlight(code, grammar, prismLang);
+  return `<pre class="language-${lang}"><code>${html}</code></pre>`;
 }
 
 export const toggleButton =
@@ -41,13 +47,13 @@ function markFencePairs(tokens) {
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
     if (t.type !== "fence") continue;
-    const lang = t.info.trim();
+    const lang = normalizeLang(t.info.trim());
     const next = tokens[i + 1];
     if (
       lang === "typescript" &&
       next &&
       next.type === "fence" &&
-      next.info.trim() === "rescript"
+      normalizeLang(next.info.trim()) === "rescript"
     ) {
       t.meta = { pair: "start" };
       next.meta = { pair: "end" };
@@ -84,10 +90,10 @@ export function createMarkdown(highlighter) {
 
   md.renderer.rules.fence = (tokens, idx, options, env) => {
     const token = tokens[idx];
-    const lang = token.info.trim();
+    const lang = normalizeLang(token.info.trim());
     if (!ALLOWED_LANGS.includes(lang)) {
       throw new Error(
-        `${env.file}: code fence uses unsupported language "${lang}" (only "typescript" or "rescript" allowed)`
+        `${env.file}: code fence uses unsupported language "${lang}" (only "typescript", "rescript", or "res" allowed)`
       );
     }
     const codeHtml = highlightCode(highlighter, token.content.replace(/\n$/, ""), lang);
@@ -105,7 +111,7 @@ export function createMarkdown(highlighter) {
     }
     if (env.page === "api") {
       if (pair === "start") {
-        out += `<figure class="ex" data-pair><figcaption class="exbar"><span class="k">Example</span>${toggleButton}</figcaption>`;
+        out += `<figure class="ex" data-pair><figcaption class="exbar"><span class="k">Example</span></figcaption>`;
         out += codeHtml;
         return out;
       }

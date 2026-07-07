@@ -13,9 +13,10 @@
   "dependencies": {
     "chokidar": "^4.0.3",
     "gray-matter": "^4.0.3",
+    "live-server": "^1.2.2",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^4.0.0",
-    "shiki": "^4.3.1",
+    "prismjs": "^1.30.0",
     "sury": "11.0.0-alpha.9"
   }
 }

@@ -4,36 +4,36 @@ slug: observe
 kind: function
 module: core
 since: "1.0"
-sort: 2
-summary: Run a function now, and re-run it whenever the reactive values it reads change.
+sort: 30
+summary: Run a tracked callback immediately and on dependency changes.
 signature:
-  ts: "function observe(fn: () => void): () => void"
-  res: "let observe: (unit => unit) => unit => unit"
+  ts: "function observe(fn: () => void): void"
+  res: "let observe: (unit => unit) => unit"
 tags: []
 ---
 
-tilia records which properties `fn` reads during each run and re-runs it when any of them is written. Tracking is per-property and re-computed on every run, so branches that stop reading a value stop depending on it. `observe` returns a disposer that stops the tracking; call it to detach the effect.
+`observe` runs `fn` once immediately, tracks reactive reads during that run, and re-runs `fn` whenever one of those tracked keys changes. Dependency tracking is rebuilt on each run.
 
-Use `observe` for effects that live outside a view: logging, persistence, derived state kept in the domain.
+Writes performed inside `fn` are deferred while `fn` is running. If `fn` writes to keys it also tracks, it is scheduled to run again after the current run finishes. This makes `observe` suitable for state-machine style transitions.
 
-::: story
-Nice, the age updates automatically, Alice can grow older :-)
-:::
+`observe` has no return value. For two-phase capture/effect behavior, use [watch](api.html#watch). For pull reactivity, use [computed](api.html#computed). See guide chapters [A Living Object](docs.html#a-living-object) and [Time and Consistency](docs.html#time-and-consistency).
 
 ```typescript
-const stop = observe(() => {
-  document.title = `${forest.trees} trees`
-})
+import { observe, tilia } from "tilia";
 
-// later, if the effect is no longer needed
-stop()
+const alice = tilia({ name: "Alice", username: "alice" });
+
+observe(() => {
+  alice.username = alice.name.toLowerCase();
+})
 ```
 
 ```rescript
-let stop = observe(() => {
-  Document.setTitle(`${forest.trees->Int.toString} trees`)
-})
+open Tilia
 
-// later, if the effect is no longer needed
-stop()
+let alice = tilia({name: "Alice", username: "alice"})
+
+observe(() => {
+  alice.username = alice.name->String.toLowerCase
+})
 ```

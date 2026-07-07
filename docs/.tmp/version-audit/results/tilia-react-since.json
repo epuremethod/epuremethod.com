@@ -1,0 +1,255 @@
+{
+  "audit": "@tilia/react",
+  "releases": [
+    {
+      "id": "@tilia/react@1.0.0",
+      "source": "@tilia/react",
+      "version": "1.0.0"
+    },
+    {
+      "id": "@tilia/react@1.1.0",
+      "source": "@tilia/react",
+      "version": "1.1.0"
+    },
+    {
+      "id": "@tilia/react@1.1.1",
+      "source": "@tilia/react",
+      "version": "1.1.1"
+    },
+    {
+      "id": "@tilia/react@1.1.2",
+      "source": "@tilia/react",
+      "version": "1.1.2"
+    },
+    {
+      "id": "@tilia/react@1.3.0",
+      "source": "@tilia/react",
+      "version": "1.3.0"
+    },
+    {
+      "id": "@tilia/react@1.3.1",
+      "source": "@tilia/react",
+      "version": "1.3.1"
+    },
+    {
+      "id": "@tilia/react@1.3.2",
+      "source": "@tilia/react",
+      "version": "1.3.2"
+    },
+    {
+      "id": "@tilia/react@1.5.0",
+      "source": "@tilia/react",
+      "version": "1.5.0"
+    },
+    {
+      "id": "@tilia/react@1.5.1",
+      "source": "@tilia/react",
+      "version": "1.5.1"
+    },
+    {
+      "id": "@tilia/react@1.6.0",
+      "source": "@tilia/react",
+      "version": "1.6.0"
+    },
+    {
+      "id": "@tilia/react@2.0.0",
+      "source": "@tilia/react",
+      "version": "2.0.0"
+    },
+    {
+      "id": "@tilia/react@2.0.1",
+      "source": "@tilia/react",
+      "version": "2.0.1"
+    },
+    {
+      "id": "@tilia/react@2.1.0",
+      "source": "@tilia/react",
+      "version": "2.1.0"
+    },
+    {
+      "id": "@tilia/react@2.1.1",
+      "source": "@tilia/react",
+      "version": "2.1.1"
+    },
+    {
+      "id": "@tilia/react@2.2.0",
+      "source": "@tilia/react",
+      "version": "2.2.0"
+    },
+    {
+      "id": "@tilia/react@3.0.0",
+      "source": "@tilia/react",
+      "version": "3.0.0"
+    },
+    {
+      "id": "@tilia/react@4.0.0",
+      "source": "@tilia/react",
+      "version": "4.0.0"
+    },
+    {
+      "id": "@tilia/react@5.0.0",
+      "source": "@tilia/react",
+      "version": "5.0.0"
+    },
+    {
+      "id": "@tilia/react@5.0.1",
+      "source": "@tilia/react",
+      "version": "5.0.1"
+    },
+    {
+      "id": "@tilia/react@5.1.0",
+      "source": "@tilia/react",
+      "version": "5.1.0"
+    },
+    {
+      "id": "@tilia/react@5.2.0",
+      "source": "@tilia/react",
+      "version": "5.2.0"
+    }
+  ],
+  "resiPathByRelease": {
+    "@tilia/react@1.0.0": "package/src/Tilia.resi",
+    "@tilia/react@1.1.0": "package/src/Tilia.resi",
+    "@tilia/react@1.1.1": "package/src/Tilia.resi",
+    "@tilia/react@1.1.2": "package/src/Tilia.resi",
+    "@tilia/react@1.3.0": "package/src/Tilia.resi",
+    "@tilia/react@1.3.1": "package/src/Tilia.resi",
+    "@tilia/react@1.3.2": "package/src/Tilia.resi",
+    "@tilia/react@1.5.0": "package/src/Tilia.resi",
+    "@tilia/react@1.5.1": "package/src/Tilia.resi",
+    "@tilia/react@1.6.0": "package/src/Tilia.resi",
+    "@tilia/react@2.0.0": "package/src/TiliaReact.resi",
+    "@tilia/react@2.0.1": "package/src/TiliaReact.resi",
+    "@tilia/react@2.1.0": "package/src/TiliaReact.resi",
+    "@tilia/react@2.1.1": "package/src/TiliaReact.resi",
+    "@tilia/react@2.2.0": "package/src/TiliaReact.resi",
+    "@tilia/react@3.0.0": "package/src/TiliaReact.resi",
+    "@tilia/react@4.0.0": "package/src/TiliaReact.resi",
+    "@tilia/react@5.0.0": "package/src/TiliaReact.resi",
+    "@tilia/react@5.0.1": "package/src/TiliaReact.resi",
+    "@tilia/react@5.1.0": "package/src/TiliaReact.resi",
+    "@tilia/react@5.2.0": "package/src/TiliaReact.resi"
+  },
+  "minorSnapshots": [
+    {
+      "package": "@tilia/react",
+      "version": "1.0.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "1.1.2"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "1.3.2"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "1.5.1"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "1.6.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "2.0.1"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "2.1.1"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "2.2.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "3.0.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "4.0.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "5.0.1"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "5.1.0"
+    },
+    {
+      "package": "@tilia/react",
+      "version": "5.2.0"
+    }
+  ],
+  "since": [
+    {
+      "symbol": "let:clear",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.5.0",
+      "sinceMinor": "1.5"
+    },
+    {
+      "symbol": "let:compute",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.6.0",
+      "sinceMinor": "1.6"
+    },
+    {
+      "symbol": "let:leaf",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "3.0.0",
+      "sinceMinor": "3.0"
+    },
+    {
+      "symbol": "let:make",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.0.0",
+      "sinceMinor": "1.0"
+    },
+    {
+      "symbol": "let:observe",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.0.0",
+      "sinceMinor": "1.0"
+    },
+    {
+      "symbol": "let:track",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.5.0",
+      "sinceMinor": "1.5"
+    },
+    {
+      "symbol": "let:use",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.0.0",
+      "sinceMinor": "1.0"
+    },
+    {
+      "symbol": "let:useComputed",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "2.0.0",
+      "sinceMinor": "2.0"
+    },
+    {
+      "symbol": "let:useTilia",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "2.0.0",
+      "sinceMinor": "2.0"
+    },
+    {
+      "symbol": "type:observer",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "1.5.0",
+      "sinceMinor": "1.5"
+    },
+    {
+      "symbol": "type:tilia_react",
+      "sinceSource": "@tilia/react",
+      "sinceExact": "2.0.0",
+      "sinceMinor": "2.0"
+    }
+  ]
+}

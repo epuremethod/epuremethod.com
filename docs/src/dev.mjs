@@ -1,57 +1,51 @@
-import http from "node:http";
 import path from "node:path";
-import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import chokidar from "chokidar";
-import { runBuild } from "./build.mjs";
+import { copyAssets, runBuild } from "./build.mjs";
+
+const require = createRequire(import.meta.url);
+const liveServer = require("live-server");
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const distDir = path.join(root, "dist");
 const port = 4175;
 
-const CONTENT_TYPES = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-};
-
 async function rebuild() {
   await runBuild();
 }
 
 function serve() {
-  const server = http.createServer(async (req, res) => {
-    const urlPath = req.url === "/" ? "/api.html" : req.url;
-    const filePath = path.join(distDir, decodeURIComponent(urlPath.split("?")[0]));
-    try {
-      const data = await readFile(filePath);
-      const ext = path.extname(filePath);
-      res.writeHead(200, { "Content-Type": CONTENT_TYPES[ext] || "application/octet-stream" });
-      res.end(data);
-    } catch {
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("Not found");
-    }
+  liveServer.start({
+    host: "127.0.0.1",
+    port,
+    root: distDir,
+    open: false,
+    logLevel: 2,
+    wait: 100,
   });
-  server.listen(port, () => {
-    console.log(`Dev server running at http://localhost:${port}`);
-  });
+  console.log(`Dev server running at http://localhost:${port}`);
 }
 
 async function main() {
   await rebuild();
   serve();
-  chokidar
-    .watch([path.join(root, "content"), path.join(root, "src"), path.join(root, "assets")], {
-      ignoreInitial: true,
-    })
-    .on("all", async (event, file) => {
-      console.log(`${event}: ${path.relative(root, file)} — rebuilding`);
-      await rebuild();
-    });
+  chokidar.watch([path.join(root, "content"), path.join(root, "assets")], { ignoreInitial: true }).on(
+    "all",
+    async (event, file) => {
+      const rel = path.relative(root, file);
+      if (rel.startsWith("assets/")) {
+        console.log(`${event}: ${rel} — copying assets`);
+        await copyAssets();
+        return;
+      }
+      if (rel.startsWith("content/")) {
+        console.log(`${event}: ${rel} — rebuilding`);
+        await rebuild();
+      }
+    }
+  );
 }
 
 main();

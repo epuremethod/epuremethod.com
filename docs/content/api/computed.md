@@ -3,31 +3,43 @@ name: computed
 slug: computed
 kind: function
 module: core
-since: "1.0"
-sort: 3
-summary: Derive a memoized value that recomputes only when the reactive values it reads change.
+since: "2.0"
+sort: 60
+summary: Define a pull-based cached value for insertion into reactive objects.
 signature:
-  ts: "function computed<T>(fn: () => T): () => T"
-  res: "let computed: (unit => 'a) => unit => 'a"
+  ts: "function computed<T>(fn: () => T): T"
+  res: "let computed: (unit => 'a) => 'a"
 tags: []
 ---
 
-`computed` wraps `fn` in the same dependency tracking as `observe`, but instead of running eagerly it returns a getter. The first call to the getter runs `fn` and caches the result; later calls return the cached value until one of the properties read by `fn` changes, at which point the next call recomputes it.
+`computed` creates a dynamic value intended to be assigned directly in a `tilia`/`carve` object. The value is computed on read, cached, and invalidated when tracked dependencies change.
 
-The computation can be created anywhere but only becomes active — that is, only starts tracking — once its getter is called from inside a tilia object or array, or from an `observe` run.
+If no observer depends on the computed key, Tilia can clear its internal observer and keep the dynamic definition for later reads. Replacing or deleting the property removes the previous computed behavior.
 
-::: pro
-The computed can be created anywhere but only becomes active inside a Tilia object or array.
-:::
+Using a computed value outside insertion context raises an orphan-computation error. Define it directly where it is inserted. See [tilia](api.html#tilia), [carve](api.html#carve), and guide chapter [Values That Follow](docs.html#values-that-follow).
 
 ```typescript
-const canGrow = computed(() => forest.health === 'good')
+import { computed, tilia } from "tilia";
 
-canGrow() // reads forest.health, caches the result
+const alice = tilia({
+  birthYear: 2015,
+  nowYear: 2026,
+  age: computed(() => alice.nowYear - alice.birthYear),
+});
+
+alice.nowYear = 2027;
+alice.age;
 ```
 
 ```rescript
-let canGrow = computed(() => forest.health === "good")
+open Tilia
 
-canGrow() // reads forest.health, caches the result
+let alice = tilia({
+  birthYear: 2015,
+  nowYear: 2026,
+  age: computed(() => alice.nowYear - alice.birthYear),
+})
+
+alice.nowYear = 2027
+ignore(alice.age)
 ```

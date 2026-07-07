@@ -44,13 +44,12 @@ const DOCS_SCROLL_SPY_SCRIPT = `/* Scroll-spy: highlight the current chapter in 
 })();`;
 
 function header(active) {
-  const docsHref = active === "api" ? "#" : "./docs.html";
   return `<header class="top">
   <div class="wrap">
     <a class="wordmark" href="./index.html" aria-label="tilia — home">${WORDMARK_SVG}tilia</a>
     <nav class="nav" aria-label="Site">
       <a href="./index.html">Home</a>
-      <a href="${docsHref}"${active === "docs" ? ' aria-current="page"' : ""}>Docs</a>
+      <a href="./docs.html"${active === "docs" ? ' aria-current="page"' : ""}>Docs</a>
       <a href="./api.html"${active === "api" ? ' aria-current="page"' : ""}>API</a>
       <a href="#">Compare</a>
       <a href="https://github.com/tiliajs/tilia">GitHub</a>
@@ -250,8 +249,8 @@ function renderChapter(chapter, index) {
   const refs =
     chapter.refs.length > 0
       ? `<p class="xref">Reference: ${chapter.refs
-          .map((slug) => `<a href="./api.html#${slug}">${slug}</a>`)
-          .join(", ")} <span class="arrow">→</span></p>`
+        .map((slug) => `<a href="./api.html#${slug}">${slug}</a>`)
+        .join(", ")} <span class="arrow">→</span></p>`
       : "";
   return `<section class="chapter" id="${chapter.slug}">
   <div class="ch-kicker"><span class="no">${String(index + 1).padStart(2, "0")}</span><span class="rule"></span></div>
