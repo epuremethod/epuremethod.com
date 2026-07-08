@@ -6,10 +6,28 @@ pages:
   api:
     input:
       markdownDir: api
+    assets:
+      copy:
+        - from: index.html
+          to: ../../dist/{{project}}/index.html
+        - from: ../../assets/style.css
+          to: ../../dist/{{project}}/style.css
+        - from: ../../assets/fonts
+          to: ../../dist/{{project}}/fonts
+          recursive: true
 
   guide:
     input:
       markdownDir: guide
+    assets:
+      copy:
+        - from: index.html
+          to: ../../dist/{{project}}/index.html
+        - from: ../../assets/style.css
+          to: ../../dist/{{project}}/style.css
+        - from: ../../assets/fonts
+          to: ../../dist/{{project}}/fonts
+          recursive: true
     templates:
       pageMain: |-
         <div class="docs-head">

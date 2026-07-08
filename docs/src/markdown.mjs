@@ -3,8 +3,9 @@ import container from "markdown-it-container";
 import Prism from "prismjs";
 import "prismjs/components/prism-typescript.js";
 import "prismjs/components/prism-rescript.js";
+import "prismjs/components/prism-gherkin.js";
 
-const ALLOWED_LANGS = ["typescript", "rescript", "res"];
+const ALLOWED_LANGS = ["typescript", "rescript", "res", "gherkin"];
 
 export async function createPrismHighlighter() {
   return Prism;
@@ -93,17 +94,18 @@ export function createMarkdown(highlighter) {
     const lang = normalizeLang(token.info.trim());
     if (!ALLOWED_LANGS.includes(lang)) {
       throw new Error(
-        `${env.file}: code fence uses unsupported language "${lang}" (only "typescript", "rescript", or "res" allowed)`
+        `${env.file}: code fence uses unsupported language "${lang}" (only "typescript", "rescript", "res", or "gherkin" allowed)`
       );
     }
     const codeHtml = highlightCode(highlighter, token.content.replace(/\n$/, ""), lang);
     const pair = token.meta && token.meta.pair;
+    const label = lang === "gherkin" ? "Contract" : "Example";
     let out = "";
     if (env.page === "docs") {
       if (pair === "start") {
         out += `<figure class="example" data-pair><figcaption class="exbar"><span class="k">Example</span>${toggleButton}</figcaption>`;
       } else if (!pair) {
-        out += `<figure class="example"><figcaption class="exbar"><span class="k">Example</span></figcaption>`;
+        out += `<figure class="example"><figcaption class="exbar"><span class="k">${label}</span></figcaption>`;
       }
       out += codeHtml;
       if (pair === "end" || !pair) out += `</figure>`;
@@ -121,7 +123,7 @@ export function createMarkdown(highlighter) {
         return out;
       }
       const plain = codeHtml.replace(/^<pre class="language-[^"]+">/, '<pre class="code">');
-      out += `<figure class="ex"><figcaption class="k">Example</figcaption>${plain}</figure>`;
+      out += `<figure class="ex"><figcaption class="k">${label}</figcaption>${plain}</figure>`;
       return out;
     }
     if (pair === "start") out += `<div class="example" data-pair>${toggleButton}`;
