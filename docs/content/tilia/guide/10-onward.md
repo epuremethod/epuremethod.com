@@ -25,7 +25,7 @@ The scheduler's repo was injected and politely ignored; synchronizing collection
 
 Testing was a promise this guide made often: pure functions and injected services are what make features checkable in plain language. **vitest-bdd** is the épure suite's tool for exactly that — specifications first, in Gherkin, runnable under [vitest-bdd](https://www.npmjs.com/package/vitest-bdd).
 
-tilia itself is open source, at [github.com/tiliajs/tilia](https://github.com/tiliajs/tilia). And the method these tools serve — software drawn before it is built — is the épure project; tilia is its way of making sure the drawing and the program never drift apart.
+tilia itself is open source, at [github.com/tiliajs/tilia](https://github.com/tiliajs/tilia). And the method these tools serve — software drawn before it is built — is the [épure](https://epuremethod.com) project; tilia is its way of making sure the drawing and the program never drift apart.
 
 ::: story
 Alice knows none of this. She flips a card, the box learns, and tomorrow asks better questions. Which was the point all along.

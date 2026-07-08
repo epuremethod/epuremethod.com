@@ -39,4 +39,4 @@ The rest of the guide builds one small, believable thing: a spaced-repetition sc
 Alice has a shoebox of Spanish flashcards. Some she knows cold, some she keeps forgetting. The box is about to become software.
 :::
 
-Each chapter introduces one idea because the scheduler needs it, and each chapter ends knowing why tilia works that way. A reader moving front to back builds one coherent mental model; the [final chapter](#onward) steps back and points onward. If you decide for your team, this chapter and that one may be all you need. The chapters between are for the people who will build.
+Each chapter introduces one idea because the scheduler needs it, and each chapter ends knowing why tilia works that way. A reader moving front to back builds one coherent mental model; the [final chapter](#onward) steps back and points onward. If you decide for your team, this chapter and that one may be all you need. The chapters between are for whoever will build — human or machine, the mental model is the same.

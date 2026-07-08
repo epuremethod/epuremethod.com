@@ -1,5 +1,5 @@
 ---
-name: make (react)
+name: make
 slug: react-make
 kind: function
 module: react

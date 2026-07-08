@@ -7,7 +7,7 @@ since: "2.0"
 sort: 70
 summary: Define an inserted value managed by previous-plus-set setup logic.
 signature:
-  ts: "function source<T>(initialValue: T, fn: (previous: T, set: Setter<T>) => unknown): T"
+  ts: "function source<T>(initVal: T, fn: (previous: T, set: Setter<T>) => unknown): T"
   res: "let source: ('a, ('a, 'a => unit) => 'ignored) => 'a"
 tags: []
 ---

@@ -71,4 +71,4 @@ Projection/print: the clay/stone fills are low-contrast by design; readability i
 
 - `Docs` nav link points to `#`; "Get Started" points to `#`.
 - `github.com/tiliajs/vitest-bdd` is a guess — épure's card only links npm. Swap in the real repo.
-- The épure link uses `https://epure.dev` — swap in the real domain.
+- The épure link uses `https://epuremethod.com` — swap in the real domain.

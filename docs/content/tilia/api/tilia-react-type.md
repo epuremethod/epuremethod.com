@@ -7,8 +7,18 @@ since: "2.0"
 sort: 300
 summary: Context-bound React integration surface for Tilia.
 signature:
-  ts: "interface TiliaReact { useTilia: () => void; useComputed: <T>(fn: () => T) => T; leaf: <T, U>(fn: (p: T) => U) => (p: T) => U }"
-  res: "type tilia_react = {useTilia: unit => unit, useComputed: 'a. (unit => 'a) => 'a, leaf: 'a 'b. ('a => 'b) => 'a => 'b}"
+  ts: |-
+    type TiliaReact {
+      useTilia: () => void;
+      useComputed: <T>(fn: () => T) => T;
+      leaf: <T, U>(fn: (p: T) => U) => (p: T) => U
+    }
+  res: |-
+    type tilia_react = {
+      useTilia: unit => unit,
+      useComputed: 'a. (unit => 'a) => 'a,
+      leaf: 'a 'b. ('a => 'b) => 'a => 'b
+    }
 tags: []
 ---
 

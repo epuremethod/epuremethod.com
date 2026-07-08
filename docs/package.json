@@ -17,6 +17,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^4.0.0",
     "prismjs": "^1.30.0",
-    "sury": "11.0.0-alpha.9"
+    "sury": "11.0.0-alpha.9",
+    "yaml": "^2.9.0"
   }
 }

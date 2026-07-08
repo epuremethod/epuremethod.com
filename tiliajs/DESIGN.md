@@ -109,7 +109,7 @@ Rule of application: green takes the primary role (buttons, active nav underline
 ## Placeholders to resolve before publishing
 
 - `Docs` and `Compare` nav links point to `#`.
-- The épure link uses `https://epure.dev` — swap in the real domain.
+- The épure link uses `https://epuremethod.com` — swap in the real domain.
 - API signatures/prose are set for layout, not verified against the tilia repo (see the HTML comment in `api.html`).
 - GitHub/npm URLs assume `github.com/tiliajs/tilia` and the `tilia` / `@tilia/query` package names.
 - `query.html` is not linked from the nav (reachable from épure's sheet A-02 and npm); decide its nav slot when Docs/Compare land.
