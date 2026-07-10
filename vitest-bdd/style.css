@@ -34,7 +34,11 @@
                             border, active-nav tick. Never links, buttons, hovers,
                             or pass/fail. 5.2:1 on paper — holds for thin strokes */
 
-  --steel: #4a463c;      /* instrument steel — code keywords */
+  /* the bench's two metals — code panes are the one place this site
+     speaks in hue. Affordance rules untouched: never links, buttons,
+     hovers, or state — these two colors exist only inside <pre>. */
+  --steel: #3b576e;      /* instrument steel — code keywords. 7.3:1 on card */
+  --verdigris: #4ea188;  /* patina — strings & measured values. 6.7:1 on card */
 
   --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
@@ -277,11 +281,11 @@ pre.code {
 }
 .codefoot .ps1 { color: var(--faint); }
 
-/* hand-set syntax tokens — near-achromatic: hierarchy by weight, not hue */
-.tk { color: var(--steel); }                          /* keyword — instrument steel, regular */
-.ts { color: var(--clay-ink); font-weight: 500; }     /* string, measured value */
+/* hand-set syntax tokens — steel keywords, verdigris measured values */
+.tk { color: var(--steel); }                          /* keyword — instrument steel */
+.ts { color: var(--verdigris); font-weight: 500; }    /* string, measured value — patina */
 .tc { color: var(--faint); font-style: italic; }      /* comment */
-.tf { font-weight: 500; }                             /* call */
+.tf { font-weight: 600; }                             /* call */
 
 /* ---------- the wing compass at the card corner ---------- */
 .code-slot { position: relative; }

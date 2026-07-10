@@ -16,6 +16,23 @@ tags: []
 
 The builder may be `async`: the runner awaits it before executing steps. In ReScript, `given` captures at most one parameter — capture further values in a step or pass a table.
 
+A `Background:` section states the shared situation once: its steps are prepended to every scenario's steps, and it must start with a `Given` — that is the step that opens the context everything else closes over.
+
+```gherkin
+Feature: Calculator
+
+  Background:
+    Given I have a "basic" calculator
+
+  Scenario: Add two numbers
+    When I add 1 and 2
+    Then the result is 3
+
+  Scenario: Order does not matter
+    When I add 2 and 1
+    Then the result is 3
+```
+
 ```typescript
 import { expect } from "vitest";
 import { Given } from "vitest-bdd";

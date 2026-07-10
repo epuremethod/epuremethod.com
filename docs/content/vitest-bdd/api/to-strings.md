@@ -12,7 +12,13 @@ signature:
 tags: []
 ---
 
-`toStrings` takes the first column of a data table and returns it as a plain list — for tables that are really just an enumeration, with no header row semantics. Its numeric sibling is [toNumbers](api.html#to-numbers); for header-driven tables use [toRecords](api.html#to-records).
+`toStrings` takes the first column of a data table and returns it as a plain list — for tables that are really just an enumeration, with no header row semantics. Its numeric sibling is [toNumbers](api.html#to-numbers); for header-driven tables use [toRecords](api.html#to-records). One column, no header row — the whole table is the list:
+
+```gherkin
+Then the decks are
+  | spanish |
+  | physics |
+```
 
 ```typescript
 Then("the decks are", (table) => {

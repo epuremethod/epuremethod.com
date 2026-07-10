@@ -101,6 +101,7 @@ const buildConfigSchema = S.schema({
       prePaintScript: S.string,
       toggleListenerScript: S.string,
       docsScrollSpyScript: S.string,
+      viewSwitchScript: S.optional(S.string, ""),
       header: S.string,
       footer: S.string,
       shell: S.string,

@@ -12,7 +12,14 @@ signature:
 tags: []
 ---
 
-`toNumbers` takes the first column of a data table and parses each cell as a number. Use it when a scenario enumerates values — intervals, amounts, thresholds — and the step wants them ready for arithmetic. Siblings: [toStrings](api.html#to-strings), [toRecords](api.html#to-records).
+`toNumbers` takes the first column of a data table and parses each cell as a number. Use it when a scenario enumerates values — intervals, amounts, thresholds — and the step wants them ready for arithmetic. Siblings: [toStrings](api.html#to-strings), [toRecords](api.html#to-records). One column, no header row — each cell one number:
+
+```gherkin
+Then the review intervals are
+  | 2 |
+  | 4 |
+  | 8 |
+```
 
 ```typescript
 Then("the review intervals are", (table) => {

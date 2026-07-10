@@ -85,10 +85,12 @@
           <pre class="code code-feature"><code><span class="tk">Feature</span>: Calculator
 
   <span class="tk">Scenario</span>: Add two numbers
+    <span class="tk">Given</span> I have a <span class="ts">"basic"</span> calculator
     <span class="tk">When</span> I add <span class="ts">1</span> and <span class="ts">2</span>
     <span class="tk">Then</span> the result is <span class="ts">3</span>
 
   <span class="tk">Scenario</span>: Advanced calculator
+    <span class="tk">Given</span> I have a <span class="ts">"basic"</span> calculator
     <span class="tk">When</span> I divide <span class="ts">1</span> by <span class="ts">2</span>
     <span class="tk">Then</span> the result is <span class="ts">0.5</span></code></pre>
           <pre class="code code-steps"><code><span class="tf">Given</span>(<span class="ts">"I have a {string} calculator"</span>, (name) =&gt; {

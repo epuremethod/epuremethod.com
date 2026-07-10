@@ -30,6 +30,9 @@ export function highlightCode(highlighter, code, lang) {
 export const toggleButton =
   '<button class="lang-toggle" type="button" aria-label="Switch example language"><span class="lt lt-ts">TS</span><span class="lt lt-res">RES</span></button>';
 
+export const viewSwitch =
+  '<div class="viewswitch" role="group" aria-label="Contract pane"><button type="button" data-view="feature" aria-pressed="true">feature</button><button type="button" data-view="steps" aria-pressed="false">steps</button></div>';
+
 function markCallouts(file, body) {
   const re = /^:::[ \t]*(\S*)$/gm;
   let m;
@@ -59,6 +62,25 @@ function markFencePairs(tokens) {
       t.meta = { pair: "start" };
       next.meta = { pair: "end" };
       i++;
+    }
+  }
+}
+
+function markContractGroups(tokens) {
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.type !== "fence" || normalizeLang(t.info.trim()) !== "gherkin") continue;
+    const next = tokens[i + 1];
+    if (!next || next.type !== "fence" || normalizeLang(next.info.trim()) !== "typescript") continue;
+    const paired = next.meta && next.meta.pair === "start";
+    t.meta = { ...t.meta, contract: "start", contractPair: paired };
+    if (paired) {
+      next.meta = { ...next.meta, contract: "mid" };
+      tokens[i + 2].meta = { ...tokens[i + 2].meta, contract: "end" };
+      i += 2;
+    } else {
+      next.meta = { ...next.meta, contract: "end" };
+      i += 1;
     }
   }
 }
@@ -112,6 +134,15 @@ export function createMarkdown(highlighter) {
       return out;
     }
     if (env.page === "api") {
+      const contract = token.meta && token.meta.contract;
+      if (contract === "start") {
+        const pairAttr = token.meta.contractPair ? " data-pair" : "";
+        out += `<figure class="ex"${pairAttr} data-view="feature"><figcaption class="exbar"><span class="k">Contract</span>${viewSwitch}</figcaption>`;
+        out += codeHtml;
+        return out;
+      }
+      if (contract === "mid") return codeHtml;
+      if (contract === "end") return codeHtml + `</figure>`;
       if (pair === "start") {
         out += `<figure class="ex" data-pair><figcaption class="exbar"><span class="k">Example</span></figcaption>`;
         out += codeHtml;
@@ -153,5 +184,6 @@ export function renderBody(md, file, body, { allowHeadings, page = "api" }) {
   const tokens = md.parse(body, env);
   if (!allowHeadings) assertNoHeadings(file, tokens);
   markFencePairs(tokens);
+  if (page === "api") markContractGroups(tokens);
   return md.renderer.render(tokens, md.options, env);
 }

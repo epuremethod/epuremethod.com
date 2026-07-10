@@ -14,7 +14,18 @@ tags: []
 
 The first argument of a [Given](api.html#given) builder is a `Context`: a record whose every field is a `Step`. In TypeScript the record is a proxy, so *any* name you destructure becomes a binder — `When`, `Then`, `And`, `But`, or `Quand` and `Alors` for a French contract. The names carry no semantics; matching is by pattern, so choose the words that read best next to the feature file. In ReScript the record has the single field `step`, used for every keyword.
 
-The operation receives the step's captured parameters — `{string}` as string, `{number}` as number, a trailing data table as `string[][]` — and may be `async`; the runner awaits it. Binding a pattern twice replaces the first operation. A step present in the feature file but never bound fails the scenario with `Step "…" not found`.
+The operation receives the step's captured parameters — `{string}` as string, `{number}` as number, a trailing data table as `string[][]` — and may be `async`; the runner awaits it. Binding a pattern twice replaces the first operation. A step present in the feature file but never bound fails the scenario with `Step "…" not found`. In the feature file, `And` and `But` continue the previous kind of step and match by pattern like any other — one binding serves whichever keyword introduces the sentence.
+
+```gherkin
+Feature: Spaced repetition
+
+  Scenario: Passed cards leave the queue
+    Given a deck named "spanish"
+    When I review "gato"
+    And I review "perro"
+    Then the queue has 0 cards
+    But nothing is due tomorrow
+```
 
 ```typescript
 Given("a deck named {string}", ({ When, Then, But }, name: string) => {

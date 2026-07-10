@@ -39,7 +39,9 @@ vitest-bdd is the coolest of the three tools — stone with a faint olive undert
 --mark:      #b0402a;  /* sanguine — the checker's pencil. ANNOTATION ONLY, see rules.
                           5.2:1 on paper — holds for thin strokes without darkening. */
 
---steel:     #4a463c;  /* code keywords */
+/* the bench's two metals — hue that lives only inside code panes */
+--steel:     #3d566b;  /* instrument steel — code keywords. 7.3:1 on card */
+--verdigris: #2f6152;  /* patina — code strings & measured values. 6.7:1 on card */
 ```
 
 ## Affordance rules
@@ -59,7 +61,7 @@ The clay system is near-achromatic, so color cannot signal function. These rules
 - **Metaphor**: compas — the divider. Steps the drawing off against the work. (Replaces the earlier équerre entry: the divider carries the dynamic the static square lacked, and the definition inverts the équerre's line — the square checked the work against the drawing; the divider steps the drawing off against the work.) The copy runs on measuring and rules ("expected 3, measured 1002"); the épure card's phrase "Contracts That Run" is the headline.
 - **PROOF stamp**: a small chip — sanguine border, clay-ink small-caps text — before the hero eyebrow, echoed on the bridge label (`SHEET A-03 · PROOF`).
 - **Signature illustration**: a wing compass mid-measure (pivot knob, spread legs, slotted wing with its thumbscrew) standing behind the code card's lower-right corner — one leg passes behind the sheet and its point emerges below the corner; the other scribes a dotted arc on the paper. Clay strokes at 35%, hidden below 920px and in print.
-- **Code panes**: near-achromatic — keywords in `--steel` at regular weight, strings/measured values in `--clay-ink` at weight 500 (hierarchy by weight and darkness, not hue), comments faint italic.
+- **Code panes**: the one place the site speaks in hue — the bench's two metals. Keywords in `--steel` (instrument steel, a cold blue) at regular weight; strings and measured values in `--verdigris` (the patina on the instruments) at weight 500; comments faint italic; punctuation and operators stepped back to `--muted` so identifiers carry the line. These two colors exist only inside `<pre>` — the affordance rules stand: they never color links, buttons, hovers, or state, and sanguine still never enters a code pane.
 
 ## Page pattern
 

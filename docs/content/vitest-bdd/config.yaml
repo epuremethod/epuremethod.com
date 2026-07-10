@@ -4,6 +4,18 @@ var:
 
 shared:
   literals:
+    viewSwitchScript: |-
+      /* feature | steps toggle on contract figures — per figure, delegated,
+         independent of the global language toggle. */
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest(".viewswitch button");
+        if (!btn) return;
+        var fig = btn.closest("figure");
+        fig.setAttribute("data-view", btn.dataset.view);
+        fig.querySelectorAll(".viewswitch button").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b === btn));
+        });
+      });
     wordmarkSvg: |-
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
         <circle cx="12" cy="12" r="5.5"/>
@@ -74,6 +86,9 @@ pages:
         API Reference — vitest-bdd
       description: |-
         vitest-bdd API reference — the Vite plugin, Gherkin step definitions, table helpers, and the ReScript bindings for Vitest.
+      scripts:
+        - |-
+          {{viewSwitchScript}}
 
   guide:
     input:
