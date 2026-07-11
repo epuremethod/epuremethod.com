@@ -93,14 +93,15 @@ A `fetch` may also return a cleanup function. That is the live-subscription hook
 
 ### The local store
 
-The optional `local` adapter is the durable half — four functions over whatever storage you have:
+The optional `local` adapter is the durable half — seven functions over whatever storage you have:
 
 - `fetch(query, channel)` — answer the query from disk, same channel contract as remote.
 - `save(value, dirty)` — upsert a row; `dirty` marks it unsynced.
 - `remove(value, dirty)` — `dirty` writes a delete tombstone; clean purges row and tombstone.
 - `dirty()` — the previous session's unsynced writes, replayed at boot.
+- `queries()` / `saveQuery(record)` / `removeQuery(key)` — the persisted query registry: per query key, the id list the remote last returned. Loaded at boot, updated on every authoritative answer, dropped on eviction. One extra table; implement all three as no-ops to opt out of retention entirely.
 
-The `dirty` flag is the entire outbox persistence mechanism: the core tells the store *what to remember about sync state*, the store just remembers it. Note what is absent — no migrations, no schemas, no query planner. If your local store is a full sync engine instead of a passive cache, it still fits: answer fetches from its database, report `covered()`, and deliver inbound changes via [`sync`](#when-the-server-disagrees).
+The `dirty` flag is the entire outbox persistence mechanism, and the registry is the entire retention mechanism: the core tells the store *what to remember about sync state*, the store just remembers it. Note what is absent — no migrations, no schemas, no query planner. If your local store is a full sync engine instead of a passive cache, it still fits: answer fetches from its database, report `covered()`, and deliver inbound changes via [`sync` and `syncRemove`](#when-the-server-disagrees).
 
 ::: story
 Alice notices none of this, which is the review the adapter author wanted.

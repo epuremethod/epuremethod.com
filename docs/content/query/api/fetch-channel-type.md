@@ -26,7 +26,7 @@ tags: []
 
 A fetch reports its outcome by calling one named callback — never by returning or constructing a result value, so the contract reads identically from TypeScript and ReScript.
 
-`emit(rows)` delivers the answer and may be called repeatedly (cached rows now, fresh rows later, live updates forever). `covered()` says a delta-sync engine owns this query: mark it fresh, keep current data, expect no rows. `fail(message)` is strictly a transport error — freshness is untouched so the next [tick](api.html#tick) retries, and the failure surfaces on [status](api.html#status). "The server says there are none" is `emit([])`, never `fail`.
+`emit(rows)` delivers the answer and may be called repeatedly (cached rows now, fresh rows later, live updates forever). `covered()` says a delta-sync engine owns this query: mark it fresh, keep current data, expect no rows — and never reconcile or prune its rows; the engine keeps sole ownership. `fail(message)` is strictly a transport error — freshness is untouched so the next [tick](api.html#tick) retries, and the failure surfaces on [status](api.html#status). "The server says there are none" is `emit([])`, never `fail`.
 
 The core cancels a channel when its query is refetched or evicted; a cancelled channel turns every callback into a no-op, so late answers are harmless and adapters never check whether they are still wanted. See guide chapter [Reads answer twice](docs.html#reads-answer-twice).
 

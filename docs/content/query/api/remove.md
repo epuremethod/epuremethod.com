@@ -14,7 +14,7 @@ tags: []
 
 `remove` deletes optimistically: the local store writes a dirty tombstone, the object leaves the cache and every query id list, and `remote.remove` is dispatched when online.
 
-While the delete is pending, fetches cannot resurrect the id. If the remote answers `conflict(server)` or `reject(message)`, the row is restored from server truth — the server said it still exists. Tombstones survive restarts and replay like any queued write. See guide chapter [Writing without waiting](docs.html#writing-without-waiting).
+While the delete is pending, fetches cannot resurrect the id, and inbound updates for it are ignored. If the remote answers `conflict(server)` or `reject(message)`, the row is restored from server truth — the server said it still exists. Tombstones survive restarts, replay like any queued write, and are never touched by reconciliation or retention pruning. See guide chapter [Writing without waiting](docs.html#writing-without-waiting).
 
 ```typescript
 cards.remove(gato);

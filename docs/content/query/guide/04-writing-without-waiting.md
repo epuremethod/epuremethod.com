@@ -35,7 +35,7 @@ The set of unsent writes is the **outbox**. It is not a log: it keeps *the lates
 
 `remove` follows the same shape with one twist: the local store keeps a *tombstone* — a dirty record saying "this was deleted" — instead of just dropping the row. The card leaves the cache and every list immediately; the tombstone is what lets a delete performed offline still reach the server after a restart. Once the remote confirms, the tombstone is purged.
 
-Tombstones also guard the read path: a fetch that returns rows will not resurrect an id with a pending delete, and a row with a pending upsert keeps its optimistic value rather than being overwritten by a fetch that raced it. Reads defer to unsettled writes — the user's intent outranks a snapshot that predates it.
+Tombstones also guard the read path: a fetch that returns rows will not resurrect an id with a pending delete, and a row with a pending upsert keeps its optimistic value rather than being overwritten by a fetch that raced it. Everything defers to unsettled writes — the retention pruning of the [previous chapter](#reads-answer-twice) and inbound updates alike skip dirty rows and tombstones. The user's intent outranks any snapshot that predates it, and nothing removes it from disk until the server has heard it.
 
 ### Replay: reconnect and restart
 

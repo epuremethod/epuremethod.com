@@ -2,7 +2,7 @@
 title: When the server disagrees
 slug: when-the-server-disagrees
 sort: 5
-refs: [sync, status, dismiss, write-channel-type, remote-type]
+refs: [sync, sync-remove, status, dismiss, write-channel-type, remote-type]
 ---
 
 Optimistic writes make a promise the server hasn't confirmed. Most of the time it simply agrees. This chapter is about the other times — and about the fourth kind of update, the one that arrives without being asked for.
@@ -157,10 +157,18 @@ let {pending, rejected, error} = cards.status
 
 ### sync: updates that arrive on their own
 
-Not every change starts on this device. A WebSocket pushes a row; a delta-sync engine applies a batch. For these there is `sync(item)`: it updates the object cache and adjusts query membership — and does *nothing else*. No remote call (the change *came* from the remote), no local save (the sync engine that delivered it owns persistence). It is the inbound half of the [`covered()`](#reads-answer-twice) story: external machinery owns the data flow, and `sync` is how it keeps the in-memory picture aligned.
+Not every change starts on this device. A WebSocket pushes a row; a delta-sync engine applies a batch. For these there is `sync(item)`: it updates the object cache, adjusts query membership, and saves the value *clean* to the local store — so a change pushed while the app was open is still there after an offline restart. What it never does is call the remote: the change *came* from the remote, and echoing it back would be a lie about authorship. It is the inbound half of the [`covered()`](#reads-answer-twice) story: external machinery owns the data flow, and `sync` is how it keeps this device's picture aligned. (An engine that already wrote its own database loses nothing — the extra clean save is idempotent.)
+
+Deletes have their own inbound path, `syncRemove(item)`, and it earns its keep on disk: it evicts the id from the cache and every list, *purges the clean local row*, and drops the id from the persisted query records of [chapter 3](#reads-answer-twice). Dropping the row from memory alone would be a trap — gone from the screen, waiting on disk, back at the next offline start as a ghost.
+
+Both paths yield to the outbox: an id with a pending optimistic write is left alone until the write settles. Alice's tunnel edit is not overwritten by a push that raced it — the conflict machinery above decides, not arrival order.
+
+::: story
+Alice's laptop retires *perro* for good. The server tells her phone over the socket; `syncRemove` walks it out of the deck, the lists, and the local database. Three tunnels later, the app restarts offline — and *perro* stays retired.
+:::
 
 ::: pro
-Resist the urge to call `upsert` for inbound updates because it "also works". It would echo the server's own change back to it and dirty the local store on the way. `sync` exists precisely so that inbound data has a path with no side effects pointing outward.
+Resist the urge to call `upsert` for inbound updates because it "also works". It would echo the server's own change back to it and dirty the local store on the way. `sync` and `syncRemove` exist precisely so that inbound data has a path with no side effects pointing outward.
 :::
 
 Every behavior so far leaned on an adapter doing the right thing with a channel. Time to look at that boundary squarely: what an adapter is, and why the contract is shaped the way it is.

@@ -36,7 +36,7 @@ tags: []
 
 The configuration passed to [make](api.html#make). Required: `id`, the object's identity, and [remote](api.html#remote-type), the authoritative adapter.
 
-`local` is the durable [Store](api.html#store-type) — without it, reads have no offline answer and writes no outbox persistence. `stale` (default 30) and `gc` (default 300) are the seconds before a watched query refreshes and an unwatched one is evicted on [tick](api.html#tick); `now` is the clock in seconds (default `Date.now() / 1000`), injectable for tests.
+`local` is the durable [Store](api.html#store-type) — without it, reads have no offline answer, writes no outbox persistence, and query results no persisted registry. `stale` (default 30) and `gc` (default 300) are the seconds before a watched query refreshes and an unwatched one is evicted on [tick](api.html#tick); `now` is the clock in seconds (default `Date.now() / 1000`), injectable for tests.
 
 `key` serializes a filter into the query cache key (default: sorted JSON stringification). `matches` decides membership, letting writes update query id lists in place without any fetch; `sort` keeps those lists ordered and stable across refetches. See guide chapter [A shape for queries](docs.html#a-shape-for-queries).
 

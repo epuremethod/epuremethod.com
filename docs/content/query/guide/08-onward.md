@@ -10,9 +10,9 @@ Step back and look at what Alice's cards travel through now. A query is a questi
 The mental model compresses well:
 
 - **Two caches, no copies.** Objects live once, by id; queries hold id lists. An update lands everywhere because there is only one everywhere.
-- **Reads answer twice.** Local answers now, remote answers with authority and writes through. Unchanged answers change nothing.
+- **Reads answer twice.** Local answers now, remote answers with authority — writing through what arrived and pruning what fell out. Unchanged answers change nothing.
 - **Writes are held sap.** Durable, then optimistic, then dispatched — latest per id wins, and reconnect or restart replays through the same flow.
-- **Disagreement is vocabulary.** `offline` retries, `conflict` resolves, `reject` surfaces and converges; `sync` lets inbound truth in without an echo.
+- **Disagreement is vocabulary.** `offline` retries, `conflict` resolves, `reject` surfaces and converges; `sync` and `syncRemove` let inbound truth in — and keep it — without an echo.
 - **The boundary is channels.** Adapters own transport and storage; cancellation makes their late answers harmless.
 - **Time is external.** `tick()` refreshes the live and evicts the idle, and liveness is read from the observer graph, not counted by hand.
 
