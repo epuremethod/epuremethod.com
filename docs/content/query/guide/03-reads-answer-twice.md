@@ -2,52 +2,54 @@
 title: Reads answer twice
 slug: reads-answer-twice
 sort: 3
-refs: [array, one, fetch-channel-type, store-type]
+refs: []
 ---
 
-A query has two possible sources: the local store on the device, and the remote. @tilia/query asks both — and the way it arbitrates between their answers is what makes cached data trustworthy instead of merely fast.
+Open a query and two reads start at once: the local store answers from what the device already holds, and the remote answers from the truth. The local answer arrives in milliseconds; the remote takes whatever the network takes. The user sees the first and is quietly upgraded to the second:
 
-### The first read starts the fetch
+```typescript
+cards.array({ deck: "spanish" });
+// now   → { state: "loaded", data: [gato, perro], fresh: false }   local
+// later → { state: "loaded", data: [gato, perro], fresh: true }    remote
+```
 
-Nothing is fetched until someone asks. The first read of `array({deck: "spanish"})` registers the query, marks it stale, and starts a fetch; every later read finds the memoized view. A fetch runs both tiers:
+```rescript
+cards.array({deck: "spanish"})
+// now   → Loaded({data: [gato, perro], fresh: false})   local
+// later → Loaded({data: [gato, perro], fresh: true})    remote
+```
 
-- **local** always answers, if a local store is configured. Whatever it emits fills the caches immediately — this is why the list appears in one frame.
-- **remote** answers only while `remote.online` is true. Its rows are **authoritative**: they refresh the query's freshness timestamp, and they are written through to the local store, so the next offline session starts from the newest truth the device ever saw.
+That is the whole trick, and it is the first rule from [chapter 1](#where-the-network-ends) made mechanical: no spinner ever stands in front of data the device has already seen. The network improves the answer; it does not gate it.
 
-The expectation is simply that the remote's answer lands after the local one — a network round trip after a disk read — so authority arrives last and wins by arriving. Both emit through the same path; there is no special merge step, just a second, better answer to the same question.
+### fresh is about knowledge, not location
 
-::: story
-The métro doors close and the signal dies mid-refresh. Alice's deck doesn't flinch: the local store already answered. The remote's turn will come at the next station.
-:::
+The `fresh` field does not say where the rows are stored. It says whether the remote is known to be current. A UI can whisper that distinction — dim the deck a shade, show a small dot — instead of blocking. When the remote result lands, it becomes the visible one, and its rows are written through to the local store, so tomorrow's cold start answers from today's truth.
 
-If the id list a tier emits is identical to the current one, nothing commits — the view keeps its identity, exactly as the [previous chapter](#a-shape-for-queries) promised. A no-op refresh is invisible by construction, not by diffing the DOM later.
+There is one honest exception: while online, a local answer that is *empty* keeps the query `Loading` rather than flashing an empty screen. Empty-and-checking and empty-for-sure are different facts, and the user should only ever see the second.
 
-### The answer is also the inventory
+### Five answers, each a sentence
 
-An authoritative answer does one more thing: it settles what the device should still be holding. Each query's id list is persisted through the local store, and every remote answer is diffed against the last one — rows that were in the result and no longer are get purged from the local store and evicted from memory. Without this, a row deleted on the server would linger on disk and reappear as a ghost on the next offline start: the screen said gone, the restart said back.
+A `loadable` never makes the reader guess. Each state is a complete sentence:
 
-The rule is worth stating precisely, because it decides what your local store contains: **retention is driven by the server's own answers — the persisted id lists — never by re-evaluating `matches`, and unsynced writes are untouchable.** A row survives as long as some persisted result still claims it or the outbox still owes it to the server; when the last claim goes, so does the row. The local store is thereby bounded to the union of known query results plus unsynced writes — it cannot grow into an unaccounted copy of the server.
+- `Loading` — an answer may still be coming. Shown only when there is truly nothing to show yet.
+- `Loaded, fresh: false` — here is what we know; we are checking.
+- `Loaded, fresh: true` — this is current.
+- `NotFound` — the fetch completed, and there is no such row. An answer, from `one`.
+- `NotLocal` — the device is offline and holds nothing for this query. Also an answer, not a progress state: the app can say "not available offline" instead of spinning forever.
+- `Failed` — the remote fetch broke, and the message surfaces *at the read site*, where the value is used. There is no global error slot to join against, and the query is not stuck: it re-enters the refresh cycle and retries.
 
-::: story
-On the laptop, Alice prunes twenty cards she'll never review again. Her phone, online in her pocket, refreshes the deck and quietly drops the same twenty from disk. In tomorrow's tunnel, the deck is the deck — not the deck plus its dead.
-:::
+### The heartbeat
 
-### Stale is a timestamp, not an event
+Who decides when "fresh" stops being true? The engine owns no timers. The application calls `tick()` on whatever schedule it already has, and the tick does the time-based work: queries someone is watching are refreshed when their result grows old (30 seconds by default, while online), results nobody watches are let go from memory, old local data is eventually purged.
 
-Every query remembers when the remote last confirmed it. A query older than the `stale` window (30 seconds by default) is refetched on the next `tick()` — while online and while someone is actually watching it. [Chapter 7](#the-pulse-and-the-canopy) covers the tick; what matters here is the shape of the policy: freshness decays with time, refresh happens in the background, and the data on screen stays put while the new answer is fetched. There is no flash of *loading* over a list the user is already reading.
-
-### Three ways for a fetch to end
-
-The adapter reports the outcome of a fetch through a channel with three named callbacks, and the distinctions carry the semantics:
-
-- `emit(rows)` — here is the answer. May be called more than once: cached rows now, fresh rows later, live updates forever.
-- `covered()` — "a sync engine owns this query." Mark it fresh, keep whatever the cache holds, don't expect rows. This is the hook for delta-sync setups where the local store *is* continuously updated by other machinery and a remote refetch would be redundant. Covered queries are also never reconciled or pruned — no id list is persisted for them, so the engine keeps sole ownership of their rows.
-- `fail(message)` — a transport error, and strictly that. The query's freshness is left untouched, so the next tick simply retries; the last failure is surfaced on `status.error` for the UI, and cleared by the next success.
-
-The narrowness of `fail` is deliberate. "The server said there are none" is `emit([])`. "I couldn't reach the server" is `fail`. Collapsing the two would poison the cache with absences that were really outages.
+"Someone is watching" is not a subscription API. The engine asks tilia's observer graph which results are currently being read — a component rendering `cards.array({deck: "spanish"})` is what keeps that query alive, and closing the component is what lets it retire. Reading is the registration, exactly as everywhere else in tilia.
 
 ::: pro
-Local-tier failures are ignored by design. A local store that throws is an adapter bug, not a sync state the application should reason about — fix the adapter, don't design UI for it.
+A refetch that returns the same rows changes nothing: the result keeps its identity, and nothing re-renders. Background freshness is free at the UI layer — you never pay a repaint for learning that nothing changed.
 :::
 
-Reading is now solid: instant, honest, self-refreshing. But Alice doesn't just read her cards — she reviews them, in a tunnel, and expects the server to eventually agree. Writing is where the sap has to survive winter.
+::: story
+The 8:04 pulls out. Alice opens the laptop before the wifi has decided whether it exists; the Spanish deck is simply there, yesterday's copy, a shade dimmer if you know where to look. Three stops later something on the screen barely brightens. She never saw a spinner, because there was never nothing to show.
+:::
+
+Reading is now settled: local answers, remote confirms, the app tells the truth about which is which. The train, meanwhile, is heading for the mountains — and the first tunnel is about writes.

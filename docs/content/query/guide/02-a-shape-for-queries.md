@@ -2,102 +2,99 @@
 title: A shape for queries
 slug: a-shape-for-queries
 sort: 2
-refs: [make, get, one, array, dict]
+refs: []
 ---
 
-Everything in @tilia/query starts with one call: `make` builds the query state for a collection. This chapter is about what that object holds — two connected caches — and the vocabulary it uses to answer honestly when data is not there yet.
+The scheduler's repo was injected and politely ignored for nine chapters. Now it is a server, and the first question is what the engine needs to know about your domain to manage it. The answer is deliberately short: two functions.
 
-### Making a collection
+### Identity and membership
 
-`make` takes a configuration that describes the collection in domain terms: how to identify an object, where the data lives, and — optionally — how to decide membership and order without asking the server:
+`id` says which row a value is. `matches` says whether a value belongs to a query. Everything else — caching, refreshing, offline writes, merging — is built on those two answers:
 
 ```typescript
 import { make } from "@tilia/query";
 
-type Card = {
-  id: string;
-  deck: string;
-  front: string;
-  back: string;
-  dueDate: string;
-};
 type DeckQuery = { deck: string };
 
 const cards = make<Card, DeckQuery>({
   id: (card) => card.id,
-  remote, // authoritative — chapter 6 builds it
-  local, // answers offline — chapter 6 builds it too
-  matches: (q, card) => card.deck === q.deck,
-  sort: (a, b) => (a.dueDate < b.dueDate ? -1 : 1),
+  matches: (query, card) => card.deck === query.deck,
+  remote: {
+    online, // a tilia signal — chapter 4
+    fetch: (query, channel) =>
+      api.deckCards(query.deck).then(channel.set, (e) => channel.fail(e.message)),
+    push: (ops, channel) => api.push(ops, channel), // chapter 4
+  },
+  local: cardStore, // a small adaptor over the device's storage — chapter 6
 });
 ```
 
 ```rescript
-type card = {
-  id: string,
-  deck: string,
-  front: string,
-  back: string,
-  dueDate: string,
-}
+open TiliaQuery
+
 type deckQuery = {deck: string}
 
-let cards = TiliaQuery.make({
+let cards = make({
   id: card => card.id,
-  remote, // authoritative — chapter 6 builds it
-  local, // answers offline — chapter 6 builds it too
-  matches: (q, card) => card.deck == q.deck,
-  sort: (a, b) => a.dueDate < b.dueDate ? -1.0 : 1.0,
+  matches: (query, card) => card.deck === query.deck,
+  remote: {
+    online, // a tilia signal — chapter 4
+    fetch: (query, channel) =>
+      Api.deckCards(query.deck)->Promise.thenResolve(channel.set)->ignore,
+    push: (ops, channel) => Api.push(ops, channel), // chapter 4
+  },
+  local: cardStore, // a small adaptor over the device's storage — chapter 6
 })
 ```
 
-Notice what the configuration is *not*: there is no URL, no table name, no serialization format. Those belong to the adapters. What `make` needs is the domain's own logic — identity, membership, order — because those are exactly the three things it can use to keep results correct without a round trip.
+A query is plain data — `{deck: "spanish"}` — and its serialized form is its cache key. Ask the same question anywhere in the application and you get the same living result: one fetch, one cached id list, one identity. There is nothing to register and nothing to name; the question *is* the key.
 
-### Two connected caches
+Notice what `matches` is: a pure predicate over **one row**. That restriction is load-bearing. Because membership can be decided by looking at a single value, the engine can update query results locally — when a write arrives, when a live update lands — without asking the server which lists changed. A query that cannot be expressed this way (a limit, a page, an aggregate) belongs in a domain adaptor of its own, not in this shape.
 
-Internally, `cards` keeps two caches that reference each other:
+### Reading is asking
 
-- an **object cache**, every known card by id;
-- a **query cache**, one entry per distinct filter, holding an *id list* — not copies of the rows.
-
-The split is the load-bearing decision of the whole library. Because queries store ids and objects live in one place, an object updated once is updated everywhere: every list that contains it, every detail view that shows it. There is no "which copy is current?" — there are no copies.
-
-The query cache is keyed by a stable serialization of the filter (`{deck: "spanish"}` and a differently-ordered but equal object produce the same key), so the same question always finds the same entry. You can supply your own `key` function when filters carry values that don't serialize well.
-
-### Three views, one honesty
-
-You read the collection through three views — `array` for lists, `one` for a detail, `dict` when you want rows keyed by id — plus `get` for a plain cache lookup by id. Each returns a `loadable`, a value that admits it might not be there yet:
+Two readers cover collection data: `array` returns a query's results, `one` returns the first result. Both are reactive tilia values — read them in a component or an observer and the subscription is the reading, exactly as in tilia:
 
 ```typescript
-const spanish = cards.array({ deck: "spanish" });
+import { leaf } from "@tilia/react";
 
-if (spanish === "loading") render(skeleton);
-else if (spanish === "notFound") render(empty);
-else render(spanish.data); // Card[]
+const DeckView = leaf(() => {
+  const result = cards.array({ deck: "spanish" });
+  switch (result) {
+    case "loading":
+      return <Skeleton />;
+    case "notFound":
+    case "notLocal":
+      return <EmptyState />;
+    default:
+      if (result.state === "failed") return <Retryable message={result.message} />;
+      return <Deck cards={result.data} dim={!result.fresh} />;
+  }
+});
 ```
 
 ```rescript
-let spanish = cards.array({deck: "spanish"})
+open TiliaReact
 
-switch spanish {
-| Loading => render(skeleton)
-| NotFound => render(empty)
-| Loaded({data}) => render(data)
-}
+@react.component
+let make = leaf(() => {
+  switch cards.array({deck: "spanish"}) {
+  | Loading => <Skeleton />
+  | NotFound | NotLocal => <EmptyState />
+  | Failed({message}) => <Retryable message />
+  | Loaded({data, fresh}) => <Deck cards=data dim={!fresh} />
+  }
+})
 ```
 
+The result is a `loadable` — a value that admits it has a lifecycle. Five answers are possible, and in ReScript the compiler holds you to all of them; the [next chapter](#reads-answer-twice) gives each one its precise meaning. For now, one detail: `array` never answers `NotFound` — an empty result set is a loaded, empty array. `one` answers `NotFound` when the fetch completes and there is no such row.
+
 ::: story
-Alice opens the Spanish deck on her phone. For one frame the list says *loading*; then every card she has ever written is simply there.
+Alice packs. Her cards became an account last month; the laptop and the phone are both signed in. Nothing in her deck components changed that day — they still read `cards.array({deck: "spanish"})` and render what comes back.
 :::
-
-`loadable` is deliberately small. `Loading` means the question was just asked. `Loaded` carries data — and an empty list is `Loaded` with an empty array, not `NotFound`: "the server answered and there are none" is an answer. `NotFound` is reserved for `one` resolving nothing and for `get` missing the cache. The distinction sounds pedantic until a UI has to choose between a spinner and an empty state; then it is the whole point.
-
-### Views keep their identity
-
-Views are memoized per query key: asking `array({deck: "spanish"})` twice returns the *same* reactive value, and that value only rebuilds when the id list actually changes membership or order. A background refetch that returns the same rows commits nothing, notifies nobody, re-renders nothing. This falls straight out of the two-cache design — comparing two id lists is cheap, so the library can afford to check before it speaks.
 
 ::: pro
-Views are tilia values. Read them inside `observe`, a computed, or a React component using tilia, and the view subscribes like any other reactive value — no hooks or glue specific to @tilia/query.
+Keep queries in domain vocabulary and wrap the readers in feature helpers — `deck.spanish()` reads better than a query literal in a component, and it keeps the query shape in one place when it evolves.
 :::
 
-So far the data appeared by magic. The next chapter follows the question out of the cache: who answers a query, in what order, and what *fresh* means.
+Two functions, two readers, one config. What that config buys becomes visible the first time the app opens somewhere slow — because a read here does not answer once. It answers twice.
