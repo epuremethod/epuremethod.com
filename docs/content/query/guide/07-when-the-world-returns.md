@@ -7,42 +7,72 @@ refs: []
 
 Halfway down the valley the phone finds a bar of signal, the connectivity signal flips, and two things happen at once: forty-one operations push to the server in the order Alice made them, and a week of the server's own history comes back the other way. Most of it passes without a ripple — confirmed writes leave the outbox, changed rows slot into their queries. This chapter is about the handful that collide.
 
-While Alice was in the hills, her study group kept editing the shared deck. Nadia rewrote the example sentence on *echar de menos* — the same card Alice rewrote at Nora's table. Two honest edits, one card. What an app does next is a values question wearing a technical costume.
+While Alice was in the hills, her study group kept editing the shared deck. Nadia rewrote the example sentence on *echar de menos* — the same card Alice rewrote at Nora's table. Two honest edits, one card. What an app does next shows how much it *cares*.
 
 The common answers are both small betrayals: refetch and let the server's copy silently replace Alice's week, or surface a raw "409 Conflict" and make her problem out of the app's. The design here refuses both, using an old idea from version control: never compare two versions when you can compare three.
 
 ### Three versions on the table
 
-When a remote value arrives for a row that has local history, the engine calls your `merge` with the full context: `change` tells the local story — `Clean` (no local edit), `Created`, `Updated` with the **base** it started from and the **edit** made since, or `Removed` — and `remote` is the server's version. `Updated` is the three-way setup: base, yours, theirs. A field only truly conflicts when *both* sides changed it, away from each other:
+When a remote value arrives for a row already known locally, the engine calls your `merge` function for two related jobs:
+
+1. fold remote fields into the existing object in place, preserving its reactive identity, and
+2. decide whether the local and remote histories can be reconciled.
+ 
+`change` tells the local story: `Clean` carries the current value with no local edit, `Created` a new local value, `Updated` the **base** and the **edit** made from it, and `Removed` the deleted value; `remote` is the server's version. For a conflict, `Updated` provides the full three-way setup — base, yours, theirs. A conflict only happens when the same field changed from *both* sides, away from each other:
 
 ```typescript
 merge: (change, remote) => {
-  if (change.TAG !== "Updated") return false; // keep remote truth
-  const [base, mine] = [change._0, change._1];
-  for (const key of editableFields) {
-    const iChanged = mine[key] !== base[key];
-    const theyChanged = remote[key] !== base[key];
-    if (iChanged && theyChanged && mine[key] !== remote[key]) return false;
-    if (theyChanged) mine[key] = remote[key];
+  switch (change.change) {
+    case "clean": 
+      // no local edit: fold the server's fields in place
+      Object.assign(change.value, remote);
+      return true;
+    case "updated": {
+      const { base, edited: mine } = change;
+      for (const key of editableFields) {
+        const iChanged = mine[key] !== base[key];
+        const theyChanged = remote[key] !== base[key];
+        if (iChanged && theyChanged && mine[key] !== remote[key]) return false;
+        if (theyChanged) mine[key] = remote[key];
+      }
+      // both edits survive, in one card
+      return true;
+    }
+    case "created":
+      // the server already has this id: same card, or a conflict
+      return editableFields.every((key) => change.edited[key] === remote[key]);
+    case "removed":
+      // keep the freshest version under the pending remove
+      Object.assign(change.base, remote);
+      return true;
   }
-  return true; // both edits survive, in one card
 },
 ```
 
 ```rescript
 merge: (~change, ~remote) =>
   switch change {
-  | Updated(base, mine) =>
+  | Clean({value}) =>
+    // fold the server's fields in place
+    value.example = remote.example 
+    true
+  | Updated({base, edited: mine}) =>
     if mine.example !== base.example && remote.example !== base.example {
       mine.example === remote.example // the same rewrite is no conflict
     } else {
       if remote.example !== base.example {
         mine.example = remote.example
       }
-      true // both edits survive, in one card
+      // both edits survive, in one card
+      true 
       // …the other fields follow the same three-way rule
     }
-  | _ => false // keep remote truth
+    // same card, or a conflict
+  | Created({edited}) => edited.example === remote.example 
+  | Removed({base}) =>
+    // keep the freshest version under the pending remove
+    base.example = remote.example 
+    true
   },
 ```
 
@@ -50,7 +80,7 @@ Return `true` and the merged value stands: Nadia fixed the article on one card w
 
 ### When a human must choose
 
-Recorded disagreements — and writes the server definitively refuses at push time — land in `status.rejected`, each carrying its whole story: what the row was, what was written, and the server's message when there is one. The reactive list is the app's cue to ask, gently, with both versions on screen:
+Recorded disagreements — and mutations the server definitively refuses at push time — land in `status.rejected`, each carrying its whole story: what the row was, what was written, and the server's message when there is one. The reactive list is the app's cue to ask, gently, with both versions on screen:
 
 ```typescript
 const keepTheirs = (r: Rejection<Card>) => cards.dismiss(r);

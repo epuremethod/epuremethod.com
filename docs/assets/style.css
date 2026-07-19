@@ -353,6 +353,18 @@ section + section {
   font-style: italic;
   color: var(--faint);
 }
+/* defcard as a guide callout (markdown "::: def") */
+.chapter .defcard {
+  margin-top: 22px;
+}
+.defcard p {
+  margin: 0;
+}
+.defcard p strong {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--ink);
+}
 
 /* ---------- code figure ---------- */
 .codefig {
@@ -820,7 +832,7 @@ pre[class*=" language-"] {
   padding: 16px 18px;
   overflow-x: auto;
   font-family: var(--mono);
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.65;
   color: var(--ink);
 }
@@ -832,6 +844,9 @@ pre[class*=" language-"] {
   font-style: italic;
   font-size: 15px;
   color: var(--muted);
+}
+.story em {
+  font-weight: 500;
 }
 .story .k {
   display: block;

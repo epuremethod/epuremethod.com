@@ -7,9 +7,9 @@ refs: []
 
 Step back and look at what Alice's app is made of now. The components still read `cards.array({deck: "spanish"})` and render what comes back. The review action still writes a card. Nothing in the feature code mentions tunnels, buses, outboxes, or Spain. One `make()` call, two small adaptors, and a `tick()` on the app's own clock carry the entire trip — and the mental model compresses well:
 
-- **Reads answer twice.** The device answers now, the network confirms later, and `fresh` says honestly which answer you are looking at.
+- **Reads answer twice.** The device answers now, the network confirms later, and `fresh` says which answer you are looking at.
 - **Offline is a state, not an error.** Every loadable state is a complete sentence; `NotLocal` is an answer, not an apology.
-- **A write accepted is a write kept.** Applied to memory and disk immediately, queued in order, pushed at reconnection, safe across restarts — and never garbage-collected while unsent.
+- **A mutation accepted is a mutation kept.** Applied to memory and disk immediately, queued in order, pushed at reconnection, safe across restarts — and never garbage-collected while unsent.
 - **The server is the meeting point.** Devices are just places where the data is remembered; changing hands costs nothing because no cache pretends to be the owner.
 - **Disagreement is data.** Base, yours, theirs: merge what merges, and hold the rest — verbatim — for a human, with no version silently lost.
 
@@ -17,10 +17,10 @@ None of these required @tilia/query. They required *deciding* that a spinner in 
 
 ### Kept honest
 
-Behavior like "a write made offline survives a restart" is exactly the kind of claim that rots in prose. In the épure toolset it doesn't stay prose — the engine's behavior is pinned by an executable specification, scenarios first, in the shape [vitest-bdd](../vitest-bdd/index.html) runs:
+Behavior like "a mutation made offline survives a restart" is exactly the kind of claim that rots in prose. In the épure toolset it doesn't stay prose — the engine's behavior is pinned by an executable specification, scenarios first, in the shape [vitest-bdd](https://vitest-bdd.dev) runs:
 
 ```gherkin
-Scenario: A write made offline survives a restart
+Scenario: A mutation made offline survives a restart
   Given the remote is offline
   When Alice upserts the card "gato"
   And the application restarts

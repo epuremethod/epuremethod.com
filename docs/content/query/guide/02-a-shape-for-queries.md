@@ -5,11 +5,13 @@ sort: 2
 refs: []
 ---
 
-The scheduler's repo was injected and politely ignored for nine chapters. Now it is a server, and the first question is what the engine needs to know about your domain to manage it. The answer is deliberately short: two functions.
+In tilia's domain-driven guide, the scheduler's repository was injected... and politely ignored for nine chapters. Now it is connected to a remote server, and the first question is what the engine needs to know about your domain to manage it.
+
+The answer is deliberately short: two functions.
 
 ### Identity and membership
 
-`id` says which row a value is. `matches` says whether a value belongs to a query. Everything else — caching, refreshing, offline writes, merging — is built on those two answers:
+`id` says which row a value *is*. `matches` says whether a value *belongs* to a query. Everything else (caching, refreshing, offline writes, merging) is built on those two answers:
 
 ```typescript
 import { make } from "@tilia/query";
@@ -22,7 +24,10 @@ const cards = make<Card, DeckQuery>({
   remote: {
     online, // a tilia signal — chapter 4
     fetch: (query, channel) =>
-      api.deckCards(query.deck).then(channel.set, (e) => channel.fail(e.message)),
+      api.deckCards(query.deck, {
+        onSuccess: channel.set,
+        onFail: channel.fail,
+      }),
     push: (ops, channel) => api.push(ops, channel), // chapter 4
   },
   local: cardStore, // a small adaptor over the device's storage — chapter 6
@@ -40,7 +45,7 @@ let cards = make({
   remote: {
     online, // a tilia signal — chapter 4
     fetch: (query, channel) =>
-      Api.deckCards(query.deck)->Promise.thenResolve(channel.set)->ignore,
+      Api.deckCards(query.deck, ~onSuccess=channel.set, ~onFail=channel.fail),
     push: (ops, channel) => Api.push(ops, channel), // chapter 4
   },
   local: cardStore, // a small adaptor over the device's storage — chapter 6
@@ -49,7 +54,7 @@ let cards = make({
 
 A query is plain data — `{deck: "spanish"}` — and its serialized form is its cache key. Ask the same question anywhere in the application and you get the same living result: one fetch, one cached id list, one identity. There is nothing to register and nothing to name; the question *is* the key.
 
-Notice what `matches` is: a pure predicate over **one row**. That restriction is load-bearing. Because membership can be decided by looking at a single value, the engine can update query results locally — when a write arrives, when a live update lands — without asking the server which lists changed. A query that cannot be expressed this way (a limit, a page, an aggregate) belongs in a domain adaptor of its own, not in this shape.
+Notice what `matches` is: a pure predicate over **one row**. That restriction is the cornerstone of the library. Because membership can be decided by looking at a single value, the engine can update query results locally — when a write arrives, when a live update lands — without asking the server which lists changed. A query that cannot be expressed this way (a limit, a page, an aggregate) belongs in a domain adaptor of its own, not in this shape.
 
 ### Reading is asking
 
@@ -87,14 +92,14 @@ let make = leaf(() => {
 })
 ```
 
-The result is a `loadable` — a value that admits it has a lifecycle. Five answers are possible, and in ReScript the compiler holds you to all of them; the [next chapter](#reads-answer-twice) gives each one its precise meaning. For now, one detail: `array` never answers `NotFound` — an empty result set is a loaded, empty array. `one` answers `NotFound` when the fetch completes and there is no such row.
+The result is a `loadable`: a value with a lifecycle. Five answers are possible, and in ReScript the compiler holds you to all of them; the [next chapter](#reads-answer-twice) gives each one its precise meaning.
 
 ::: story
-Alice packs. Her cards became an account last month; the laptop and the phone are both signed in. Nothing in her deck components changed that day — they still read `cards.array({deck: "spanish"})` and render what comes back.
+Alice packs. Her cards became an account last month; the laptop and the phone are both signed in. Nothing in her deck components changed that day. They still read `cards.array({deck: "spanish"})` and render what comes back.
 :::
 
 ::: pro
-Keep queries in domain vocabulary and wrap the readers in feature helpers — `deck.spanish()` reads better than a query literal in a component, and it keeps the query shape in one place when it evolves.
+Keep queries in domain vocabulary and wrap the filters and views in feature helpers : `deck.select("spanish")` reads better than a select with a query literal in a component, and it keeps the query shape in one place when it evolves.
 :::
 
-Two functions, two readers, one config. What that config buys becomes visible the first time the app opens somewhere slow — because a read here does not answer once. It answers twice.
+Two functions, two readers, one config. What that config gives back becomes visible the first time the app opens somewhere slow. Because now a read does not answer once. It answers twice.
