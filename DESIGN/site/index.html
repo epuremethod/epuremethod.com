@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="épure — a method and open toolset for AI-assisted application development: feature files as human-validated contracts, strict layering, reactive UIs, offline-friendly data.">
+<meta name="description" content="épure — a method and open toolset for building software together, humans and AI assistants alike: plain-language scenarios as executable contracts, strict floors, reactive UIs, offline-friendly data.">
 <title>épure — software, drawn before it is built</title>
 <link rel="stylesheet" href="./styles.css">
 </head>
@@ -31,14 +31,16 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
       <div>
-        <p class="eyebrow">A-00 · A method &amp; open toolset for AI-assisted development</p>
+        <p class="eyebrow">A-00 · A method &amp; open toolset for building software together</p>
         <h1>Software, drawn before it is built.</h1>
         <p class="lead">
-          épure is a working method and an open toolset for building applications
-          with AI in organizations that cannot afford surprises — public services,
-          regulated industries, large teams. The drawing comes first: business
-          contracts written in plain language, validated by humans, then implemented
-          by machines under supervision.
+          épure is a working method and an open toolset for building software
+          together — domain owners, developers, AI assistants — in organizations
+          that cannot afford surprises: public services, regulated industries,
+          large teams. The drawing comes first: contracts written in the domain's
+          own words, signed by the people who own the need, honored by the
+          machines that build. What was drawn is what runs — and the work at the
+          table stays convivial.
         </p>
         <div class="cta-row">
           <a class="btn solid" href="#window">Read the method</a>
@@ -54,7 +56,7 @@
 
       <figure class="hero-fig">
         <svg viewBox="0 0 460 372" role="img"
-             aria-label="Architectural section drawing of an application: a views floor on top, a services floor in the middle, and a business foundation resting on hatched ground. A feature-file flag annotates the whole structure.">
+             aria-label="Architectural section drawing of an application: a views floor on top, a services floor and a repo floor beneath it, and a features foundation resting on hatched ground. A feature-file flag annotates the whole structure.">
           <defs>
             <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
               <line x1="0" y1="0" x2="0" y2="7" stroke="currentColor" stroke-width="1" opacity="0.45"/>
@@ -65,35 +67,41 @@
           <line class="draw" style="--d:0" pathLength="1" x1="24" y1="318" x2="436" y2="318" stroke="currentColor" stroke-width="2.5"/>
           <rect class="fadein" style="--d:0.5" x="40" y="320" width="380" height="26" fill="url(#hatch)"/>
 
-          <!-- business foundation -->
-          <rect class="draw" style="--d:0.25" pathLength="1" x="84" y="242" width="292" height="76" fill="none" stroke="currentColor" stroke-width="2"/>
-          <text class="fadein" style="--d:0.9" x="230" y="274" text-anchor="middle" fill="currentColor" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" letter-spacing="2">BUSINESS</text>
-          <text class="fadein" style="--d:0.9" x="230" y="294" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1">PURE FUNCTIONS</text>
+          <!-- features foundation -->
+          <rect class="draw" style="--d:0.2" pathLength="1" x="84" y="261" width="292" height="57" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text class="fadein" style="--d:0.8" x="230" y="285" text-anchor="middle" fill="currentColor" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" letter-spacing="2">FEATURES</text>
+          <text class="fadein" style="--d:0.85" x="230" y="302" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1">THE BUSINESS · PURE FUNCTIONS</text>
+
+          <!-- repo floor -->
+          <rect class="draw" style="--d:0.35" pathLength="1" x="84" y="204" width="292" height="57" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text class="fadein" style="--d:0.9" x="230" y="228" text-anchor="middle" fill="currentColor" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" letter-spacing="2">REPO</text>
+          <text class="fadein" style="--d:0.95" x="230" y="245" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1">PERSISTENCE</text>
 
           <!-- services floor -->
-          <rect class="draw" style="--d:0.45" pathLength="1" x="84" y="166" width="292" height="76" fill="none" stroke="currentColor" stroke-width="2"/>
-          <rect class="draw" style="--d:0.75" pathLength="1" x="100" y="182" width="76" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
-          <rect class="draw" style="--d:0.85" pathLength="1" x="192" y="182" width="76" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
-          <rect class="draw" style="--d:0.95" pathLength="1" x="284" y="182" width="76" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
-          <text class="fadein" style="--d:1.15" x="138" y="208" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">auth</text>
-          <text class="fadein" style="--d:1.2" x="230" y="208" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">storage</text>
-          <text class="fadein" style="--d:1.25" x="322" y="208" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">transport</text>
+          <rect class="draw" style="--d:0.5" pathLength="1" x="84" y="147" width="292" height="57" fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect class="draw" style="--d:0.8" pathLength="1" x="100" y="160" width="76" height="30" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <rect class="draw" style="--d:0.85" pathLength="1" x="192" y="160" width="76" height="30" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <rect class="draw" style="--d:0.9" pathLength="1" x="284" y="160" width="76" height="30" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <text class="fadein" style="--d:1.0" x="138" y="179" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">clock</text>
+          <text class="fadein" style="--d:1.05" x="230" y="179" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">storage</text>
+          <text class="fadein" style="--d:1.1" x="322" y="179" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5">network</text>
 
           <!-- views floor -->
-          <rect class="draw" style="--d:0.65" pathLength="1" x="84" y="90" width="292" height="76" fill="none" stroke="currentColor" stroke-width="2"/>
-          <rect class="draw" style="--d:1.0" pathLength="1" x="102" y="108" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
-          <rect class="draw" style="--d:1.05" pathLength="1" x="142" y="108" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
-          <rect class="draw" style="--d:1.1" pathLength="1" x="182" y="108" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
-          <rect class="draw" style="--d:1.15" pathLength="1" x="222" y="108" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
-          <text class="fadein" style="--d:1.3" x="310" y="120" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1">VIEWS</text>
-          <text class="fadein" style="--d:1.35" x="310" y="134" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="8.5">state → screen</text>
-          <text class="fadein" style="--d:1.4" x="310" y="146" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="8.5">no logic</text>
+          <rect class="draw" style="--d:0.65" pathLength="1" x="84" y="90" width="292" height="57" fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect class="draw" style="--d:0.95" pathLength="1" x="102" y="103" width="26" height="26" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect class="draw" style="--d:1.0" pathLength="1" x="140" y="103" width="26" height="26" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect class="draw" style="--d:1.05" pathLength="1" x="178" y="103" width="26" height="26" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect class="draw" style="--d:1.1" pathLength="1" x="216" y="103" width="26" height="26" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+          <text class="fadein" style="--d:1.2" x="310" y="110" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1">VIEWS</text>
+          <text class="fadein" style="--d:1.25" x="310" y="124" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="8.5">state → screen</text>
+          <text class="fadein" style="--d:1.3" x="310" y="136" text-anchor="middle" fill="var(--faint)" font-family="IBM Plex Mono, monospace" font-size="8.5">no logic</text>
 
           <!-- dimension line, right -->
           <line class="draw" style="--d:1.2" pathLength="1" x1="404" y1="90" x2="404" y2="318" stroke="var(--accent)" stroke-width="1"/>
           <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="90" x2="410" y2="90" stroke="var(--accent)" stroke-width="1"/>
-          <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="166" x2="410" y2="166" stroke="var(--accent)" stroke-width="1"/>
-          <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="242" x2="410" y2="242" stroke="var(--accent)" stroke-width="1"/>
+          <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="147" x2="410" y2="147" stroke="var(--accent)" stroke-width="1"/>
+          <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="204" x2="410" y2="204" stroke="var(--accent)" stroke-width="1"/>
+          <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="261" x2="410" y2="261" stroke="var(--accent)" stroke-width="1"/>
           <line class="draw" style="--d:1.3" pathLength="1" x1="398" y1="318" x2="410" y2="318" stroke="var(--accent)" stroke-width="1"/>
           <text class="fadein" style="--d:1.45" x="422" y="204" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="8.5" letter-spacing="1.5" transform="rotate(90 422 204)" text-anchor="middle">TESTABLE, FLOOR BY FLOOR</text>
 
@@ -113,11 +121,19 @@
       </figure>
     </section>
 
+    <!-- ============ EPIGRAPH ============ -->
+    <blockquote class="epigraph">
+      <p>&ldquo;Convivial tools are those which give each person who uses them
+      the greatest opportunity to enrich the environment with the fruits of his
+      or her vision.&rdquo;</p>
+      <cite>Ivan Illich · Tools for Conviviality, 1973</cite>
+    </blockquote>
+
     <!-- ============ PRINCIPLES ============ -->
     <section id="principles">
       <header class="sec-head">
         <div class="sec-kicker"><span class="no">§ 01</span><span class="rule"></span><span class="tag">Structure</span></div>
-        <h2>Load-bearing principles</h2>
+        <h2>The master lines</h2>
         <p class="sec-lead">
           Four rules carry everything. They make an application legible to the next
           reviewer — whether that reviewer is a colleague, an auditor, or a machine.
@@ -147,16 +163,19 @@
           <span class="pid">P-2</span>
           <div class="picon">
             <svg width="34" height="30" viewBox="0 0 34 30" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="32" height="8" stroke="currentColor" stroke-width="1.5"/>
-              <rect x="1" y="11" width="32" height="8" stroke="currentColor" stroke-width="1.5"/>
-              <rect x="1" y="21" width="32" height="8" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="1" y="1" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="1" y="8.4" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="1" y="15.8" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="1" y="23.2" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
             </svg>
           </div>
-          <h3>Three layers, strictly drawn</h3>
+          <h3>Four bounded floors</h3>
           <p>
-            Business logic is pure functions. Services are named and deliberately
-            few. Views are projections of application state, with no logic of their
-            own. Each floor is testable alone — and replaceable alone.
+            Features hold the business — state, derived values and actions carved
+            into one object, the logic pure functions. Repos persist, one object
+            per saved type. Services are named and deliberately few. Views project
+            state, with no logic of their own. Each floor is testable alone — and
+            replaceable alone.
           </p>
         </article>
 
@@ -193,6 +212,13 @@
           </p>
         </article>
       </div>
+
+      <p class="arrival">
+        In a repository, the method is one page: <code>CONTRIBUTING.md</code> —
+        the working agreement everyone reads on arrival. Humans find it by habit;
+        agents are sent by a one-line <code>AGENTS.md</code> that points them to
+        it. One table, one set of promises.
+      </p>
     </section>
 
     <!-- ============ THE WINDOW ============ -->
@@ -248,7 +274,7 @@
               <p>
                 The feature files are reviewed and validated by the people who own
                 the need. From here on they are the contract the AI must honor —
-                and, run by vitest-bdd, the suite that enforces it.
+                and, run by @epure/vitest, the suite that enforces it.
               </p>
             </div>
             <span class="actor">Business signs</span>
@@ -359,7 +385,7 @@
               <li>TypeScript &amp; ReScript</li>
             </ul>
           </div>
-          <a class="tool-link" href="https://tiliajs.com">tiliajs.com <span class="arrow">↗</span></a>
+          <a class="tool-link" href="https://tiliajs.dev">tiliajs.dev <span class="arrow">↗</span></a>
         </article>
 
         <article class="tool">
@@ -385,7 +411,7 @@
               <li>live updates merged in place</li>
             </ul>
           </div>
-          <a class="tool-link" href="https://tiliajs.com">tiliajs.com <span class="arrow">↗</span></a>
+          <a class="tool-link" href="https://tiliajs.dev/query">tiliajs.dev <span class="arrow">↗</span></a>
         </article>
 
         <article class="tool">
@@ -394,7 +420,7 @@
             <span class="role">Proof</span>
           </div>
           <div class="tool-body">
-            <h3>vitest-bdd</h3>
+            <h3>@epure/vitest</h3>
             <p class="tool-def">
               <span class="term">compas</span> <span class="ipa">/kɔ̃·pa/</span>
               <span class="gram">n., m.</span> — the divider. Steps the drawing
@@ -410,7 +436,7 @@
               <li>runs in CI and in watch mode</li>
             </ul>
           </div>
-          <a class="tool-link" href="https://www.npmjs.com/package/vitest-bdd">npm: vitest-bdd <span class="arrow">↗</span></a>
+          <a class="tool-link" href="https://epurejs.dev">epurejs.dev <span class="arrow">↗</span></a>
         </article>
       </div>
     </section>
@@ -422,8 +448,8 @@
       <div class="tb-cell"><span class="lbl">Project</span><span class="val">ÉPURE — drawn software</span></div>
       <div class="tb-cell"><span class="lbl">Sheet</span><span class="val">A-00 · Title</span></div>
       <div class="tb-cell"><span class="lbl">Scale</span><span class="val">1 : 1</span></div>
-      <div class="tb-cell"><span class="lbl">Date</span><span class="val">2026-07-05</span></div>
-      <div class="tb-cell"><span class="lbl">Rev</span><span class="val">0</span></div>
+      <div class="tb-cell"><span class="lbl">Date</span><span class="val">2026-07-19</span></div>
+      <div class="tb-cell"><span class="lbl">Rev</span><span class="val">1</span></div>
     </div>
     <div class="tb-row crew">
       <div class="tb-cell"><span class="lbl">Drawn by</span><span class="val">Humans</span></div>

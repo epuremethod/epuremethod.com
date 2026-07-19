@@ -101,7 +101,7 @@ Prioritized in three tiers. IDs (`R*` references, `P*` playbooks, `T*` tooling) 
 | P1 | `bootstrap.md` | Zero → running épure project: layout, installs, config, first feature |
 | P2 | `align.md` | Audit + incremental migration of an existing codebase |
 | P3 | `evolve.md` | The development window as an agent-executable protocol |
-| P4 | Project `AGENTS.md` template | The four principles as enforceable rules, dropped into every épure project |
+| P4 | Project `CONTRIBUTING.md` template | The four principles as enforceable rules, dropped into every épure project; a one-line `AGENTS.md` points agent tooling at it |
 
 All four are plain markdown, authored in `docs/content/epure/` (new), published on epuremethod.com (e.g. `/agents/bootstrap.md` and linked from `/llms.txt`), and vendored verbatim into the starter template (T1).
 
@@ -165,7 +165,7 @@ Housekeeping, small but real: the current file says the repo has no build system
    src/views/    projections of state, no logic
    ```
 2. **Install** — `tilia @tilia/react @tilia/query vitest-bdd vitest typescript` (exact package names and the vitest config wiring for `.feature` files).
-3. **Drop in P4** as the project's `AGENTS.md`, and generate `CLAUDE.md` pointing at it.
+3. **Drop in P4** as the project's `CONTRIBUTING.md`, and write the one-line `AGENTS.md` pointing at it ("Read `CONTRIBUTING.md` — it is addressed to you too."), which agent tooling reads on its own.
 4. **First feature end-to-end** — write one `.feature`, one steps file, one business module, one tilia state object, one view; suite green. This worked example is the single most anti-hallucination artifact in the whole plan: it shows the *shape* once, correctly, in the project itself.
 5. **Verification loop** — `tsc --noEmit && vitest run` defined as the project's standing check; the agent is told to run it after every change.
 
@@ -187,9 +187,9 @@ Housekeeping, small but real: the current file says the repo has no build system
 
 P4 references this protocol so it survives in every project, not just on the website.
 
-### P4 — project `AGENTS.md` template
+### P4 — project `CONTRIBUTING.md` template
 
-**Audience:** every agent that ever opens an épure project. One file, ≤ 120 lines, four sections:
+**Audience:** everyone who builds in an épure project — agents land on it through the one-line `AGENTS.md`. One file, ≤ 120 lines, four sections:
 
 1. **Rules** — the four principles as imperatives ("every behavior change starts as a `.feature` diff and stops there until signed", "no network access outside `src/services/`", "views render state, never compute it", "reads answer from local first; writes go through the outbox").
 2. **Read before coding** — `node_modules/tilia/llms.txt`, `node_modules/@tilia/query/llms.txt`, `node_modules/vitest-bdd/llms.txt` (version-matched), with the R2 negative-knowledge blocks inlined as a fallback for offline/partial installs.
