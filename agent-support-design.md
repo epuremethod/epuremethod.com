@@ -11,10 +11,12 @@ prior knowledge of tilia, `@tilia/query`, or `@epure/vitest` can bootstrap an
 project evolves.
 
 This review used the complete local working trees for
-[épure](https://github.com/epuremethod/epuremethod.com),
-[Tilia](https://github.com/tiliajs/tilia), and the repository that is becoming
-[`@epure/vitest`](https://github.com/epuremethod/vitest). Local staged and
-uncommitted work counts as prepared, not published.
+
+* [épure](https://github.com/epuremethod/epuremethod.com)
+* [Tilia](https://github.com/tiliajs/tilia)
+* [@epure/vitest](https://github.com/epuremethod/vitest)
+
+Local staged and uncommitted work counts as prepared, not published.
 
 ---
 
