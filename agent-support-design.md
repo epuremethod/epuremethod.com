@@ -74,8 +74,8 @@ Ownership is now resolved:
   documentation, releases, and `tiliajs.dev`.
 - [epuremethod/vitest](https://github.com/epuremethod/vitest) will own
   `@epure/vitest`, its references, documentation, release, and `epurejs.dev`.
-  The local repository and package are still named `vitest-bdd`; the transfer
-  and rename are pending.
+  The local repositories are in `~/git/epure`. The package is still named
+  `vitest-bdd`; the transfer is done.
 - Starter, plugin, and lint implementations should use separate repositories
   when they become real distributable tools. Their method-level specifications
   remain here.
