@@ -10,6 +10,6 @@ The tools and their documentation live elsewhere: [tilia and @tilia/query](https
 
 ## Contents
 
-- `CONTRIBUTING.md` — the épure working agreement **template**: the artifact consuming projects copy to their root (paired there with a one-line `AGENTS.md` pointing at it). It describes how *épure projects* work, **not** how this repo works — do not follow its promises (feature files, carve layout) here. Never create a root `AGENTS.md` in this repo: agent tooling auto-reads that filename and would be misdirected to the template.
-- `agent-support-design.md` — live design doc for the agent-support surface: references (R1–R4), playbooks (P1–P3), the `CONTRIBUTING.md` template (P4), and tooling (T1–T3).
-- `website/` — epuremethod.com (plain HTML/CSS, deployed by GitHub Actions with no build step).
+- `website/content/agreement.md` — the épure working agreement **template**: the artifact consuming projects copy to their root as `CONTRIBUTING.md` (paired there with a one-line `AGENTS.md` pointing at it). It describes how *épure projects* work, **not** how this repo works — do not follow its promises (feature files, carve layout) here. It is the single source for the published page and the raw download, so edit it and nothing else. Never create a root `AGENTS.md` or `CONTRIBUTING.md` in this repo: agent tooling and GitHub auto-read those filenames and would mistake the template for this repository's own instructions.
+- `agent-support-design.md` — live design doc for the agent-support surface: references (R1–R4), playbooks (P1–P3), the working agreement template (P4), and tooling (T1–T3).
+- `website/` — epuremethod.com, built by [minidoc](https://github.com/epuremethod/minidoc) and deployed by GitHub Actions. `content/config.yaml` declares the shared shell and every output; `content/` holds the page bodies, `assets/` the stylesheet and fonts. `pnpm build` writes `website/dist`, which is what Pages serves.

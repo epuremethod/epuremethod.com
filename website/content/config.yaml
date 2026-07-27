@@ -1,0 +1,133 @@
+var:
+  output: ../dist
+  # Empty on the home page, so its own nav links stay in-page anchors.
+  homeHref: ""
+  agreementCurrentAttr: ""
+  scripts: ""
+  header: |-
+      <header class="top">
+          <a class="wordmark" href="{{homeHref}}#top" aria-label="épure — home">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="10" cy="10" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 0v4M10 16v4M0 10h4M16 10h4" stroke="var(--accent)" stroke-width="1.5"/>
+            </svg>
+            épure
+          </a>
+          <nav class="idx" aria-label="Sections">
+            <a href="{{homeHref}}#principles">Principles</a>
+            <a href="{{homeHref}}#window">The window</a>
+            <a href="{{homeHref}}#projects">The toolset</a>
+            <a href="./agreement.html"{{agreementCurrentAttr}}>The agreement</a>
+          </nav>
+        </header>
+  footer: |-
+      <footer class="titleblock">
+          <div class="tb-row">
+            <div class="tb-cell"><span class="lbl">Project</span><span class="val">ÉPURE — drawn software</span></div>
+            <div class="tb-cell"><span class="lbl">Sheet</span><span class="val">{{sheet}}</span></div>
+            <div class="tb-cell"><span class="lbl">Scale</span><span class="val">1 : 1</span></div>
+            <div class="tb-cell"><span class="lbl">Date</span><span class="val">2026-07-22</span></div>
+            <div class="tb-cell"><span class="lbl">Rev</span><span class="val">1</span></div>
+          </div>
+          <div class="tb-row crew">
+            <div class="tb-cell"><span class="lbl">Drawn by</span><span class="val">Humans</span></div>
+            <div class="tb-cell"><span class="lbl">Built by</span><span class="val">Machines</span></div>
+            <div class="tb-cell"><span class="lbl">Checked by</span><span class="val">Humans</span></div>
+            <div class="tb-cell"><span class="lbl">Notes</span><span class="val">Open source — <a href="https://tiliajs.dev">tiliajs.dev</a></span></div>
+          </div>
+        </footer>
+  shell: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{description}}">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="./styles.css">
+    </head>
+    <body>
+
+    <div class="sheet">
+      <i class="reg tl"></i><i class="reg tr"></i><i class="reg bl"></i><i class="reg br"></i>
+
+    {{header}}
+
+      <main>
+    {{main}}
+      </main>
+
+    {{footer}}
+    </div>
+    {{scripts}}
+    </body>
+    </html>
+  homeMain:
+    file: home.html
+  agreementDoc:
+    file: agreement.md
+  agreementMain: |-
+    <section class="agreement" id="top">
+      <header class="ag-head">
+        <div class="sec-kicker"><span class="no">A-00</span><span class="rule"></span><span class="tag">Working agreement</span></div>
+        <p class="ag-lead">
+          The method fits on one page — this one. It is the file itself, served
+          as it is copied: take it to the root of your project and it becomes
+          the agreement between everyone who builds there.
+        </p>
+        <div class="ag-actions">
+          <button class="btn solid copy" type="button">Copy the file</button>
+          <a class="btn" href="./CONTRIBUTING.md">Raw markdown <span class="arrow">↗</span></a>
+        </div>
+      </header>
+
+      <article class="doc">
+        {{agreementDoc}}
+      </article>
+    </section>
+  copyScript: |-
+    /* The button copies the very file the raw link serves — one source, no second copy.
+       The fetch starts now, not on click: Safari only grants the clipboard to a
+       handler that reaches it without waiting on the network. */
+    var agreement = fetch("./CONTRIBUTING.md").then(function (file) { return file.text(); });
+    document.querySelector(".copy").addEventListener("click", function (event) {
+      var button = event.currentTarget;
+      var label = button.textContent;
+      agreement
+        .then(function (text) { return navigator.clipboard.writeText(text); })
+        .then(function () { button.textContent = "Copied"; })
+        .catch(function () { button.textContent = "Copy failed — take the raw file"; })
+        .then(function () {
+          setTimeout(function () { button.textContent = label; }, 2600);
+        });
+    });
+build:
+  - output: "{{output}}/index.html"
+    input: "{{shell}}"
+    var:
+      title: épure — software, drawn before it is built
+      description: "épure — a method and open toolset for building software together, humans and AI assistants alike: plain-language scenarios as executable contracts, strict floors, reactive UIs, offline-friendly data."
+      sheet: A-00 · Title
+      main: "{{homeMain}}"
+  - output: "{{output}}/agreement.html"
+    input: "{{shell}}"
+    var:
+      title: The working agreement — épure
+      description: "The épure working agreement: the one page every project keeps at its root, addressed to everyone who builds there — humans and AI assistants alike. Copy it, or take the raw markdown."
+      sheet: A-00 · Agreement
+      homeHref: ./index.html
+      agreementCurrentAttr: ' aria-current="page"'
+      main: "{{agreementMain}}"
+      scripts: <script>{{copyScript}}</script>
+  - output: "{{output}}/CONTRIBUTING.md"
+    input:
+      copy: agreement.md
+  - output: "{{output}}/styles.css"
+    input:
+      copy: ../assets/styles.css
+  - output: "{{output}}/fonts"
+    input:
+      copy: ../assets/fonts
+  - output: "{{output}}/CNAME"
+    input:
+      copy: ../assets/CNAME

@@ -1,33 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="épure — a method and open toolset for building software together, humans and AI assistants alike: plain-language scenarios as executable contracts, strict floors, reactive UIs, offline-friendly data.">
-<title>épure — software, drawn before it is built</title>
-<link rel="stylesheet" href="./styles.css">
-</head>
-<body>
-
-<div class="sheet">
-  <i class="reg tl"></i><i class="reg tr"></i><i class="reg bl"></i><i class="reg br"></i>
-
-  <header class="top">
-    <a class="wordmark" href="#top" aria-label="épure — home">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <circle cx="10" cy="10" r="5.5" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M10 0v4M10 16v4M0 10h4M16 10h4" stroke="var(--accent)" stroke-width="1.5"/>
-      </svg>
-      épure
-    </a>
-    <nav class="idx" aria-label="Sections">
-      <a href="#principles">Principles</a>
-      <a href="#window">The window</a>
-      <a href="#projects">The toolset</a>
-    </nav>
-  </header>
-
-  <main>
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
       <div>
@@ -214,11 +184,15 @@
       </div>
 
       <p class="arrival">
-        In a repository, the method is one page: <code>CONTRIBUTING.md</code> —
-        the working agreement everyone reads on arrival. Humans find it by habit;
-        agents are sent by a one-line <code>AGENTS.md</code> that points them to
-        it. One table, one set of promises.
+        In a repository, the method is one page:
+        <a href="./agreement.html"><code>CONTRIBUTING.md</code></a> — the working
+        agreement everyone reads on arrival. Humans find it by habit; agents are
+        sent by a one-line <code>AGENTS.md</code> that points them to it. One
+        table, one set of promises.
       </p>
+      <div class="cta-row">
+        <a class="btn solid" href="./agreement.html">Read the agreement</a>
+      </div>
     </section>
 
     <!-- ============ THE WINDOW ============ -->
@@ -440,25 +414,3 @@
         </article>
       </div>
     </section>
-  </main>
-
-  <!-- ============ TITLE BLOCK ============ -->
-  <footer class="titleblock">
-    <div class="tb-row">
-      <div class="tb-cell"><span class="lbl">Project</span><span class="val">ÉPURE — drawn software</span></div>
-      <div class="tb-cell"><span class="lbl">Sheet</span><span class="val">A-00 · Title</span></div>
-      <div class="tb-cell"><span class="lbl">Scale</span><span class="val">1 : 1</span></div>
-      <div class="tb-cell"><span class="lbl">Date</span><span class="val">2026-07-22</span></div>
-      <div class="tb-cell"><span class="lbl">Rev</span><span class="val">1</span></div>
-    </div>
-    <div class="tb-row crew">
-      <div class="tb-cell"><span class="lbl">Drawn by</span><span class="val">Humans</span></div>
-      <div class="tb-cell"><span class="lbl">Built by</span><span class="val">Machines</span></div>
-      <div class="tb-cell"><span class="lbl">Checked by</span><span class="val">Humans</span></div>
-      <div class="tb-cell"><span class="lbl">Notes</span><span class="val">Open source — <a href="https://tiliajs.dev">tiliajs.dev</a></span></div>
-    </div>
-  </footer>
-</div>
-
-</body>
-</html>
