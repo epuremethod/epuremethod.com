@@ -428,6 +428,7 @@ section + section { border-top: 1.5px solid var(--ink); }
   border-left: 1px solid var(--line);
 }
 .tool {
+  position: relative;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--line);
@@ -496,7 +497,11 @@ p.tool-def {
   text-decoration: none;
   color: var(--ink);
 }
-.tool-link:hover { color: var(--accent); }
+/* the link covers the whole card, so any part of it is clickable */
+.tool-link::after { content: ""; position: absolute; inset: 0; }
+.tool:hover .tool-link { color: var(--accent); }
+.tool-link:focus-visible { outline: none; }
+.tool-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: -3px; }
 .tool-link .arrow { color: var(--accent); }
 
 /* ---------- title block ---------- */
