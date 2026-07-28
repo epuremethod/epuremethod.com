@@ -1,4 +1,4 @@
 .DS_Store
 legacy-docs
 node_modules
-website/dist
+docs/dist
