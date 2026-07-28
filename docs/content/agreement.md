@@ -2,7 +2,7 @@
 
 This project is drawn before it is built — the
 [épure](https://epuremethod.com) way of working together. This file is the
-working agreement: copy it into an empty directory and keep it at the root
+working agreement: copy it to the root of your project and keep it there
 for the life of the project. It is addressed to everyone who will ever build
 here — humans and AI assistants alike — so that the building stays convivial:
 any mind, arriving at any moment, reads this page and knows how the work is
@@ -13,7 +13,7 @@ that assistant tooling lands here on its own.)
 
 1. **The scenarios are the design.** Every want becomes a scenario — Given,
    When, Then, in the domain's own words — before it becomes code. The
-   `.feature` files are the project's design contracts and its decision
+   scenario files are the project's design contracts and its decision
    ledger: to know what the software does, read them; to change what it
    does, change them first. They cannot drift from the code, because they
    run against it. The vocabulary of the code is the vocabulary of the
@@ -33,7 +33,7 @@ that assistant tooling lands here on its own.)
 - **features/** — the business logic. One self-contained object per feature,
   built with tilia's `carve`: its state, its derived values, and its actions
   live together and speak the domain's words. Beside each feature live its
-  `.feature` scenarios and their steps file. The logic itself is ordinary
+  scenarios and their steps file. The logic itself is ordinary
   pure functions — readable, testable alone, handed over whole.
 - **repo/** — persistence. One self-contained object per data type that is
   saved.

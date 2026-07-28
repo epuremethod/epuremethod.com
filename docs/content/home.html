@@ -161,8 +161,8 @@
           <h3>Reactive by construction</h3>
           <p>
             Application state flows to the screen through tilia. Data is loaded
-            ahead of navigation and refreshed in the background — no loading-pizza
-            spinning on every page.
+            ahead of navigation and refreshed in the background — no loading
+            spinner on every page.
           </p>
         </article>
 
@@ -331,7 +331,7 @@
         <div class="sec-kicker"><span class="no">§ 04</span><span class="rule"></span><span class="tag">Open source</span></div>
         <h2>The toolset</h2>
         <p class="sec-lead">
-          Three small tools, each doing one job. Together they make the method
+          Small tools, each doing one job. Together they make the method
           practical: reactive state, predictable remote data, and contracts that run.
         </p>
       </header>
@@ -370,8 +370,8 @@
           <div class="tool-body">
             <h3>@tilia/query</h3>
             <p class="tool-def">
-              <span class="term">sève</span> <span class="ipa">/sɛv/</span>
-              <span class="gram">n., f.</span> — the sap. Moves between root and
+              <span class="gram">workshop name</span> <span class="term">sève</span>
+              <span class="ipa">/sɛv/</span> <span class="gram">n., f.</span> — the sap. Moves between root and
               crown; held through winter, flowing again at thaw.
             </p>
             <p>
@@ -396,16 +396,16 @@
           <div class="tool-body">
             <h3>@epure/vitest</h3>
             <p class="tool-def">
-              <span class="term">compas</span> <span class="ipa">/kɔ̃·pa/</span>
-              <span class="gram">n., m.</span> — the divider. Steps the drawing
+              <span class="gram">workshop name</span> <span class="term">compas</span>
+              <span class="ipa">/kɔ̃·pa/</span> <span class="gram">n., m.</span> — the divider. Steps the drawing
               off against the work.
             </p>
             <p>
-              Contracts that run: every *.feature file is also a Vitest suite, so
-              what business signed is exactly what the tests check.
+              Contracts that run: every scenario file — Gherkin or YAML — is also
+              a Vitest suite, so what business signed is exactly what the tests check.
             </p>
             <ul class="spec">
-              <li>plain Gherkin, no translation layer</li>
+              <li>translated in memory, no generated files</li>
               <li>steps are ordinary functions</li>
               <li>runs in CI and in watch mode</li>
             </ul>
