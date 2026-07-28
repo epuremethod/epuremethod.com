@@ -410,6 +410,7 @@ section + section { border-top: 1.5px solid var(--ink); }
 .sec-note h2 { font-size: clamp(18px, 2.4vw, 21px); }
 .bounds { max-width: 62ch; }
 .bounds p { font-size: 14.5px; color: var(--muted); }
+.bounds p + p { margin-top: 14px; }
 .bound-list { list-style: none; margin: 16px 0; padding: 0; }
 .bound-list li {
   display: flex;

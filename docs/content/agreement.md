@@ -25,10 +25,15 @@ that assistant tooling lands here on its own.)
    kept in sync by hand, because nothing needs to be.
 
 3. **Green is the handshake.** A feature is done when its scenarios pass,
-   and it stays done because they keep passing. Nobody re-reads old code to
-   feel safe; the suite is the trust between collaborators.
+   and it stays done because they keep passing — with the project's standing
+   check green beside them. Trust lives in the suite, not in re-reading old
+   code. And the steps that bind scenarios to code are code: reviewed like
+   code, because a wrong step makes green meaningless.
 
 ## The shape of the code
+
+Four floors, each testable alone. The tools named here are the reference
+stack — a project may swap them; the boundaries and the promises stay.
 
 - **features/** — the business logic. One self-contained object per feature,
   built with tilia's `carve`: its state, its derived values, and its actions

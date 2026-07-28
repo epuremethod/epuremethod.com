@@ -99,14 +99,52 @@
       <cite>Ivan Illich · Tools for Conviviality, 1973</cite>
     </blockquote>
 
+    <!-- ============ LINEAGE ============ -->
+    <section id="lineage" class="sec-note">
+      <header class="sec-head">
+        <div class="sec-kicker"><span class="no">§ 01</span><span class="rule"></span><span class="tag">Lineage</span></div>
+        <h2>Why now</h2>
+        <p class="sec-lead">
+          The method stands on known ground. What changed is who does the
+          work — and that changes what is economical.
+        </p>
+      </header>
+
+      <div class="bounds">
+        <ul class="bound-list">
+          <li><span class="actor">Kept</span> Specification by example — scenarios in the domain's words as the one shared source of truth.</li>
+          <li><span class="actor">Kept</span> The ubiquitous language of domain-driven design — one vocabulary from conversation to code.</li>
+          <li><span class="actor">Kept</span> Ports &amp; adapters — the world at the edges, injected, so the core runs alone.</li>
+        </ul>
+        <p>
+          None of that is new, and BDD already promised most of it. It faded in
+          most places for an honest reason: the translation tax. Somebody had
+          to write the step bindings, carry them through every refactoring,
+          keep the scenarios readable — and that somebody was always a
+          developer with other work. The scenarios rotted into a stilted test
+          dialect the business never read, and teams quietly went back to
+          plain tests.
+        </p>
+        <p>
+          AI assistants change both sides of that ledger. Writing and
+          maintaining the bindings is now nearly free — the tax collapsed. And
+          a new need appeared in its place: an AI that writes code needs an
+          anchor it cannot reinterpret, a contract that holds from one prompt
+          to the next. The signed, executable scenario is exactly that anchor.
+          What was BDD's cost center is now the safety mechanism.
+        </p>
+      </div>
+    </section>
+
     <!-- ============ PRINCIPLES ============ -->
     <section id="principles">
       <header class="sec-head">
-        <div class="sec-kicker"><span class="no">§ 01</span><span class="rule"></span><span class="tag">Structure</span></div>
+        <div class="sec-kicker"><span class="no">§ 02</span><span class="rule"></span><span class="tag">Method</span></div>
         <h2>The master lines</h2>
         <p class="sec-lead">
-          Four rules carry everything. They make an application legible to the next
-          reviewer — whether that reviewer is a colleague, an auditor, or a machine.
+          Four rules carry everything, and none of them names a tool. They make
+          an application legible to the next reviewer — whether that reviewer
+          is a colleague, an auditor, or a machine.
         </p>
       </header>
 
@@ -122,10 +160,11 @@
           </div>
           <h3>Contracts before code</h3>
           <p>
-            Every behavior starts as a <code>*.feature</code> file: plain-language
-            scenarios that business reviews and signs <em>before</em> the AI writes a
-            line of code. The same file is executable — the contract and the test suite are
-            one artifact, so they can never drift apart.
+            Every behavior starts as a scenario file: plain-language
+            Given–When–Then that business reviews and signs <em>before</em> the
+            AI writes a line of code. The same file is executable — contract
+            and test suite are one artifact, and drift is a failing build, not
+            a late discovery.
           </p>
         </article>
 
@@ -133,19 +172,16 @@
           <span class="pid">P-2</span>
           <div class="picon">
             <svg width="34" height="30" viewBox="0 0 34 30" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
-              <rect x="1" y="8.4" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
-              <rect x="1" y="15.8" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
-              <rect x="1" y="23.2" width="32" height="5.8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 5h30M2 12h30M2 19h16M2 26h22" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M22 19h10" stroke="var(--accent2)" stroke-width="1.8"/>
             </svg>
           </div>
-          <h3>Four bounded floors</h3>
+          <h3>The domain's own words</h3>
           <p>
-            Features hold the business — state, derived values and actions carved
-            into one object, the logic pure functions. Repos persist, one object
-            per saved type. Services are named and deliberately few. Views project
-            state, with no logic of their own. Each floor is testable alone — and
-            replaceable alone.
+            One vocabulary runs from the table to the scenario to the
+            identifiers in the code. When the software speaks the domain's
+            language, the people who own the need can read what it promises —
+            and catch what no code review would.
           </p>
         </article>
 
@@ -153,32 +189,36 @@
           <span class="pid">P-3</span>
           <div class="picon">
             <svg width="34" height="30" viewBox="0 0 34 30" fill="none" aria-hidden="true">
-              <path d="M3 27V13l9-9 9 9" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M17 27v-8h6v8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M25 10c4 1 6 4 6 8" stroke="var(--accent2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <rect x="12" y="4" width="20" height="22" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M1 15h13" stroke="var(--accent2)" stroke-width="1.8"/>
+              <path d="M10 11l4 4-4 4" stroke="var(--accent2)" stroke-width="1.8"/>
             </svg>
           </div>
-          <h3>Reactive by construction</h3>
+          <h3>The world arrives injected</h3>
           <p>
-            Application state flows to the screen through tilia. Data is loaded
-            ahead of navigation and refreshed in the background — no loading
-            spinner on every page.
+            The business logic never reaches for the outside world. Storage,
+            network, clock — connectors are named, deliberately few, and handed
+            in from the edge. Every scenario runs against the real logic with
+            no world attached; the core is testable alone, and replaceable
+            alone.
           </p>
         </article>
 
         <article class="pcard">
           <span class="pid">P-4</span>
           <div class="picon">
-            <svg width="38" height="30" viewBox="0 0 38 30" fill="none" aria-hidden="true">
-              <circle cx="14" cy="15" r="10" stroke="currentColor" stroke-width="1.5"/>
-              <circle cx="24" cy="15" r="10" stroke="var(--accent2)" stroke-width="1.5"/>
+            <svg width="34" height="30" viewBox="0 0 34 30" fill="none" aria-hidden="true">
+              <path d="M4 3v24M30 3v24" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M9 15h14" stroke="var(--accent2)" stroke-width="1.8"/>
+              <path d="M19 10l5 5-5 5" stroke="var(--accent2)" stroke-width="1.8"/>
             </svg>
           </div>
-          <h3>Offline, online — both</h3>
+          <h3>Change happens in windows</h3>
           <p>
-            Local-first reads answer instantly; a durable outbox replays writes when
-            the network returns. The same application works in the field, in the
-            basement, and in the audit room.
+            All change is bounded: a window opens on a validated need and
+            closes on an audited, demonstrated result. Between windows the
+            system is stable — nothing is &ldquo;quickly patched.&rdquo;
+            §&nbsp;03 walks a window end to end.
           </p>
         </article>
       </div>
@@ -198,7 +238,7 @@
     <!-- ============ THE WINDOW ============ -->
     <section id="window">
       <header class="sec-head">
-        <div class="sec-kicker"><span class="no">§ 02</span><span class="rule"></span><span class="tag">Governance</span></div>
+        <div class="sec-kicker"><span class="no">§ 03</span><span class="rule"></span><span class="tag">Governance</span></div>
         <h2>The development window</h2>
         <p class="sec-lead">
           AI-assisted development stays safe when it is bounded. All change happens
@@ -233,9 +273,9 @@
             <div>
               <h3>Pair prompting</h3>
               <p>
-                A domain expert and a method expert sit together and draft the change
-                as Gherkin <em>*.feature</em> files — plain-language scenarios anyone
-                in the room can read. This is the épure.
+                A domain expert and a method expert sit together and draft the
+                change as plain-language scenarios — Given, When, Then — that
+                anyone in the room can read. This is the épure.
               </p>
             </div>
             <span class="actor">Expert × Expert</span>
@@ -246,9 +286,10 @@
             <div>
               <h3>The contract is signed</h3>
               <p>
-                The feature files are reviewed and validated by the people who own
-                the need. From here on they are the contract the AI must honor —
-                and, run by @epure/vitest, the suite that enforces it.
+                The scenario files are reviewed and validated by the people who
+                own the need. From here on they are the contract the AI must
+                honor — and, executed by the project's runner, the suite that
+                enforces it.
               </p>
             </div>
             <span class="actor">Business signs</span>
@@ -259,10 +300,10 @@
             <div>
               <h3>Build &amp; iterate</h3>
               <p>
-                The AI implements against the signed scenarios; the contracts anchor
-                every prompt and keep hallucination out of the codebase. A senior
-                reviews on a fixed cadence — every few hours or days, never only at
-                the end.
+                The AI implements against the signed scenarios — a contract it
+                cannot reinterpret, anchoring every prompt. A senior reviews on
+                a fixed cadence — every few hours or days, never only at the
+                end.
               </p>
             </div>
             <span class="actor ai">AI builds · senior reviews</span>
@@ -306,7 +347,7 @@
     <!-- ============ SCOPE ============ -->
     <section id="scope" class="sec-note">
       <header class="sec-head">
-        <div class="sec-kicker"><span class="no">§ 03</span><span class="rule"></span><span class="tag">Scope</span></div>
+        <div class="sec-kicker"><span class="no">§ 04</span><span class="rule"></span><span class="tag">Scope</span></div>
         <h2>What the method does not decide</h2>
       </header>
 
@@ -328,11 +369,16 @@
     <!-- ============ PROJECTS ============ -->
     <section id="projects">
       <header class="sec-head">
-        <div class="sec-kicker"><span class="no">§ 04</span><span class="rule"></span><span class="tag">Open source</span></div>
+        <div class="sec-kicker"><span class="no">§ 05</span><span class="rule"></span><span class="tag">Reference implementation</span></div>
         <h2>The toolset</h2>
         <p class="sec-lead">
-          Small tools, each doing one job. Together they make the method
-          practical: reactive state, predictable remote data, and contracts that run.
+          The method requires no particular stack — only contracts that run,
+          state that keeps the domain's shape, and a world that can be
+          injected.
+        </p>
+        <p class="sec-lead">
+          The tools below are how we build, with ReScript or TypeScript: one
+          reference implementation, open source, not a prerequisite.
         </p>
       </header>
 
@@ -412,5 +458,44 @@
           </div>
           <a class="tool-link" href="https://epurejs.dev">epurejs.dev <span class="arrow">↗</span></a>
         </article>
+      </div>
+
+      <p class="arrival">
+        Built with these, an application settles into the four floors of the
+        section drawing above — features, repos, services, views — each
+        testable alone, each replaceable alone. Reads are local-first and
+        answer instantly; writes queue in a durable outbox and replay when the
+        network returns. The same application works in the field, in the
+        basement, and in the audit room.
+      </p>
+    </section>
+
+    <!-- ============ SIGNATURE ============ -->
+    <section id="author" class="sec-note">
+      <header class="sec-head">
+        <div class="sec-kicker"><span class="no">§ 06</span><span class="rule"></span><span class="tag">Signature</span></div>
+        <h2>Who drew this</h2>
+      </header>
+
+      <div class="bounds">
+        <p>
+          épure is drawn by <strong>Gaspard Anna Bucher</strong> — solutions
+          architect in Swiss public services, twenty-five years of building
+          software for organizations that cannot afford surprises: regulated
+          industries, public administrations, and the people who depend on
+          them. tilia, the method's foundation, was not designed on a
+          whiteboard — it was built for production work in a regulated
+          industry, and runs there still.
+        </p>
+        <p>
+          I drew épure because AI assistants finally make the old promise
+          affordable: software whose design is written in the words of the
+          people it serves — and provable against them.
+        </p>
+        <ul class="bound-list">
+          <li><span class="actor">Code</span> <a href="https://github.com/gaspard">github.com/gaspard</a></li>
+          <li><span class="actor">Work</span> <a href="https://www.linkedin.com/in/gaspard-anna-bucher">linkedin.com/in/gaspard-anna-bucher</a></li>
+          <li><span class="actor">Mail</span> <a href="mailto:g.a.bucher@midasum.com">g.a.bucher@midasum.com</a></li>
+        </ul>
       </div>
     </section>
