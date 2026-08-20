@@ -1,0 +1,39 @@
+{
+  "name": "{{name}}",
+  "sources": [
+    {
+      "dir": "src/domain",
+      "subdirs": true
+    },
+    {
+      "dir": "src/service",
+      "subdirs": true
+    },
+    {
+      "dir": "src/view",
+      "subdirs": true
+    },
+    {
+      "dir": "src/design",
+      "type": "dev",
+      "subdirs": true
+    }
+  ],
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": true
+  },
+  "suffix": ".res.mjs",
+  "jsx": {
+    "version": 4
+  },
+  "dependencies": [
+    "lapa",
+    "tilia",
+    "@tilia/query",
+    "@tilia/react"
+  ],
+  "dev-dependencies": [
+    "@epure/vitest"
+  ]
+}

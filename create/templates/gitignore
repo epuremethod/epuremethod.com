@@ -1,0 +1,7 @@
+node_modules/
+lib/
+*.res.mjs
+.data/
+dist/
+SESSION.md
+.DS_Store

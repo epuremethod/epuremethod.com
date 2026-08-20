@@ -1,13 +1,13 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
       <div>
-        <p class="eyebrow">A-00 · A method &amp; open toolset for building software together</p>
+        <p class="eyebrow">A-00 · A method &amp; an open toolset for building software together</p>
         <h1>Software, drawn before it is built.</h1>
         <p class="lead">
           épure is a working method and an open toolset for building software
           together — domain owners, developers, AI assistants — in organizations
           that cannot afford surprises: public services, regulated industries,
-          large teams. The drawing comes first: contracts written in the domain's
+          and large teams. The drawing comes first: contracts written in the domain's
           own words, signed by the people who own the need, honored by the
           machines that build. What was drawn is what runs — and the work at the
           table stays convivial.
@@ -117,12 +117,12 @@
           <li><span class="actor">Kept</span> Ports &amp; adapters — the world at the edges, injected, so the core runs alone.</li>
         </ul>
         <p>
-          None of that is new, and BDD already promised most of it. It faded in
+          None of that is new, and BDD already promised most of it. It faded from
           most places for an honest reason: the translation tax. Somebody had
           to write the step bindings, carry them through every refactoring,
           keep the scenarios readable — and that somebody was always a
           developer with other work. The scenarios rotted into a stilted test
-          dialect the business never read, and teams quietly went back to
+          dialect that the business never read, and teams quietly went back to
           plain tests.
         </p>
         <p>
@@ -160,8 +160,8 @@
           </div>
           <h3>Contracts before code</h3>
           <p>
-            Every behavior starts as a scenario file: plain-language
-            Given–When–Then that business reviews and signs <em>before</em> the
+            Every behavior starts as a scenario file: a plain-language
+            Given–When–Then contract that the business reviews and signs <em>before</em> the
             AI writes a line of code. The same file is executable — contract
             and test suite are one artifact, and drift is a failing build, not
             a late discovery.
@@ -181,7 +181,7 @@
             One vocabulary runs from the table to the scenario to the
             identifiers in the code. When the software speaks the domain's
             language, the people who own the need can read what it promises —
-            and catch what no code review would.
+            and catch what no code review would catch.
           </p>
         </article>
 
@@ -197,10 +197,9 @@
           <h3>The world arrives injected</h3>
           <p>
             The business logic never reaches for the outside world. Storage,
-            network, clock — connectors are named, deliberately few, and handed
+            network, clock — connectors are named, deliberately limited, and handed
             in from the edge. Every scenario runs against the real logic with
-            no world attached; the core is testable alone, and replaceable
-            alone.
+            no world attached; the core can be tested and replaced in isolation.
           </p>
         </article>
 
@@ -218,7 +217,7 @@
             All change is bounded: a window opens on a validated need and
             closes on an audited, demonstrated result. Between windows the
             system is stable — nothing is &ldquo;quickly patched.&rdquo;
-            §&nbsp;03 walks a window end to end.
+            §&nbsp;03 walks through a window end to end.
           </p>
         </article>
       </div>
@@ -226,8 +225,8 @@
       <p class="arrival">
         In a repository, the method is one page:
         <a href="./agreement.html"><code>CONTRIBUTING.md</code></a> — the working
-        agreement everyone reads on arrival. Humans find it by habit; agents are
-        sent by a one-line <code>AGENTS.md</code> that points them to it. One
+        agreement everyone reads on arrival. Humans find it by habit; agents
+        reach it through a one-line <code>AGENTS.md</code> that points them to it. One
         table, one set of promises.
       </p>
       <div class="cta-row">
@@ -254,7 +253,7 @@
           <div>
             <h3>The need</h3>
             <p>
-              Business states a clear need — in its own words, with the outcome it
+              The business states a clear need — in the domain's own words, with the outcome it
               expects and the value attached to it. No window opens without one.
             </p>
           </div>
@@ -287,7 +286,7 @@
               <h3>The contract is signed</h3>
               <p>
                 The scenario files are reviewed and validated by the people who
-                own the need. From here on they are the contract the AI must
+                own the need. From then on, they are the contract the AI must
                 honor — and, executed by the project's runner, the suite that
                 enforces it.
               </p>
@@ -301,9 +300,8 @@
               <h3>Build &amp; iterate</h3>
               <p>
                 The AI implements against the signed scenarios — a contract it
-                cannot reinterpret, anchoring every prompt. A senior reviews on
-                a fixed cadence — every few hours or days, never only at the
-                end.
+                cannot reinterpret and an anchor for every prompt. A senior reviewer checks the work
+                at fixed intervals — every few hours or days, rather than only at the end.
               </p>
             </div>
             <span class="actor ai">AI builds · senior reviews</span>
@@ -327,7 +325,7 @@
             <div>
               <h3>Security audit</h3>
               <p>
-                Before anything ships, an audit walks the diff, the dependencies and
+                Before anything ships, an audit walks the diff, the dependencies, and
                 the data paths. The window's bounded scope is exactly what makes
                 this audit tractable.
               </p>
@@ -338,7 +336,7 @@
           <div class="win-edge">
             <span class="st-no k">08</span>
             <span class="t">The window closes</span>
-            <span class="note">Stable — maintenance continues, the next need reopens</span>
+            <span class="note">Stable — maintenance continues until the next need opens a window</span>
           </div>
         </div>
       </div>
@@ -359,8 +357,8 @@
         </p>
         <ul class="bound-list">
           <li><span class="actor">Birth</span> Whether the artifact should exist at all: build or buy, prototype or product.</li>
-          <li><span class="actor">Succession</span> Who owns it when its author moves on, and what happens when that name goes stale.</li>
-          <li><span class="actor">Death</span> When it is retired, and what &ldquo;unmaintained&rdquo; triggers.</li>
+          <li><span class="actor">Succession</span> Who owns it when its author moves on, and what happens when the named owner is no longer available.</li>
+          <li><span class="actor">Death</span> When it is retired, and what triggers &ldquo;unmaintained&rdquo; status.</li>
         </ul>
         <p>These are answered before the first window opens.</p>
       </div>
@@ -377,8 +375,8 @@
           injected.
         </p>
         <p class="sec-lead">
-          The tools below are how we build, with ReScript or TypeScript: one
-          reference implementation, open source, not a prerequisite.
+          The tools below are how we build with ReScript or TypeScript: an
+          open-source reference implementation, not a prerequisite.
         </p>
       </header>
 
@@ -393,7 +391,7 @@
             <p class="tool-def">
               <span class="term">tilia</span> <span class="ipa">/ti·li·a/</span>
               <span class="gram">n., Latin</span> — the linden. The carver's
-              wood: even-grained, cuts clean, holds detail.
+              wood: even-grained, cuts cleanly, holds detail.
             </p>
             <p>
               Reactive state that stays in the domain's shape: plain objects and
@@ -422,7 +420,7 @@
             </p>
             <p>
               Query state on top of tilia: a shared object cache, query views,
-              background staleness refresh, and a durable write outbox that
+              background refreshes of stale data, and a durable write outbox that
               survives restarts — offline-friendly by design.
             </p>
             <ul class="spec">
@@ -443,12 +441,12 @@
             <h3>@epure/vitest</h3>
             <p class="tool-def">
               <span class="gram">workshop name</span> <span class="term">compas</span>
-              <span class="ipa">/kɔ̃·pa/</span> <span class="gram">n., m.</span> — the divider. Steps the drawing
-              off against the work.
+              <span class="ipa">/kɔ̃·pa/</span> <span class="gram">n., m.</span> — the divider. Transfers measurements
+              from the drawing to the work.
             </p>
             <p>
               Contracts that run: every scenario file — Gherkin or YAML — is also
-              a Vitest suite, so what business signed is exactly what the tests check.
+              a Vitest suite, so what the business signed is exactly what the tests check.
             </p>
             <ul class="spec">
               <li>translated in memory, no generated files</li>
@@ -463,8 +461,8 @@
       <p class="arrival">
         Built with these, an application settles into the four floors of the
         section drawing above — features, repos, services, views — each
-        testable alone, each replaceable alone. Reads are local-first and
-        answer instantly; writes queue in a durable outbox and replay when the
+        independently testable and replaceable. Reads are local-first and
+        answer instantly; writes are queued in a durable outbox and replayed when the
         network returns. The same application works in the field, in the
         basement, and in the audit room.
       </p>
@@ -479,18 +477,18 @@
 
       <div class="bounds">
         <p>
-          épure is drawn by <strong>Gaspard Anna Bucher</strong> — solutions
+          épure is drawn by <strong>Gaspard Anna Bucher</strong> — a solutions
           architect in Swiss public services, twenty-five years of building
           software for organizations that cannot afford surprises: regulated
           industries, public administrations, and the people who depend on
           them. tilia, the method's foundation, was not designed on a
           whiteboard — it was built for production work in a regulated
-          industry, and runs there still.
+          industry, and still runs there.
         </p>
         <p>
           I drew épure because AI assistants finally make the old promise
           affordable: software whose design is written in the words of the
-          people it serves — and provable against them.
+          people it serves — and provable against what they require.
         </p>
         <ul class="bound-list">
           <li><span class="actor">Code</span> <a href="https://github.com/gaspard">github.com/gaspard</a></li>

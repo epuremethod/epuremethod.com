@@ -1,0 +1,30 @@
+{
+  "name": "@epure/create",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The method's tool: `epure init` scaffolds a project, `epure dev` starts it.",
+  "type": "module",
+  "bin": {
+    "epure": "bin/epure.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "agreement": "cp ../docs/content/agreement.md templates/CONTRIBUTING.md",
+    "res:build": "rescript",
+    "format": "rescript format",
+    "pretest": "pnpm agreement && pnpm res:build",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "rescript": "*",
+    "vite": "*"
+  },
+  "devDependencies": {
+    "@epure/vitest": "1.1.0-beta.20260727T084407",
+    "@rescript/runtime": "^12.3.0",
+    "rescript": "^12.3.0",
+    "vitest": "^3.2.4"
+  }
+}

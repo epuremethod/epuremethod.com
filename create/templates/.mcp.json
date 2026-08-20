@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "desk": {
+      "type": "http",
+      "url": "http://localhost:8080/_lapa/mcp"
+    }
+  }
+}

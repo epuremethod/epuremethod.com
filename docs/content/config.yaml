@@ -71,8 +71,8 @@ var:
       <header class="ag-head">
         <div class="sec-kicker"><span class="no">A-00</span><span class="rule"></span><span class="tag">Working agreement</span></div>
         <p class="ag-lead">
-          The method fits on one page — this one. It is the file itself, served
-          as it is copied: take it to the root of your project and it becomes
+          The method fits on one page — this one. The page serves the file
+          exactly as it is copied: place it at the root of your project and it becomes
           the agreement between everyone who builds there.
         </p>
         <div class="ag-actions">
@@ -96,7 +96,7 @@ var:
       agreement
         .then(function (text) { return navigator.clipboard.writeText(text); })
         .then(function () { button.textContent = "Copied"; })
-        .catch(function () { button.textContent = "Copy failed — take the raw file"; })
+        .catch(function () { button.textContent = "Copy failed — use the raw file"; })
         .then(function () {
           setTimeout(function () { button.textContent = label; }, 2600);
         });
@@ -106,7 +106,7 @@ build:
     input: "{{shell}}"
     var:
       title: épure — software, drawn before it is built
-      description: "épure — a method and open toolset for building software together, humans and AI assistants alike: plain-language scenarios as executable contracts, strict floors, reactive UIs, offline-friendly data."
+      description: "épure — a method and open toolset for building software together — humans and AI assistants alike — using plain-language scenarios as executable contracts, strict floors, reactive UIs, and offline-friendly data."
       sheet: A-00 · Title
       main: "{{homeMain}}"
   - output: "{{output}}/agreement.html"

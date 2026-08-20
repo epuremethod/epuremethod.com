@@ -32,34 +32,21 @@ that assistant tooling lands here on its own.)
 
 ## The shape of the code
 
-The code follows the diagonal architecture: layers ordered by dependency,
-each independently testable, where a lower layer depends on higher layers
-only. Nothing in `src/domain` touches an external library — tilia, the
-state manager, is the one exception. The tools named here are the
-reference stack — a project may swap them; the boundaries and the
-promises stay.
+Four floors, each independently testable. The tools named here are the reference
+stack — a project may swap them; the boundaries and the promises stay.
 
-- **design/** — the executable scenarios, their steps, and the test
-  assembly. The steps that bind scenarios to code are code: reviewed like
-  code, because a wrong step makes passing meaningless.
-- **domain/api/** — the interfaces. `entity/` holds the types of the
-  business objects — the vocabulary. `feature/` holds the contract each
-  feature offers. `service/` holds every contract with the outside world —
-  network, storage, audio, a socket, an rpc call. Whatever the app needs
-  from the world is defined here and injected, so a test hands a feature
-  fakes instead of the world.
-- **domain/feature/** — the business behavior. One self-contained object
-  per feature, built with tilia's `carve`: its state, its derived values,
-  and its actions live together and speak the domain's words. The logic
-  itself consists of ordinary pure functions — readable, testable in
-  isolation, and handed over as a whole.
-- **service/** — the connectors to the outside world (storage, network,
-  clock, audio, translations). A service abstracts the technical details
-  behind its interface; it holds no cache and no business logic.
-- **view/** — the face. Views read features and render; they contain no
-  business logic. The scenario suite never needs to know views exist. A
-  server has **surfaces/** instead: one directory per surface, assembling
-  the layers below it for the people or agents that reach it.
+- **features/** — the business logic. One self-contained object per feature,
+  built with tilia's `carve`: its state, its derived values, and its actions
+  live together and speak the domain's words. Alongside each feature are its
+  scenarios and its steps file. The logic itself consists of ordinary
+  pure functions — readable, testable in isolation, and handed over as a whole.
+- **repo/** — persistence. One self-contained object per data type that is
+  saved.
+- **services/** — connectors to the outside world (storage, network, clock,
+  audio, translations). Features and repos never reach for the world; the
+  world arrives **injected**, so every feature runs unchanged in a test.
+- **views/** — the face. Views read features and render; they contain no
+  business logic. The scenario suite never needs to know views exist.
 
 ## The loop
 

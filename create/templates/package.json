@@ -1,0 +1,34 @@
+{
+  "name": "{{name}}",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "epure dev",
+    "res:build": "rescript",
+    "res:dev": "rescript watch",
+    "format": "rescript format",
+    "build": "rescript && vite build",
+    "pretest": "rescript",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@tilia/query": "^0.1.0-beta",
+    "@tilia/react": "^6.0.0-beta",
+    "lapa": "^0.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tilia": "^6.0.0-beta"
+  },
+  "devDependencies": {
+    "@epure/create": "^0.0.0",
+    "@epure/vitest": "1.1.0-beta.20260727T084407",
+    "@rescript/react": "^0.15.0",
+    "@rescript/runtime": "^12.3.0",
+    "rescript": "^12.3.0",
+    "vite": "^7.1.0",
+    "vitest": "^3.2.4"
+  }
+}
