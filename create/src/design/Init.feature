@@ -57,6 +57,19 @@ Feature: Initialize an epure project
     When Theo initializes a project named "adventure"
     Then the built page says "adventure is running"
 
+  Scenario: The create convention names the project directly
+    When Theo creates a project named "adventure-parc" with no command
+    Then "adventure-parc" exists
+    And "adventure-parc/package.json" names the project "adventure-parc"
+
+  Scenario: A project made with no registry carries no npmrc
+    When Theo initializes a project named "adventure"
+    Then "adventure/.npmrc" does not exist
+
+  Scenario: A project made against a registry keeps it
+    When Theo initializes a project named "adventure-npm" against "https://registry.npmjs.org/"
+    Then "adventure-npm/.npmrc" contains "https://registry.npmjs.org/"
+
   # ── Refusals ───────────────────────────────────────────────────────────
 
   Scenario: Init refuses to replace an existing directory

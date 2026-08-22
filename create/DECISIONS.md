@@ -133,3 +133,65 @@ Refused: letting the spawn error throw. An unhandled stack trace names
 nothing and leaves the watcher running.
 
 Costs an exit that waits for its children.
+
+## 2026-08-22 — The template's versions are fixed when the tool publishes
+
+`pnpm sync` resolves every dependency the template names against the
+registry in front of it and writes what it found. A template is worth
+what its versions were installed, built and tested at together, so they
+are fixed here and never resolved when a project is scaffolded. The four
+steps are sync, commit, test, publish, in that order: sync is its own
+step so the bump lands in the history as a readable change, and what was
+tested is what was committed.
+
+Sync follows the line the template is already on. A prerelease spec asks
+for that tag, anything else asks for the release, and either falls back
+to the other when the line it wants is empty. The range written is a
+caret over the base version, keeping the first prerelease identifier:
+`0.1.0-beta.3` becomes `^0.1.0-beta`, `19.2.3` becomes `^19.2.3`.
+
+Refused: taking the newest version regardless of line. `tilia` is
+`5.2.0` on latest and 6 on beta, and the scaffold's `Live.res` is
+written against 6 — sync would have downgraded it and broken the build.
+Leaving a beta line stays a hand edit, which sync then respects.
+
+Refused: a curated list of packages to pin. The range style follows from
+what the registry answers, so `react` and `lapa` go through one path.
+
+A beta range floats on purpose. `^0.1.0-beta` matches every later beta
+of that line and then the release that ends it, which is what a beta is
+for. It does not reach the next line, so moving from `^0.1.0-beta` to
+`^0.2.0-beta` is a sync and a commit that someone reads.
+
+Costs a step before every publish, and a refusal when a dependency is
+not published — sync writes nothing rather than moving the template half
+way.
+
+## 2026-08-22 — `pnpm create @epure <name>` names the project directly
+
+npm's create convention runs the bin as `epure <name>`, with no
+subcommand, and the tool answered its usage line instead. A first word
+that is neither a command nor a flag is the project's name. `epure init
+<name>` still works and is what the scenarios drive.
+
+Costs a rule that a future subcommand must be added to.
+
+## 2026-08-22 — `--registry` hands the registry to the project
+
+pnpm reads `.npmrc` from the project directory and does not walk up, so
+a registry configured where the command was typed does not reach the
+install `init` runs one level down. `epure init <name> --registry <url>`
+writes `.npmrc` into the scaffold, so the first install and every later
+one find it. With no flag no file is written.
+
+Refused: restricting the flag to prerelease versions. Where packages
+come from and what versions they are are unrelated, and a mirror, an
+offline install or a CI cache are ordinary reasons to point elsewhere.
+The guard against publishing in the wrong place is
+`publishConfig.registry`, which is a different thing.
+
+Refused: redirecting `registry.npmjs.org` in `/etc/hosts`. It is
+machine-global and invisible, and it fails on TLS against a local
+registry serving http.
+
+Costs an `.npmrc` in a scaffold whose maker asked for one.

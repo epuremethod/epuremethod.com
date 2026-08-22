@@ -33,6 +33,25 @@ module System = {
 let package = System.resolved(System.parent(fileOf(importUrl)), "../..")
 let entry = System.joined(package, "bin/epure.mjs")
 
+@val @scope("process") external environment: dict<string> = "env"
+
+let sylva = switch environment->Dict.get("SYLVA") {
+| Some(path) if path != "" => path
+| _ => System.resolved(package, "../../sylva")
+}
+
+// The checkouts an init in this suite links, so it installs what is here
+// rather than what a registry holds. One list: the shared init and the
+// scenarios that run their own must link the same things.
+let links = [
+  "--with",
+  `lapa=link:${System.joined(sylva, "lapa")}`,
+  "--with",
+  `@lapa/server=link:${System.joined(sylva, "server")}`,
+  "--with",
+  `@epure/create=link:${package}`,
+]
+
 type golden = {project: string, lapa: string}
 
 let golden = () =>
@@ -49,9 +68,9 @@ let golden = () =>
 
 type ran = {said: string, complained: string, code: int}
 
-let runs = async (args: array<string>, ~at: string) => {
+let runs = async (args: array<string>, ~at: string, ~entry as from=entry) => {
   open System
-  let child = run("node", [entry]->Array.concat(args), {"cwd": at})
+  let child = run("node", [from]->Array.concat(args), {"cwd": at})
   let said = ref("")
   let complained = ref("")
   child->out->reads("utf8")

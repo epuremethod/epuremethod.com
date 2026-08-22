@@ -1,0 +1,18 @@
+# The tool as a project runs it: the bin, the compiled sources, and the
+# templates whole. Without this file npm falls back to .gitignore, which
+# ignores the generated templates/CONTRIBUTING.md — the scaffold would arrive
+# without the agreement.
+
+/lib/
+/src/design/
+/vitest.config.mjs
+
+# This project's own method files. The scaffold's are under templates/.
+/AGENTS.md
+/CONTRIBUTING.md
+/CONVENTIONS.md
+/DECISIONS.md
+/SESSION.md
+
+# The maintainer runs sync; a project never does.
+/bin/sync.mjs

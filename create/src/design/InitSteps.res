@@ -87,6 +87,33 @@ given("an empty working directory", ({step}, context: testContext) => {
     }
   )
 
+  step("Theo creates a project named {string} with no command", async (name: string) =>
+    last := Some(await TestCli.runs([name]->Array.concat(TestCli.links), ~at=place()))
+  )
+
+  step("{string} names the project {string}", (path: string, name: string) =>
+    switch JSON.parseOrThrow(System.readFile(at(path), "utf8")) {
+    | JSON.Object(fields) => expect(fields->Dict.get("name")).toEqual(Some(JSON.String(name)))
+    | _ => expect(path).toBe("an object")
+    }
+  )
+
+  step(
+    "Theo initializes a project named {string} against {string}",
+    async (name: string, registry: string) =>
+      last :=
+        Some(
+          await TestCli.runs(
+            ["init", name, "--registry", registry]->Array.concat(TestCli.links),
+            ~at=place(),
+          ),
+        ),
+  )
+
+  step("{string} does not exist", (path: string) =>
+    expect((path, System.exists(at(path)))).toEqual((path, false))
+  )
+
   step("{string} exists", (path: string) =>
     expect((path, System.exists(at(path)))).toEqual((path, true))
   )

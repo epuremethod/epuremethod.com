@@ -7,6 +7,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { links } from "./TestCli.mjs";
+
 const create = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const sylva = process.env.SYLVA ?? resolve(create, "../../sylva");
 
@@ -18,10 +20,7 @@ export default function setup() {
       join(create, "bin/epure.mjs"),
       "init",
       "adventure",
-      "--with",
-      `lapa=link:${join(sylva, "lapa")}`,
-      "--with",
-      `@epure/create=link:${create}`,
+      ...links,
     ],
     { cwd: root, stdio: "inherit" },
   );

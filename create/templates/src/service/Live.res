@@ -1,3 +1,6 @@
+open Lapa.App
+open Lapa.Data
+
 // Live queries: @tilia/query fed by the lapa client. Lapa owns the
 // database — the front, the push, the pull, the refusal. The engine owns
 // the read model: what a view asks stays live as writes land and pulls

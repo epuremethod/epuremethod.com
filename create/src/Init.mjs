@@ -65,7 +65,7 @@ function overrides(raw, withs) {
   return JSON.stringify(json, undefined, 2) + "\n";
 }
 
-function run(name, withs) {
+function run(name, withs, registry) {
   let dir = Nodepath.resolve(process.cwd(), name);
   if (Nodefs.existsSync(dir) && Nodefs.readdirSync(dir).length !== 0) {
     process.stderr.write(`init refuses: ` + name + ` already holds files\n`);
@@ -80,6 +80,9 @@ function run(name, withs) {
       recursive: true
     });
     Nodefs.writeFileSync(target, text$1);
+  });
+  Stdlib_Option.forEach(registry, url => {
+    Nodefs.writeFileSync(Nodepath.join(dir, ".npmrc"), `registry=` + url + `\n`);
   });
   let installed = Nodechild_process.spawnSync("pnpm", ["install"], {
     cwd: dir,

@@ -52,7 +52,7 @@ let overrides = (raw: string, withs: array<(string, string)>) => {
   }
 }
 
-let run = (name: string, withs: array<(string, string)>) => {
+let run = (name: string, withs: array<(string, string)>, ~registry=?) => {
   let dir = resolved(cwd(), name)
   if exists(dir) && readDir(dir)->Array.length > 0 {
     warn(`init refuses: ${name} already holds files\n`)
@@ -66,6 +66,10 @@ let run = (name: string, withs: array<(string, string)>) => {
     mkdir(parent(target), {"recursive": true})
     writeFile(target, text)
   })
+  // pnpm reads .npmrc from the project directory and does not walk up, so a
+  // registry named where the command was typed does not reach the install one
+  // level down. The project keeps it, and its later installs find it too.
+  registry->Option.forEach(url => writeFile(joined(dir, ".npmrc"), `registry=${url}\n`))
   let installed = runSync("pnpm", ["install"], {"cwd": dir, "stdio": "inherit"})
   if Nullable.toOption(installed["status"]) != Some(0) {
     warn(`init could not install in ${name}\n`)

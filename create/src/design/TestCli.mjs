@@ -28,6 +28,19 @@ let $$package = Nodepath.resolve(Nodepath.dirname(Nodeurl.fileURLToPath(import.m
 
 let entry = Nodepath.join($$package, "bin/epure.mjs");
 
+let path = process.env["SYLVA"];
+
+let sylva = path !== undefined && path !== "" ? path : Nodepath.resolve($$package, "../../sylva");
+
+let links = [
+  "--with",
+  `lapa=link:` + Nodepath.join(sylva, "lapa"),
+  "--with",
+  `@lapa/server=link:` + Nodepath.join(sylva, "server"),
+  "--with",
+  `@epure/create=link:` + $$package
+];
+
 function golden() {
   let fields = JSON.parse(Nodefs.readFileSync(Nodepath.join(Nodeos.tmpdir(), "epure-golden.json"), "utf8"));
   if (typeof fields !== "object" || fields === null || Array.isArray(fields)) {
@@ -45,8 +58,9 @@ function golden() {
   }
 }
 
-async function runs(args, at) {
-  let child = Nodechild_process.spawn("node", [entry].concat(args), {
+async function runs(args, at, fromOpt) {
+  let from = fromOpt !== undefined ? fromOpt : entry;
+  let child = Nodechild_process.spawn("node", [from].concat(args), {
     cwd: at
   });
   let said = {
@@ -76,6 +90,8 @@ export {
   System,
   $$package,
   entry,
+  sylva,
+  links,
   golden,
   runs,
 }

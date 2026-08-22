@@ -89,10 +89,36 @@ Vitest$1.Given("an empty working directory", (param, context) => {
       last.contents = await TestCli.runs([
         "init",
         name
-      ], root);
+      ], root, undefined);
       return;
     }
   });
+  step("Theo creates a project named {string} with no command", async name => {
+    last.contents = await TestCli.runs([name].concat(TestCli.links), place(), undefined);
+  });
+  step("{string} names the project {string}", (path, name) => {
+    let fields = JSON.parse(Nodefs.readFileSync(Nodepath.join(root(), path), "utf8"));
+    if (typeof fields === "object" && fields !== null && !Array.isArray(fields)) {
+      return Vitest.expect(fields["name"]).toEqual(name);
+    } else {
+      return Vitest.expect(path).toBe("an object");
+    }
+  });
+  step("Theo initializes a project named {string} against {string}", async (name, registry) => {
+    last.contents = await TestCli.runs([
+      "init",
+      name,
+      "--registry",
+      registry
+    ].concat(TestCli.links), place(), undefined);
+  });
+  step("{string} does not exist", path => Vitest.expect([
+    path,
+    Nodefs.existsSync(Nodepath.join(root(), path))
+  ]).toEqual([
+    path,
+    false
+  ]));
   step("{string} exists", path => Vitest.expect([
     path,
     Nodefs.existsSync(Nodepath.join(root(), path))

@@ -4,7 +4,36 @@ import * as Dev from "./Dev.mjs";
 import * as Init from "./Init.mjs";
 import * as Stdlib_String from "@rescript/runtime/lib/es6/Stdlib_String.js";
 
-let usage = "epure <init|dev>\n  init <name> [--with package=spec]\n  dev\n";
+let usage = "epure <init|dev>\n  init <name> [--registry <url>] [--with package=spec]\n  dev\n";
+
+function names(word) {
+  if (word !== "init" && word !== "dev") {
+    return !word.startsWith("-");
+  } else {
+    return false;
+  }
+}
+
+function flagged(args, name) {
+  let _index = 0;
+  while (true) {
+    let index = _index;
+    let match = args[index];
+    let match$1 = args[index + 1 | 0];
+    if (match === undefined) {
+      return;
+    }
+    if (match$1 !== undefined) {
+      if (match === name) {
+        return match$1;
+      }
+      _index = index + 1 | 0;
+      continue;
+    }
+    _index = index + 1 | 0;
+    continue;
+  };
+}
 
 function withsOf(args) {
   let withs = [];
@@ -49,9 +78,15 @@ function main() {
         return Dev.main();
       case "init" :
         if (match$1 !== undefined && !match$1.startsWith("-")) {
-          return Init.run(match$1, withsOf(args));
+          return Init.run(match$1, withsOf(args), flagged(args, "--registry"));
         }
         break;
+    }
+    if (names(match)) {
+      return Init.run(match, withsOf(args), flagged(args, "--registry"));
+    } else {
+      process.stderr.write(usage);
+      return process.exit(1);
     }
   }
   process.stderr.write(usage);
@@ -60,6 +95,8 @@ function main() {
 
 export {
   usage,
+  names,
+  flagged,
   withsOf,
   main,
 }
