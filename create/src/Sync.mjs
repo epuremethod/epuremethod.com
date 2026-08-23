@@ -3,6 +3,7 @@
 import * as Init from "./Init.mjs";
 import * as Nodefs from "node:fs";
 import * as Nodepath from "node:path";
+import * as Stdlib_Int from "@rescript/runtime/lib/es6/Stdlib_Int.js";
 import * as Stdlib_JsExn from "@rescript/runtime/lib/es6/Stdlib_JsExn.js";
 import * as Stdlib_Option from "@rescript/runtime/lib/es6/Stdlib_Option.js";
 import * as Stdlib_String from "@rescript/runtime/lib/es6/Stdlib_String.js";
@@ -61,24 +62,24 @@ function split(version) {
   }
 }
 
-function ranged(version) {
+function named(version) {
   let match = split(version);
   let pre = match[1];
-  let base = match[0];
-  if (pre === undefined) {
-    return `^` + base;
-  }
-  let tag = pre.split(".")[0];
-  if (tag !== undefined) {
-    return `^` + base + `-` + tag;
+  if (pre !== undefined) {
+    return Stdlib_Option.getOr(pre.split(".")[0], "beta");
   } else {
-    return `^` + base;
+    return `^` + version;
   }
 }
 
 function wanted(spec) {
-  let match = split(spec.replace("^", ""));
-  let pre = match[1];
+  let bare = spec.replace("^", "");
+  let match = Stdlib_Int.fromString(bare.slice(0, 1), undefined);
+  if (match === undefined) {
+    return bare;
+  }
+  let match$1 = split(bare);
+  let pre = match$1[1];
   if (pre !== undefined) {
     return Stdlib_Option.getOr(pre.split(".")[0], "latest");
   } else {
@@ -182,7 +183,7 @@ async function main() {
           param[0],
           $$package,
           spec,
-          ranged(taken(packument, $$package, tag))
+          named(taken(packument, $$package, tag))
         ];
       }));
     } catch (raw_error) {
@@ -215,7 +216,7 @@ export {
   flagged,
   registry,
   split,
-  ranged,
+  named,
   wanted,
   asked,
   taken,

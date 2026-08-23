@@ -33,6 +33,8 @@ Feature: Initialize an epure project
       | rescript      | dev dependency |
       | vite          | dev dependency |
     And "adventure/.mcp.json" contains "http://localhost:8080/_lapa/mcp"
+    And "adventure/.mcp.json" contains "Authorization"
+    And "adventure/AGENTS.md" contains "pnpm dev"
     # pnpm stops on a build script it was not told about and tells the person
     # to run `pnpm approve-builds` — from a directory they are not in, after an
     # install that scrolled past. Asserted on the file rather than on the
@@ -42,6 +44,7 @@ Feature: Initialize an epure project
     And "adventure/pnpm-workspace.yaml" contains "msgpackr-extract: true"
     And "adventure/pnpm-workspace.yaml" contains "esbuild: true"
     And "adventure/.gitignore" contains ".data"
+    And "adventure/.gitignore" contains ".mcp.json"
     And "adventure/src/view/Page.res" exists
     And "adventure/src/service/Live.res" exists
     And "adventure/src/app.css" exists

@@ -8,3 +8,13 @@
 allowBuilds:
   esbuild: true
   msgpackr-extract: true
+
+# pnpm 11 holds a version back for a day after it is published
+# (`minimumReleaseAge`), and quietly resolves an older one meanwhile. The
+# method's own families move by betas that a scaffold installs minutes after
+# they are published, so they are exempt. Remove each as its line releases.
+minimumReleaseAgeExclude:
+  - "@epure/*"
+  - "@lapa/*"
+  - tilia
+  - "@tilia/*"

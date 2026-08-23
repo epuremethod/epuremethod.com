@@ -1,5 +1,11 @@
 Read `CONTRIBUTING.md` before changing the project.
 
+Run the app with `pnpm dev`, in the background, and leave it running. It
+prints one link with the session in the address. Give that link to the
+person to open: the app opens only on a session. `.mcp.json` names the
+desk on the same session — the install wrote it, dev keeps it — and the
+desk's tools answer while dev runs.
+
 Write plain, natural English:
 
 - Use common words, short sentences, active voice, and concrete subjects.

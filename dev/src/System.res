@@ -15,13 +15,20 @@ type stream
 @send external signal: (child, string) => bool = "kill"
 
 @module("node:fs") external exists: string => bool = "existsSync"
+@module("node:fs") external readFile: (string, string) => string = "readFileSync"
+@module("node:fs") external writeFile: (string, string, {"mode": int}) => unit = "writeFileSync"
 @module("node:path") external joined: (string, string) => string = "join"
 @module("node:path") external named: string => string = "basename"
 
 @val external answers: string => promise<'a> = "fetch"
 @val external later: (unit => unit, int) => unit = "setTimeout"
 
+type timer
+@val external delay: (unit => unit, int) => timer = "setTimeout"
+@send external unref: timer => unit = "unref"
+
 @val external process: 'a = "process"
+@val @scope("process") external argv: array<string> = "argv"
 @val @scope("process") external cwd: unit => string = "cwd"
 @val @scope("process") external exit: int => 'never = "exit"
 // Sets the code and lets the process leave when its children have closed.

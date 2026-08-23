@@ -6,6 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "postinstall": "epure-dev prepare",
     "dev": "epure-dev",
     "res:build": "rescript",
     "res:dev": "rescript watch",
@@ -15,18 +16,18 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@lapa/board": "^0.1.0-beta",
-    "@lapa/db": "^0.1.0-beta",
-    "@tilia/query": "^0.1.0-beta",
-    "@tilia/react": "^6.0.0-beta",
+    "@lapa/board": "beta",
+    "@lapa/db": "beta",
+    "@tilia/query": "beta",
+    "@tilia/react": "beta",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tilia": "^6.0.0-beta"
+    "tilia": "beta"
   },
   "devDependencies": {
-    "@epure/dev": "^0.1.0-beta",
-    "@epure/vitest": "^1.1.0-beta",
-    "@lapa/server": "^0.1.0-beta",
+    "@epure/dev": "beta",
+    "@epure/vitest": "beta",
+    "@lapa/server": "beta",
     "@rescript/react": "^0.15.0",
     "@rescript/runtime": "^12.3.0",
     "@tailwindcss/vite": "^4.3.3",

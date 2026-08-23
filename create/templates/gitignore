@@ -2,6 +2,7 @@ node_modules/
 lib/
 *.res.mjs
 .data/
+.mcp.json
 dist/
 SESSION.md
 .DS_Store

@@ -60,5 +60,10 @@ pnpm res:build
 npm --no-git-tag-version version "$VERSION" >/dev/null
 pnpm publish --tag beta --access public --no-git-checks --registry "$REGISTRY"
 
+# `latest` too, while every version is a prerelease: npm sets it on the first
+# publish whatever the tag says and never moves it again, and `pnpm create`
+# reads it. See sylva's bin/publish.sh for the whole of it.
+npm dist-tag add "@epure/create@$VERSION" latest --registry "$REGISTRY"
+
 echo
 echo "Published @epure/create@$VERSION to $REGISTRY"

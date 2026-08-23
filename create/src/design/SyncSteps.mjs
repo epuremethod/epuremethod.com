@@ -194,16 +194,19 @@ Vitest$1.Given("a registry answering for the template's dependencies", (param, c
     ], scratch, Nodepath.join(TestCli.$$package, "bin/sync.mjs"));
   });
   step("the template names {string} at {string}", (name, spec) => Vitest.expect(named(template, name)).toBe(spec));
-  step("{string} satisfies the range it wrote for {string}", (version, name) => Vitest.expect(Semver.satisfies(version, named(template, name))).toBe(true));
-  step("{string} does not satisfy the range it wrote for {string}", (version, name) => Vitest.expect(Semver.satisfies(version, named(template, name))).toBe(false));
   step("the template names each dependency at a published version", table => {
-    Vitest$1.toRecords(table).forEach(row => Vitest.expect([
-      row.dependency,
-      Semver.satisfies(served(row.dependency), named(template, row.dependency))
-    ]).toEqual([
-      row.dependency,
-      true
-    ]));
+    Vitest$1.toRecords(table).forEach(row => {
+      let spec = named(template, row.dependency);
+      let tags = published[row.dependency];
+      let tagged = tags !== undefined ? Stdlib_Option.isSome(tags[spec]) : false;
+      Vitest.expect([
+        row.dependency,
+        tagged || Semver.satisfies(served(row.dependency), spec)
+      ]).toEqual([
+        row.dependency,
+        true
+      ]);
+    });
   });
   step("the template still names the project {string}", name => {
     let fields = JSON.parse(Nodefs.readFileSync(template, "utf8"));

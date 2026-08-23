@@ -3,10 +3,10 @@ Feature: Sync the template's versions
   For the person publishing the template.
 
   `pnpm sync` asks the registry in front of it what each of the template's
-  dependencies is published as, and writes those versions into
-  `templates/package.json`. What a template is worth is that its versions were
-  installed, built and tested together, so they are fixed when the tool is
-  published and never resolved when a project is scaffolded.
+  dependencies is published as, and writes what it finds into
+  `templates/package.json`: a caret over the version for a released line, and
+  the tag itself for a line still in beta, so a scaffold installs the newest
+  beta the registry holds.
 
   Background:
     Given a registry answering for the template's dependencies
@@ -18,23 +18,22 @@ Feature: Sync the template's versions
     When the template is synced
     Then the template names "react" at "^19.2.3"
 
-  Scenario: Sync writes a beta range when the published version is a beta
+  Scenario: Sync writes the tag when the published version is a beta
     Given "@lapa/db" is published at "0.1.0-beta.3"
     When the template is synced
-    Then the template names "@lapa/db" at "^0.1.0-beta"
+    Then the template names "@lapa/db" at "beta"
 
-  Scenario: A beta range carries the whole line
-    Given "@lapa/db" is published at "0.1.0-beta.3"
-    When the template is synced
-    Then "0.1.0-beta.4" satisfies the range it wrote for "@lapa/db"
-    And "0.1.0" satisfies the range it wrote for "@lapa/db"
-    And "0.2.0-beta.1" does not satisfy the range it wrote for "@lapa/db"
-
-  Scenario: Sync moves the range when the line moves
+  Scenario: Sync rewrites a beta range to the tag
     Given the template already names "@lapa/db" at "^0.1.0-beta"
+    And "@lapa/db" is published at "0.1.0-beta.6"
+    When the template is synced
+    Then the template names "@lapa/db" at "beta"
+
+  Scenario: The tag stays as the line moves
+    Given the template already names "@lapa/db" at "beta"
     And "@lapa/db" is published at "0.2.0-beta.1"
     When the template is synced
-    Then the template names "@lapa/db" at "^0.2.0-beta"
+    Then the template names "@lapa/db" at "beta"
 
   Scenario: Leaving a beta line is a hand edit, and sync keeps it
     Given the template already names "@lapa/db" at "^0.1.0"
@@ -65,11 +64,11 @@ Feature: Sync the template's versions
   # ── Which version sync takes ───────────────────────────────────────────
 
   Scenario: Sync follows the line the template is on
-    Given the template already names "tilia" at "^6.0.0-beta"
+    Given the template already names "tilia" at "beta"
     And "tilia" is published at "5.2.0" as "latest"
     And "tilia" is published at "6.0.0-beta.9" as "beta"
     When the template is synced
-    Then the template names "tilia" at "^6.0.0-beta"
+    Then the template names "tilia" at "beta"
 
   Scenario: A template on a release line takes the release
     Given the template already names "react" at "^19.2.0"
@@ -82,7 +81,7 @@ Feature: Sync the template's versions
     Given the template already names "@lapa/db" at "^0.0.0"
     And "@lapa/db" is published at "0.1.0-beta.3" as "beta" only
     When the template is synced
-    Then the template names "@lapa/db" at "^0.1.0-beta"
+    Then the template names "@lapa/db" at "beta"
 
   # ── Refusals ───────────────────────────────────────────────────────────
 

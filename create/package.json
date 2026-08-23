@@ -1,6 +1,6 @@
 {
   "name": "@epure/create",
-  "version": "0.1.0-beta.6",
+  "version": "0.1.0-beta.14",
   "description": "The method's tool: `epure init` scaffolds a project, `epure dev` starts it.",
   "type": "module",
   "bin": {

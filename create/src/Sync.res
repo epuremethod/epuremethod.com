@@ -1,7 +1,8 @@
 // `pnpm sync`: what the template's dependencies are published as, written
-// into `templates/package.json`. A template is worth what its versions were
-// installed, built and tested at together, so they are fixed here and never
-// resolved when a project is scaffolded.
+// into `templates/package.json`. A released line is fixed by a caret over
+// the tested version. A line still in beta is named by its tag: the line
+// moves daily and only its newest build is kept working, so a scaffold
+// must take what the tag names at install.
 
 open System
 
@@ -39,27 +40,30 @@ let split = (version: string) =>
   | None => (version, None)
   }
 
-/** `0.1.0-beta.3` becomes `^0.1.0-beta`, and `19.2.3` becomes `^19.2.3`. A
-    prerelease keeps its first identifier only, so the range carries the whole
-    line: every later prerelease of it, then the release that ends it. */
-let ranged = (version: string) =>
+/** `19.2.3` becomes `^19.2.3`, and `0.1.0-beta.6` becomes `beta`: a
+    prerelease is named by its tag, so a scaffold takes the newest beta the
+    registry holds when it installs. */
+let named = (version: string) =>
   switch split(version) {
-  | (base, None) => `^${base}`
-  | (base, Some(pre)) =>
-    switch pre->String.split(".")->Array.get(0) {
-    | Some(tag) => `^${base}-${tag}`
-    | None => `^${base}`
-    }
+  | (_, None) => `^${version}`
+  | (_, Some(pre)) => pre->String.split(".")->Array.get(0)->Option.getOr("beta")
   }
 
-/** A spec on a prerelease line asks for that tag; anything else asks for the
-    release. Leaving a beta line is a hand edit to the template, and sync must
-    not undo it by preferring whichever version is newest. */
-let wanted = (spec: string) =>
-  switch split(spec->String.replace("^", "")) {
-  | (_, Some(pre)) => pre->String.split(".")->Array.get(0)->Option.getOr("latest")
-  | (_, None) => "latest"
+/** A spec that is a tag asks for it, and a spec on a prerelease line asks for
+    its tag; anything else asks for the release. Leaving a beta line is a hand
+    edit to the template, and sync must not undo it by preferring whichever
+    version is newest. */
+let wanted = (spec: string) => {
+  let bare = spec->String.replace("^", "")
+  switch bare->String.slice(~start=0, ~end=1)->Int.fromString {
+  | None => bare
+  | Some(_) =>
+    switch split(bare) {
+    | (_, Some(pre)) => pre->String.split(".")->Array.get(0)->Option.getOr("latest")
+    | (_, None) => "latest"
+    }
   }
+}
 
 let asked = async (~registry, ~package) => {
   let url = `${registry}/${package->String.replaceAll("/", "%2f")}`
@@ -135,7 +139,7 @@ let main = async () => {
         specs->Array.map(async ((deps, package, spec)) => {
           let tag = wanted(spec)
           let packument = await asked(~registry, ~package)
-          (deps, package, spec, ranged(taken(packument, ~package, ~tag)))
+          (deps, package, spec, named(taken(packument, ~package, ~tag)))
         }),
       ) catch {
       | JsExn(error) => {

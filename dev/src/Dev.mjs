@@ -62,6 +62,63 @@ function settle(ms) {
   });
 }
 
+function connect(token) {
+  let path = Nodepath.join(process.cwd(), ".mcp.json");
+  let held;
+  if (Nodefs.existsSync(path)) {
+    let exit = 0;
+    let fields;
+    try {
+      fields = JSON.parse(Nodefs.readFileSync(path, "utf8"));
+      exit = 1;
+    } catch (exn) {
+      held = undefined;
+    }
+    if (exit === 1) {
+      held = typeof fields === "object" && fields !== null && !Array.isArray(fields) ? fields : undefined;
+    }
+  } else {
+    held = {};
+  }
+  if (held !== undefined) {
+    let match = held["mcpServers"];
+    let servers;
+    let exit$1 = 0;
+    if (typeof match === "object" && match !== null && !Array.isArray(match)) {
+      servers = match;
+    } else {
+      exit$1 = 1;
+    }
+    if (exit$1 === 1) {
+      let servers$1 = {};
+      held["mcpServers"] = servers$1;
+      servers = servers$1;
+    }
+    servers["desk"] = Object.fromEntries([
+      [
+        "type",
+        "http"
+      ],
+      [
+        "url",
+        `http://localhost:` + appPort + `/_lapa/mcp`
+      ],
+      [
+        "headers",
+        Object.fromEntries([[
+            "Authorization",
+            token
+          ]])
+      ]
+    ]);
+    Nodefs.writeFileSync(path, JSON.stringify(held, undefined, 2) + "\n", {
+      mode: 384
+    });
+    return;
+  }
+  process.stderr.write(".mcp.json is not JSON; dev leaves it and writes no desk entry\n");
+}
+
 async function announce(token) {
   let address = `http://localhost:` + appPort + `/`;
   let probes = [
@@ -98,11 +155,59 @@ async function announce(token) {
   return await waits(300);
 }
 
-function main() {
-  if (!Nodefs.existsSync(Nodepath.join(process.cwd(), "package.json"))) {
-    process.stderr.write("dev runs in a project; no package.json here\n");
-    process.exit(1);
-  }
+function prepare() {
+  let lapa = Stdlib_Option.getOr(process.env["EPURE_LAPA_BIN"], "lapa");
+  let served = Nodechild_process.spawn(lapa, [
+    "dev",
+    ".data",
+    "--port",
+    "0"
+  ], {
+    cwd: process.cwd(),
+    stdio: [
+      "ignore",
+      "pipe",
+      "pipe"
+    ]
+  });
+  let seen = {
+    contents: false
+  };
+  let skip = message => {
+    process.stderr.write(`prepare skipped: ` + message + `\n`);
+    return process.exit(0);
+  };
+  served.on("error", param => skip("lapa could not start"));
+  served.on("close", param => {
+    if (!seen.contents) {
+      return skip("lapa stopped before it spoke");
+    }
+  });
+  served.stdout.setEncoding("utf8");
+  served.stdout.on("data", text => {
+    if (seen.contents) {
+      return;
+    }
+    let line = text.split("\n").find(line => line.startsWith("dev "));
+    if (line !== undefined) {
+      seen.contents = true;
+      Stdlib_Option.forEach(sessionOf(line), connect);
+      process.stdout.write(".mcp.json holds the desk\n");
+      served.kill("SIGTERM");
+      return;
+    }
+  });
+  served.stderr.setEncoding("utf8");
+  served.stderr.on("data", param => {});
+  setTimeout(() => {
+    if (!seen.contents) {
+      served.kill("SIGTERM");
+      return skip("lapa said nothing");
+    }
+  }, 30000).unref();
+}
+
+function serve() {
   let vite = Nodepath.join(process.cwd(), "node_modules/.bin/vite");
   let rescript = Nodepath.join(process.cwd(), "node_modules/.bin/rescript");
   if (!Nodefs.existsSync(vite) || !Nodefs.existsSync(rescript)) {
@@ -153,6 +258,7 @@ function main() {
         ]
       }));
       return Stdlib_Option.forEach(sessionOf(line), token => {
+        connect(token);
         announce(token);
       });
     }
@@ -166,6 +272,22 @@ function main() {
   watch("lapa", served);
 }
 
+function main() {
+  if (!Nodefs.existsSync(Nodepath.join(process.cwd(), "package.json"))) {
+    process.stderr.write("dev runs in a project; no package.json here\n");
+    process.exit(1);
+  }
+  let word = process.argv[2];
+  if (word === undefined) {
+    return serve();
+  }
+  if (word === "prepare") {
+    return prepare();
+  }
+  process.stderr.write(`epure-dev knows no ` + word + `\n`);
+  process.exit(1);
+}
+
 export {
   lapaPort,
   appPort,
@@ -175,7 +297,10 @@ export {
   watch,
   sessionOf,
   settle,
+  connect,
   announce,
+  prepare,
+  serve,
   main,
 }
 /* node:fs Not a pure module */

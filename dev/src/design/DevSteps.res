@@ -64,10 +64,13 @@ given("a project created by init that nothing serves", ({step}, context: testCon
   let where = golden()
   let project = where.project
   let data = System.joined(project, ".data")
+  let mcp = System.joined(project, ".mcp.json")
   System.forget(data)
+  System.forget(mcp)
 
   let current: ref<option<served>> = ref(None)
   let listening: ref<option<(socket, array<string>)>> = ref(None)
+  let browsing: ref<option<Browser.t>> = ref(None)
   let lastStatus = ref(0)
   let lastBody = ref("")
 
@@ -78,6 +81,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     }
 
   context.onTestFinished(async _ => {
+    browsing.contents->Option.forEach(Browser.shuts)
     listening.contents->Option.forEach(((socket, _)) => socket->closes)
     switch current.contents {
     | Some(server) if !server.gone.contents => {
@@ -90,6 +94,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     | _ => ()
     }
     System.forget(data)
+    System.forget(mcp)
   })
 
   let starts = async () => {
@@ -252,6 +257,100 @@ given("a project created by init that nothing serves", ({step}, context: testCon
   step("the link carries the session dev printed", async () => {
     let address = await link()
     expect(address).toContain(running().session.contents)
+  })
+
+  // ── the desk file ─────────────────────────────────────────────────────
+
+  let objectAt = (fields, name) =>
+    switch fields->Dict.get(name) {
+    | Some(JSON.Object(inner)) => inner
+    | _ => raise(`.mcp.json names no ${name}`)
+    }
+
+  let stringAt = (fields, name) =>
+    switch fields->Dict.get(name) {
+    | Some(JSON.String(value)) => value
+    | _ => raise(`the entry names no ${name}`)
+    }
+
+  let servers = () =>
+    switch JSON.parseOrThrow(System.readFile(mcp, "utf8")) {
+    | JSON.Object(fields) => objectAt(fields, "mcpServers")
+    | _ => raise(".mcp.json is not an object")
+    }
+
+  let planted = ref("")
+
+  step(".mcp.json names the desk at {string}", (address: string) => {
+    let desk = objectAt(servers(), "desk")
+    expect(stringAt(desk, "type")).toBe("http")
+    expect(stringAt(desk, "url")).toBe(address)
+  })
+
+  step("the desk's authorization is the session dev printed", () => {
+    let headers = objectAt(objectAt(servers(), "desk"), "headers")
+    expect(stringAt(headers, "Authorization")).toBe(running().session.contents)
+  })
+
+  step("a .mcp.json naming another server", () =>
+    System.writeFile(
+      mcp,
+      `{"mcpServers":{"notes":{"type":"http","url":"http://localhost:9999/mcp"}}}\n`,
+    )
+  )
+
+  step(".mcp.json still names the other server", () => {
+    let notes = objectAt(servers(), "notes")
+    expect(stringAt(notes, "url")).toBe("http://localhost:9999/mcp")
+  })
+
+  step("a .mcp.json that is not JSON", () => {
+    planted := "not json\n"
+    System.writeFile(mcp, planted.contents)
+  })
+
+  step(".mcp.json is unchanged", () =>
+    expect(System.readFile(mcp, "utf8")).toBe(planted.contents)
+  )
+
+  step("dev warns that .mcp.json is not JSON", async () =>
+    await until(async () => running().complained.contents->String.includes(".mcp.json is not JSON"))
+  )
+
+  // ── prepare ───────────────────────────────────────────────────────────
+
+  let prepared = ref(-1)
+
+  let prepares = async () => {
+    let env = assign(Dict.make(), processEnv)
+    env->Dict.set("EPURE_LAPA_BIN", where.lapa)
+    let child = System.run("node", [entry, "prepare"], {"cwd": project, "env": env})
+    prepared :=
+      (
+        await Promise.make(
+          (resolve, _reject) => child->System.whenGone(code => resolve(code->Nullable.getOr(-1))),
+        )
+      )
+  }
+
+  step("Theo runs prepare", async () => await prepares())
+
+  step("Theo ran prepare", async () => await prepares())
+
+  step("prepare exits with {number}", (expected: float) =>
+    expect(prepared.contents).toBe(expected->Float.toInt)
+  )
+
+  let authorization = () =>
+    stringAt(objectAt(objectAt(servers(), "desk"), "headers"), "Authorization")
+
+  step("the desk's authorization is the session the boot kept", () =>
+    expect(authorization()).toBe(meta("session"))
+  )
+
+  step("the link carries the session .mcp.json names", async () => {
+    let named = authorization()
+    expect((await link())->String.includes(named)).toBe(true)
   })
 
   step("a client pulling with that session answers the boot's rows", async () => {
@@ -451,6 +550,72 @@ given("a project created by init that nothing serves", ({step}, context: testCon
       Console.error(built["stderr"])
     }
     expect(status).toBe(0)
+  })
+
+  // ── the page ──────────────────────────────────────────────────────────
+
+  let browser = () =>
+    switch browsing.contents {
+    | Some(page) => page
+    | None => raise("no browser was opened")
+    }
+
+  let opensAt = async address => {
+    let page = await Browser.opens()
+    browsing := Some(page)
+    await page->Browser.goes(~to=address)
+    page
+  }
+
+  step("Theo opens the link in a browser", async () => (await opensAt(await link()))->ignore)
+
+  step("Theo opens the app with no session in a browser", async () =>
+    (await opensAt(app ++ "/"))->ignore
+  )
+
+  step("the page draws the app", async () => {
+    let drawn = await browser()->Browser.drew
+    if drawn == "" {
+      // The console is usually empty here — that is the shape of the bug —
+      // so what was on it goes out either way rather than into an assertion.
+      Console.error(browser().complaints->Array.join("\n"))
+      Console.error(
+        browser().sockets->Array.map(((_, url, _)) => url)->Array.join("\n"),
+      )
+    }
+    expect(drawn == "").toBe(false)
+    expect(drawn).toContain("Hello")
+  })
+
+  step("the browser reports nothing wrong", () =>
+    expect(browser().complaints->Array.filter(one => !(one->String.includes("favicon")))).toEqual([])
+  )
+
+  step("the app opens one socket under {string}", async (prefix: string) => {
+    let page = browser()
+    // Vite opens a socket of its own for reload; the app's is the one
+    // carrying a session.
+    await until(async () =>
+      page.sockets->Array.some(((_, url, _)) => url->String.includes("session="))
+    )
+    let wire =
+      page.sockets
+      ->Array.filter(((_, url, _)) => url->String.includes("session="))
+      ->Array.map(((_, url, _)) => url)
+    expect(wire->Array.length).toBe(1)
+    expect(wire->Array.getUnsafe(0)).toContain(prefix)
+  })
+
+  step("the server answers that socket", async () => {
+    let page = browser()
+    let wire = () => page.sockets->Array.filter(((_, url, _)) => url->String.includes("session="))
+    await until(async () => wire()->Array.every(((_, _, answered)) => answered.contents))
+    expect(wire()->Array.every(((_, _, answered)) => answered.contents)).toBe(true)
+  })
+
+  step("the page says {string}", async (wanted: string) => {
+    let drawn = await browser()->Browser.drew
+    expect(drawn).toContain(wanted)
   })
 
   step("Theo sends SIGTERM to dev", async () => {

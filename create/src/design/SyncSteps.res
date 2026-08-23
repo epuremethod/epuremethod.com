@@ -197,23 +197,18 @@ given("a registry answering for the template's dependencies", ({step}, context: 
     expect(named(template, name)).toBe(spec)
   )
 
-  step("{string} satisfies the range it wrote for {string}", (version: string, name: string) =>
-    expect(satisfies(version, named(template, name))).toBe(true)
-  )
-
-  step(
-    "{string} does not satisfy the range it wrote for {string}",
-    (version: string, name: string) =>
-      expect(satisfies(version, named(template, name))).toBe(false),
-  )
-
   step("the template names each dependency at a published version", (table: array<array<string>>) =>
-    toRecords(table)->Array.forEach((row: dependency) =>
-      expect((
+    toRecords(table)->Array.forEach((row: dependency) => {
+      let spec = named(template, row.dependency)
+      let tagged = switch published->Dict.get(row.dependency) {
+      | Some(tags) => tags->Dict.get(spec)->Option.isSome
+      | None => false
+      }
+      expect((row.dependency, tagged || satisfies(served(row.dependency), spec))).toEqual((
         row.dependency,
-        satisfies(served(row.dependency), named(template, row.dependency)),
-      )).toEqual((row.dependency, true))
-    )
+        true,
+      ))
+    })
   )
 
   step("the template still names the project {string}", (name: string) =>

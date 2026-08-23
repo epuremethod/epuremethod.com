@@ -227,3 +227,61 @@ worth of supervision into every scaffold, where no fix would ever reach it.
 Costs a second package to version and publish, and they move together for now.
 `epure dev` no longer runs; it says where `dev` went, because a first word that
 is not a command would otherwise scaffold a project named "dev".
+
+## 2026-08-23 — While in beta, the template names tags
+
+`pnpm sync` writes `beta` for a dependency published as a prerelease, and a
+caret over the version for a released line. The ranges it wrote before —
+`^0.1.0-beta` — met pnpm 11's `minimumReleaseAge`: pnpm holds a version back
+for a day after it is published (default 1440 minutes) and quietly resolves
+an older one meanwhile, and under that gate the range fell back to the
+*oldest* beta on the line. A scaffold made minutes after a publish installed
+beta.2 while the registry said beta.6.
+
+The tag alone is not enough — the gate holds tags back too — so the
+template's `pnpm-workspace.yaml` lists `@epure/*`, `@lapa/*`, `tilia` and
+`@tilia/*` under `minimumReleaseAgeExclude`. The publishing machine goes
+further in `~/.config/pnpm/config.yaml`: `minimumReleaseAge: 0` and
+`dlxCacheMaxAge: 0`, because `pnpm create @epure` resolves through dlx,
+which honors the gate but not the exclusions, and its cache would serve
+yesterday's create for a day after a publish.
+
+Refused: keeping the ranges and clearing caches — the gate is policy, not
+staleness, and no cache clearing moves it.
+
+Costs a scaffold whose beta versions are resolved at install rather than
+fixed by the template, and a spec that never leaves the beta line by itself:
+when a line releases, the template is hand-edited to a release spec and the
+exclusions are removed. Both costs end with the betas.
+
+## 2026-08-24 — The desk file is minted at install, and dev keeps it
+
+The desk at `/_lapa/mcp` takes the founder's session in the
+`Authorization` header, and an MCP client that arrives without it falls
+into an OAuth flow the server does not have. An agent reads `.mcp.json`
+when it starts, so the file must exist before the agent does — and the
+first agent of a project starts right after the install. The template's
+`postinstall` runs `epure-dev prepare`: lapa boots once on an ephemeral
+port, founds itself if the store is new, the session lands in
+`.mcp.json` as the desk's authorization, and the boot stops. Dev writes
+the same file on every serve, so a wiped `.data` heals on the next run.
+A prepare that cannot boot lapa — missing, or the store held by a
+running dev — warns and exits zero: the install stays whole, and the
+running dev maintains the file itself. The desk entry is dev's alone:
+other entries in the file are kept, and a file that does not parse is
+left with a warning. The file carries a credential and differs in every
+checkout, so it is created owner-only, the template gitignores it, and
+init does not ship it as a file of its own. The template's `AGENTS.md`
+tells an agent the loop: run `pnpm dev` in the background, give the
+printed link to the person, and reach the desk through `.mcp.json`.
+
+Refused: shipping the entry without the session, as the template did. A
+client reads it, is refused, and tries dynamic client registration,
+which answers 404. Refused: writing the file only when dev first
+serves. The agent usually starts before `pnpm dev`, and asking it to
+reconnect proved one step too many. Refused: an environment variable in
+the entry — nothing sets it in the client's shell. Refused: a stdio
+proxy reading `dev.json` — a second process for what one header does.
+
+Costs an install that boots lapa once, and a `.data` store that exists
+before dev has ever served.
