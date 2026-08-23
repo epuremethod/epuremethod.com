@@ -1,2 +1,10 @@
+# The builds a fresh install is allowed to run. Without them pnpm stops and
+# tells the person to run `pnpm approve-builds` — in a directory they are not
+# in, at the end of an install that scrolled past. A scaffold should install
+# and be ready.
+#
+# msgpackr-extract is a native accelerator the wire's msgpack uses. esbuild is
+# vite's.
 allowBuilds:
   esbuild: true
+  msgpackr-extract: true

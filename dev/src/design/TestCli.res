@@ -11,11 +11,8 @@ module System = {
   @send external whenGone: (child, @as("close") _, Nullable.t<int> => unit) => unit = "on"
   @send external signal: (child, string) => bool = "kill"
 
-  @module("node:fs") external exists: string => bool = "existsSync"
-  @module("node:fs") external mkdir: (string, {"recursive": bool}) => unit = "mkdirSync"
   @module("node:fs") external readFile: (string, string) => string = "readFileSync"
   @module("node:fs") external writeFile: (string, string) => unit = "writeFileSync"
-  @module("node:fs") external tempDir: string => string = "mkdtempSync"
   @module("node:fs")
   external removeDir: (string, {"recursive": bool, "force": bool}) => unit = "rmSync"
   @module("node:os") external tempRoot: unit => string = "tmpdir"
@@ -24,7 +21,6 @@ module System = {
   @module("node:path") external parent: string => string = "dirname"
   @module("node:path") external named: string => string = "basename"
 
-  let scratch = () => tempDir(joined(tempRoot(), "epure-test-"))
   let forget = path => removeDir(path, {"recursive": true, "force": true})
 }
 
@@ -32,34 +28,18 @@ module System = {
 @module("node:url") external fileOf: string => string = "fileURLToPath"
 
 let package = System.resolved(System.parent(fileOf(importUrl)), "../..")
-let entry = System.joined(package, "bin/epure.mjs")
 
-@val @scope("process") external environment: dict<string> = "env"
-
-let sylva = switch environment->Dict.get("SYLVA") {
-| Some(path) if path != "" => path
-| _ => System.resolved(package, "../../sylva")
-}
-
-// The checkouts an init in this suite links, so it installs what is here
-// rather than what a registry holds. One list: the shared init and the
-// scenarios that run their own must link the same things.
-let links = [
-  "--with",
-  `@lapa/db=link:${System.joined(sylva, "lapa")}`,
-  "--with",
-  `@lapa/server=link:${System.joined(sylva, "server")}`,
-  "--with",
-  `@lapa/board=link:${System.joined(sylva, "board")}`,
-  "--with",
-  `@epure/dev=link:${System.resolved(package, "../dev")}`,
-]
+/** The dev server's own bin. It takes no subcommand: the package is the
+    command. */
+let entry = System.joined(package, "bin/epure-dev.mjs")
 
 type golden = {project: string, lapa: string}
 
+/** The scaffold `setup.mjs` built once for the whole run, and the lapa binary
+    it is served by. */
 let golden = () =>
   switch JSON.parseOrThrow(
-    System.readFile(System.joined(System.tempRoot(), "epure-golden.json"), "utf8"),
+    System.readFile(System.joined(System.tempRoot(), "epure-dev-golden.json"), "utf8"),
   ) {
   | JSON.Object(fields) =>
     switch (fields->Dict.get("project"), fields->Dict.get("lapa")) {
@@ -68,25 +48,3 @@ let golden = () =>
     }
   | _ => JsError.throwWithMessage("no shared init was built")
   }
-
-type ran = {said: string, complained: string, code: int}
-
-let runs = async (args: array<string>, ~at: string, ~entry as from=entry) => {
-  open System
-  let child = run("node", [from]->Array.concat(args), {"cwd": at})
-  let said = ref("")
-  let complained = ref("")
-  child->out->reads("utf8")
-  child->out->hears("data", text => said := said.contents ++ text)
-  child->err->reads("utf8")
-  child->err->hears("data", text => complained := complained.contents ++ text)
-  await Promise.make((resolve, _reject) =>
-    child->whenGone(code =>
-      resolve({
-        said: said.contents,
-        complained: complained.contents,
-        code: code->Nullable.getOr(-1),
-      })
-    )
-  )
-}

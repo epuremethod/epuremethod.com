@@ -1,0 +1,31 @@
+{
+  "name": "@epure/dev",
+  "version": "0.1.0-beta.1",
+  "description": "The method's dev server: rescript watch, lapa dev and vite, three processes as one.",
+  "type": "module",
+  "bin": {
+    "epure-dev": "bin/epure-dev.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "res:build": "rescript",
+    "format": "rescript format",
+    "pretest": "pnpm res:build",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "rescript": "*",
+    "vite": "*"
+  },
+  "devDependencies": {
+    "@epure/create": "workspace:*",
+    "@epure/vitest": "1.1.0-beta.20260727T084407",
+    "rescript": "^12.3.0",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@rescript/runtime": "^12.3.0"
+  }
+}

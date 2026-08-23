@@ -34,11 +34,13 @@ let sylva = path !== undefined && path !== "" ? path : Nodepath.resolve($$packag
 
 let links = [
   "--with",
-  `lapa=link:` + Nodepath.join(sylva, "lapa"),
+  `@lapa/db=link:` + Nodepath.join(sylva, "lapa"),
   "--with",
   `@lapa/server=link:` + Nodepath.join(sylva, "server"),
   "--with",
-  `@epure/create=link:` + $$package
+  `@lapa/board=link:` + Nodepath.join(sylva, "board"),
+  "--with",
+  `@epure/dev=link:` + Nodepath.resolve($$package, "../dev")
 ];
 
 function golden() {

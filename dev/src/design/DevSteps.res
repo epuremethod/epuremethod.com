@@ -1,7 +1,7 @@
 open EpureVitest
 open TestCli
 
-// Dev.feature drives the real pair: `epure dev` spawned over the shared
+// Dev.feature drives the real pair: `epure-dev` spawned over the shared
 // scaffold, lapa reached only through vite's proxy, and death and stopping
 // exercised on the real processes.
 
@@ -96,7 +96,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     let env = assign(Dict.make(), processEnv)
     env->Dict.set("EPURE_LAPA_BIN", where.lapa)
     let server = {
-      child: System.run("node", [entry, "dev"], {"cwd": project, "env": env}),
+      child: System.run("node", [entry], {"cwd": project, "env": env}),
       said: ref(""),
       complained: ref(""),
       session: ref(""),
@@ -190,9 +190,79 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     expect(lastBody.contents).toContain("adventure")
   })
 
-  step("dev prints the session and the code", () => {
-    expect(running().session.contents->String.length > 0).toBe(true)
+  step("dev prints the code", () => {
     expect(running().code.contents->String.length > 0).toBe(true)
+  })
+
+  // ── the link ──────────────────────────────────────────────────────────
+
+  // Dev writes the link only once the app answers, so it can arrive after
+  // `starts` has returned. Vite prints an address of its own on the same
+  // stream, so the session is what tells dev's line from it.
+  let linesWithLink = () =>
+    running().said.contents
+    ->String.split("\n")
+    ->Array.filter(line => line->String.includes("?lapa-session="))
+
+  let awaitsLink = async () => {
+    await until(async () => linesWithLink()->Array.length > 0)
+    linesWithLink()->Array.getUnsafe(0)
+  }
+
+  let linkIn = line =>
+    line
+    ->String.trim
+    ->String.split(" ")
+    ->Array.find(word => word->String.startsWith("http://"))
+    ->Option.getOrThrow
+
+  let link = async () => linkIn(await awaitsLink())
+
+  step("dev prints one link", async () => {
+    let _ = await awaitsLink()
+    expect(linesWithLink()->Array.length).toBe(1)
+  })
+
+  step("the link is the app page on the app port", async () => {
+    let address = await link()
+    expect(address->String.startsWith("http://localhost:8080/")).toBe(true)
+  })
+
+  step("the link carries the session as {string}", async (name: string) => {
+    let address = await link()
+    expect(address->String.includes(`?${name}=`)).toBe(true)
+  })
+
+  step("the link begins with {string}", async (scheme: string) =>
+    expect((await link())->String.startsWith(scheme)).toBe(true)
+  )
+
+  step("the line holding the link names the project", async () => {
+    let line = await awaitsLink()
+    expect(line).toContain(System.named(golden().project))
+  })
+
+  step("fetching the link answers the app page", async () => {
+    let address = await link()
+    let answer = await gets(address)
+    expect(answer.status).toBe(200)
+    expect(await answer->text).toContain("adventure")
+  })
+
+  step("the link carries the session dev printed", async () => {
+    let address = await link()
+    expect(address).toContain(running().session.contents)
+  })
+
+  step("a client pulling with that session answers the boot's rows", async () => {
+    let address = await link()
+    let token =
+      address
+      ->String.split("lapa-session=")
+      ->Array.getUnsafe(1)
+      ->String.split("&")
+      ->Array.getUnsafe(0)
+    await asks(`/_lapa/query?under=${encode(meta("workspace"))}`, ~token)
   })
 
   step("a client pulls through {string} with the founder's session", async (prefix: string) =>
@@ -329,7 +399,13 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     let page = System.joined(project, "src/view/Page.res")
     let original = System.readFile(page, "utf8")
     context.onTestFinished(async _ => System.writeFile(page, original))
-    System.writeFile(page, original->String.replace("is running.", text ++ " "))
+    // The sentence the page says when it opens on no session: the one line
+    // of its own text that a scaffold is born with.
+    let said = "this page opens on a session"
+    if !(original->String.includes(said)) {
+      JsError.throwWithMessage(`the page no longer says "${said}"`)
+    }
+    System.writeFile(page, original->String.replace(said, text))
   })
 
   step("the served page script says {string}", async (wanted: string) =>
@@ -346,7 +422,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
   step("Theo runs dev without a lapa binary", async () => {
     let env = assign(Dict.make(), processEnv)
     env->Dict.delete("EPURE_LAPA_BIN")
-    let child = System.run("node", [entry, "dev"], {"cwd": project, "env": env})
+    let child = System.run("node", [entry], {"cwd": project, "env": env})
     let complained = ref("")
     open System
     child->err->reads("utf8")

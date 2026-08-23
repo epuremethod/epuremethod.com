@@ -100,10 +100,7 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
   let starts = async () => {
     let env = Object.assign({}, process.env);
     env["EPURE_LAPA_BIN"] = where.lapa;
-    let server_child = Nodechild_process.spawn("node", [
-      TestCli.entry,
-      "dev"
-    ], {
+    let server_child = Nodechild_process.spawn("node", [TestCli.entry], {
       cwd: project,
       env: env
     });
@@ -250,9 +247,47 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
     Vitest.expect(lastStatus.contents).toBe(200);
     return Vitest.expect(lastBody.contents).toContain("adventure");
   });
-  step("dev prints the session and the code", () => {
-    Vitest.expect(running().session.contents.length > 0).toBe(true);
-    Vitest.expect(running().code.contents.length > 0).toBe(true);
+  step("dev prints the code", () => Vitest.expect(running().code.contents.length > 0).toBe(true));
+  let linesWithLink = () => running().said.contents.split("\n").filter(line => line.includes("?lapa-session="));
+  let awaitsLink = async () => {
+    await until(async () => linesWithLink().length !== 0, undefined);
+    return linesWithLink()[0];
+  };
+  let link = async () => {
+    let line = await awaitsLink();
+    return Stdlib_Option.getOrThrow(line.trim().split(" ").find(word => word.startsWith("http://")), undefined);
+  };
+  step("dev prints one link", async () => {
+    await awaitsLink();
+    return Vitest.expect(linesWithLink().length).toBe(1);
+  });
+  step("the link is the app page on the app port", async () => {
+    let address = await link();
+    return Vitest.expect(address.startsWith("http://localhost:8080/")).toBe(true);
+  });
+  step("the link carries the session as {string}", async name => {
+    let address = await link();
+    return Vitest.expect(address.includes(`?` + name + `=`)).toBe(true);
+  });
+  step("the link begins with {string}", async scheme => Vitest.expect((await link()).startsWith(scheme)).toBe(true));
+  step("the line holding the link names the project", async () => {
+    let line = await awaitsLink();
+    return Vitest.expect(line).toContain(Nodepath.basename(TestCli.golden().project));
+  });
+  step("fetching the link answers the app page", async () => {
+    let address = await link();
+    let answer = await fetch(address);
+    Vitest.expect(answer.status).toBe(200);
+    return Vitest.expect(await answer.text()).toContain("adventure");
+  });
+  step("the link carries the session dev printed", async () => {
+    let address = await link();
+    return Vitest.expect(address).toContain(running().session.contents);
+  });
+  step("a client pulling with that session answers the boot's rows", async () => {
+    let address = await link();
+    let token = address.split("lapa-session=")[1].split("&")[0];
+    return await asks(`/_lapa/query?under=` + encodeURIComponent(meta("workspace")), undefined, token, undefined);
   });
   step("a client pulls through {string} with the founder's session", async prefix => await asks(prefix + `query?under=` + encodeURIComponent(meta("workspace")), undefined, running().session.contents, undefined));
   step("the pull answers the boot's rows", () => {
@@ -377,7 +412,11 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
     context.onTestFinished(async param => {
       Nodefs.writeFileSync(page, original);
     });
-    Nodefs.writeFileSync(page, original.replace("is running.", text + " "));
+    let said = "this page opens on a session";
+    if (!original.includes(said)) {
+      Stdlib_JsError.throwWithMessage(`the page no longer says "` + said + `"`);
+    }
+    Nodefs.writeFileSync(page, original.replace(said, text));
   });
   step("the served page script says {string}", async wanted => await until(async () => {
     let response = await answers("/src/view/Page.res.mjs");
@@ -390,10 +429,7 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
   step("Theo runs dev without a lapa binary", async () => {
     let env = Object.assign({}, process.env);
     Stdlib_Dict.$$delete(env, "EPURE_LAPA_BIN");
-    let child = Nodechild_process.spawn("node", [
-      TestCli.entry,
-      "dev"
-    ], {
+    let child = Nodechild_process.spawn("node", [TestCli.entry], {
       cwd: project,
       env: env
     });

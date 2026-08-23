@@ -1,12 +1,11 @@
 #!/bin/bash
 #
-# Publish @epure/create on its own beta counter, `0.1.0-beta.N`, raised on
-# every publish whether the registry is local or remote. The version stays in
+# Publish @epure/dev on its own beta counter, `0.1.0-beta.N`, raised on every
+# publish whether the registry is local or remote. The version stays in
 # package.json, so what was published is what is committed.
 #
-# Run `pnpm sync` and commit before this: the template must carry the versions
-# it was tested at. `@epure/dev` publishes before both, because the template
-# names it and sync asks the registry for its version.
+# Publish this before `@epure/create`: the template names `@epure/dev`, and
+# `pnpm sync` asks the registry what version to write.
 
 set -e
 
@@ -54,11 +53,10 @@ VERSION=$(node -p '
   beta ? `${beta[1]}-beta.${Number(beta[2]) + 1}` : `${at.split("-")[0]}-beta.1`
 ')
 
-pnpm agreement
 pnpm res:build
 
 npm --no-git-tag-version version "$VERSION" >/dev/null
 pnpm publish --tag beta --access public --no-git-checks --registry "$REGISTRY"
 
 echo
-echo "Published @epure/create@$VERSION to $REGISTRY"
+echo "Published @epure/dev@$VERSION to $REGISTRY"

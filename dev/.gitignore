@@ -1,0 +1,4 @@
+node_modules/
+lib/
+*.res.mjs
+.DS_Store

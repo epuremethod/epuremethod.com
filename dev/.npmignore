@@ -1,0 +1,8 @@
+# The dev server as a project runs it: the bin and the compiled sources.
+
+/lib/
+/src/design/
+/vitest.config.mjs
+
+# This project's own method files.
+/AGENTS.md

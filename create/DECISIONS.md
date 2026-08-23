@@ -195,3 +195,35 @@ machine-global and invisible, and it fails on TLS against a local
 registry serving http.
 
 Costs an `.npmrc` in a scaffold whose maker asked for one.
+
+## 2026-08-23 — `dev` is its own package, `@epure/dev`
+
+The tool is two packages, split by how long each lives. `@epure/create`
+scaffolds: a project runs it once, through `pnpm create @epure`, and never
+installs it. `@epure/dev` runs the dev server: a project devDepends on it and
+runs it every day. The bin is `epure-dev`, and the template's `dev` script
+calls it.
+
+One package put the scaffolder in every app that would never run it again, and
+the maintainer's `sync` with it. Worse, it made the template depend on the tool
+that writes the template. `pnpm sync` reads the template's dependencies to ask
+the registry what version each is at, so it asked about `@epure/create` — the
+package it was running from — and failed on any registry that had not already
+published it. It worked here only because an earlier session had seeded the
+local one. A second machine found it in a minute.
+
+The split points the arrow one way. `@epure/create` names `@epure/dev` in the
+template it writes. `@epure/dev` names `@epure/create` only in its own
+scenarios, which need a scaffold to run against, and a devDependency is not a
+cycle. The publish order follows: `@epure/dev`, then `sync`, then
+`@epure/create`.
+
+Refused: leaving it and special-casing `@epure/create` inside `sync`. It would
+hide the cycle rather than remove it, and leave every app carrying a scaffolder
+and a maintainer tool. Refused: dropping the dependency by inlining the three
+processes in the template's `dev` script — that copies fourteen scenarios'
+worth of supervision into every scaffold, where no fix would ever reach it.
+
+Costs a second package to version and publish, and they move together for now.
+`epure dev` no longer runs; it says where `dev` went, because a first word that
+is not a command would otherwise scaffold a project named "dev".

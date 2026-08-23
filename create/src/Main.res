@@ -1,6 +1,11 @@
 open System
 
-let usage = "epure <init|dev>\n  init <name> [--registry <url>] [--with package=spec]\n  dev\n"
+let usage = "epure init <name> [--registry <url>] [--with package=spec]\n"
+
+// `dev` moved to its own package, and a person who types the old command must
+// be told rather than handed a project named "dev". `names` still refuses the
+// word for that reason.
+let moved = "dev moved to @epure/dev. Run `pnpm dev` in a project, or `epure-dev` by hand.\n"
 
 // `pnpm create @epure <name>` runs the bin as `epure <name>`: npm's create
 // convention passes no subcommand. A first word that is neither a command nor
@@ -44,7 +49,10 @@ let main = () => {
   switch (args->Array.get(0), args->Array.get(1)) {
   | (Some("init"), Some(name)) if !(name->String.startsWith("-")) =>
     Init.run(name, withsOf(args), ~registry=?flagged(args, "--registry"))
-  | (Some("dev"), _) => Dev.main()
+  | (Some("dev"), _) => {
+      warn(moved)
+      exit(1)
+    }
   | (Some(name), _) if names(name) =>
     Init.run(name, withsOf(args), ~registry=?flagged(args, "--registry"))
   | _ => {

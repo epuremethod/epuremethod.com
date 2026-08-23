@@ -13,9 +13,6 @@ importers:
       '@rescript/runtime':
         specifier: ^12.3.0
         version: 12.3.0
-      vite:
-        specifier: '*'
-        version: 7.3.6(yaml@2.9.0)
     devDependencies:
       '@epure/vitest':
         specifier: 1.1.0-beta.20260727T084407
@@ -26,6 +23,28 @@ importers:
       semver:
         specifier: ^7.6.0
         version: 7.8.5
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(yaml@2.9.0)
+
+  dev:
+    dependencies:
+      '@rescript/runtime':
+        specifier: ^12.3.0
+        version: 12.3.0
+      vite:
+        specifier: '*'
+        version: 7.3.6(yaml@2.9.0)
+    devDependencies:
+      '@epure/create':
+        specifier: workspace:*
+        version: link:../create
+      '@epure/vitest':
+        specifier: 1.1.0-beta.20260727T084407
+        version: 1.1.0-beta.20260727T084407(vite@7.3.6(yaml@2.9.0))
+      rescript:
+        specifier: ^12.3.0
+        version: 12.3.0
       vitest:
         specifier: ^3.2.4
         version: 3.2.7(yaml@2.9.0)

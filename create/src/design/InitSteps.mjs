@@ -11,17 +11,24 @@ import * as Primitive_option from "@rescript/runtime/lib/es6/Primitive_option.js
 import * as Nodechild_process from "node:child_process";
 
 let ranPage = (async path => {
-  const root = { textContent: "" };
+  const root = { textContent: "", className: "" };
   globalThis.document = {
     getElementById: id => (id === "root" ? root : null),
+    querySelector: () => null,
     createElement: () => ({ relList: { supports: () => false } }),
     querySelectorAll: () => [],
     head: { appendChild: () => {} },
     addEventListener: () => {},
   };
+  globalThis.window = {
+    location: { search: "", pathname: "/" },
+    localStorage: { getItem: () => null, setItem: () => {} },
+    history: { replaceState: () => {} },
+  };
   globalThis.MutationObserver = class { observe() {} disconnect() {} };
   await import(path);
   delete globalThis.document;
+  delete globalThis.window;
   delete globalThis.MutationObserver;
   return root.textContent;
 });
@@ -69,11 +76,17 @@ Vitest$1.Given("an empty working directory", (param, context) => {
       return [];
     }
   };
+  let building = () => {
+    let env = Object.fromEntries(Object.entries(process.env));
+    env["NODE_ENV"] = "production";
+    return env;
+  };
   let runs = (script, name) => {
     let ran = Nodechild_process.spawnSync("pnpm", [script], {
       cwd: TestCli.golden().project,
       stdio: "pipe",
-      encoding: "utf8"
+      encoding: "utf8",
+      env: building()
     });
     let status = Stdlib_Option.getOr(Primitive_option.fromNullable(ran.status), -1);
     if (status !== 0) {
@@ -95,6 +108,9 @@ Vitest$1.Given("an empty working directory", (param, context) => {
   });
   step("Theo creates a project named {string} with no command", async name => {
     last.contents = await TestCli.runs([name].concat(TestCli.links), place(), undefined);
+  });
+  step("Theo runs epure with {string}", async word => {
+    last.contents = await TestCli.runs([word], place(), undefined);
   });
   step("{string} names the project {string}", (path, name) => {
     let fields = JSON.parse(Nodefs.readFileSync(Nodepath.join(root(), path), "utf8"));
@@ -170,14 +186,21 @@ Vitest$1.Given("an empty working directory", (param, context) => {
   step("the project dependencies are installed", () => Vitest.expect(Nodefs.existsSync(Nodepath.join(TestCli.golden().project, "node_modules"))).toBe(true));
   step("the project builds successfully", () => Vitest.expect(runs("build", "build")).toBe(0));
   step("the project tests pass", () => Vitest.expect(runs("test", "test")).toBe(0));
-  step("the built page says {string}", async text => {
+  let bundle = () => {
     Vitest.expect(runs("build", "build")).toBe(0);
     let page = Nodefs.readFileSync(Nodepath.join(TestCli.golden().project, "dist/index.html"), "utf8");
     let result = page.match(/\/assets\/[^\"]+\.js/);
-    let asset = (result == null) ? Stdlib_JsError.throwWithMessage("the built page names no script") : result[0];
-    let said = await ranPage("file://" + Nodepath.join(TestCli.golden().project, "dist" + asset));
+    if (result == null) {
+      return Stdlib_JsError.throwWithMessage("the built page names no script");
+    } else {
+      return Nodepath.join(TestCli.golden().project, "dist" + result[0]);
+    }
+  };
+  step("the built page says {string}", async text => {
+    let said = await ranPage("file://" + bundle());
     return Vitest.expect(said).toContain(text);
   });
+  step("the built page carries no board", () => Vitest.expect(Nodefs.readFileSync(bundle(), "utf8").includes("close the board")).toBe(false));
   step("the {string} directory contains a file", name => {
     let dir = Nodepath.join(place(), name);
     Nodefs.mkdirSync(dir, {

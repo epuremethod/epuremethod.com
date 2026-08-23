@@ -22,18 +22,30 @@ Feature: Initialize an epure project
       | DECISIONS.md    |
     And "adventure/package.json" contains the stack dependencies
       | dependency    | type           |
-      | lapa          | dependency     |
+      | @lapa/db      | dependency     |
       | tilia         | dependency     |
       | @tilia/query  | dependency     |
       | @tilia/react  | dependency     |
+      | @lapa/board   | dependency     |
+      | tailwindcss   | dev dependency |
       | @epure/vitest | dev dependency |
-      | @epure/create | dev dependency |
+      | @epure/dev    | dev dependency |
       | rescript      | dev dependency |
       | vite          | dev dependency |
     And "adventure/.mcp.json" contains "http://localhost:8080/_lapa/mcp"
+    # pnpm stops on a build script it was not told about and tells the person
+    # to run `pnpm approve-builds` — from a directory they are not in, after an
+    # install that scrolled past. Asserted on the file rather than on the
+    # install: once a build has run, it is in the store and no later install
+    # asks again, so the output only shows it on a machine that has never
+    # built it.
+    And "adventure/pnpm-workspace.yaml" contains "msgpackr-extract: true"
+    And "adventure/pnpm-workspace.yaml" contains "esbuild: true"
     And "adventure/.gitignore" contains ".data"
     And "adventure/src/view/Page.res" exists
     And "adventure/src/service/Live.res" exists
+    And "adventure/src/app.css" exists
+    And "adventure/src/Page.res" does not exist
     And "adventure/src" contains the diagonal layout
       | directory          |
       | design             |
@@ -55,12 +67,27 @@ Feature: Initialize an epure project
 
   Scenario: The built page runs
     When Theo initializes a project named "adventure"
-    Then the built page says "adventure is running"
+    Then the built page says "this page opens on a session"
+
+  Scenario: The board mounts in the app, and only in dev
+    When Theo initializes a project named "adventure"
+    Then "adventure/src/view/Page.res" contains "<LapaBoard client />"
+    And "adventure/src/view/Page.res" contains "Env.dev"
+    And the built page carries no board
+
+  # `dev` moved to @epure/dev. A first word that is not a command is a project
+  # name, so without this the old command would scaffold a project called
+  # "dev" and say nothing.
+  Scenario: The old dev command says where dev went
+    When Theo runs epure with "dev"
+    Then init fails and reports "@epure/dev"
+    And "dev" does not exist
 
   Scenario: The create convention names the project directly
     When Theo creates a project named "adventure-parc" with no command
     Then "adventure-parc" exists
     And "adventure-parc/package.json" names the project "adventure-parc"
+
 
   Scenario: A project made with no registry carries no npmrc
     When Theo initializes a project named "adventure"

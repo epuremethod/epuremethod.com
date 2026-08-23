@@ -8,23 +8,35 @@ type layer = {directory: string}
 @module("node:fs") external stat: string => {..} = "statSync"
 @module("node:fs") external readDir: string => array<string> = "readdirSync"
 
-// Enough of a document for the built page: the root element for the page
-// itself, and what vite's module preload polyfill touches on load.
+// Enough of a browser for the built page: the root element for the page
+// itself, the address and the storage it reads its session from, and what
+// vite's module preload polyfill touches on load. The page finds no session
+// here, so it says so and mounts nothing — which is the one path a build
+// can be run down outside a browser.
 let ranPage: string => promise<string> = %raw(`async path => {
-  const root = { textContent: "" };
+  const root = { textContent: "", className: "" };
   globalThis.document = {
     getElementById: id => (id === "root" ? root : null),
+    querySelector: () => null,
     createElement: () => ({ relList: { supports: () => false } }),
     querySelectorAll: () => [],
     head: { appendChild: () => {} },
     addEventListener: () => {},
   };
+  globalThis.window = {
+    location: { search: "", pathname: "/" },
+    localStorage: { getItem: () => null, setItem: () => {} },
+    history: { replaceState: () => {} },
+  };
   globalThis.MutationObserver = class { observe() {} disconnect() {} };
   await import(path);
   delete globalThis.document;
+  delete globalThis.window;
   delete globalThis.MutationObserver;
   return root.textContent;
 }`)
+
+@val @scope("process") external processEnv: dict<string> = "env"
 
 given("an empty working directory", ({step}, context: testContext) => {
   let scratch: ref<option<string>> = ref(None)
@@ -65,11 +77,20 @@ given("an empty working directory", ({step}, context: testContext) => {
     | _ => []
     }
 
+  // vite reads `NODE_ENV`, and vitest sets it to `test`, which would leave
+  // `import.meta.env.DEV` true through a build and keep every dev-only branch
+  // in the bundle. A build run from here has to be the build a person runs.
+  let building = () => {
+    let env = processEnv->Dict.toArray->Dict.fromArray
+    env->Dict.set("NODE_ENV", "production")
+    env
+  }
+
   let runs = (script, ~name) => {
     let ran = System.runSync(
       "pnpm",
       [script],
-      {"cwd": project(), "stdio": "pipe", "encoding": "utf8"},
+      {"cwd": project(), "stdio": "pipe", "encoding": "utf8", "env": building()},
     )
     let status = Nullable.toOption(ran["status"])->Option.getOr(-1)
     if status != 0 {
@@ -91,6 +112,10 @@ given("an empty working directory", ({step}, context: testContext) => {
     last := Some(await TestCli.runs([name]->Array.concat(TestCli.links), ~at=place()))
   )
 
+  step("Theo runs epure with {string}", async (word: string) =>
+    last := Some(await TestCli.runs([word], ~at=place()))
+  )
+
   step("{string} names the project {string}", (path: string, name: string) =>
     switch JSON.parseOrThrow(System.readFile(at(path), "utf8")) {
     | JSON.Object(fields) => expect(fields->Dict.get("name")).toEqual(Some(JSON.String(name)))
@@ -98,16 +123,17 @@ given("an empty working directory", ({step}, context: testContext) => {
     }
   )
 
-  step(
-    "Theo initializes a project named {string} against {string}",
-    async (name: string, registry: string) =>
-      last :=
-        Some(
-          await TestCli.runs(
-            ["init", name, "--registry", registry]->Array.concat(TestCli.links),
-            ~at=place(),
-          ),
+  step("Theo initializes a project named {string} against {string}", async (
+    name: string,
+    registry: string,
+  ) =>
+    last :=
+      Some(
+        await TestCli.runs(
+          ["init", name, "--registry", registry]->Array.concat(TestCli.links),
+          ~at=place(),
         ),
+      )
   )
 
   step("{string} does not exist", (path: string) =>
@@ -167,16 +193,26 @@ given("an empty working directory", ({step}, context: testContext) => {
 
   step("the project tests pass", () => expect(runs("test", ~name="test")).toBe(0))
 
-  step("the built page says {string}", async (text: string) => {
+  // The one script a built page names.
+  let bundle = () => {
     expect(runs("build", ~name="build")).toBe(0)
     let page = System.readFile(System.joined(project(), "dist/index.html"), "utf8")
-    let asset = switch page->String.match(/\/assets\/[^\"]+\.js/) {
-    | Some(result) => result->RegExp.Result.fullMatch
+    switch page->String.match(/\/assets\/[^\"]+\.js/) {
+    | Some(result) => System.joined(project(), "dist" ++ result->RegExp.Result.fullMatch)
     | None => JsError.throwWithMessage("the built page names no script")
     }
-    let said = await ranPage("file://" ++ System.joined(project(), "dist" ++ asset))
+  }
+
+  step("the built page says {string}", async (text: string) => {
+    let said = await ranPage("file://" ++ bundle())
     expect(said).toContain(text)
   })
+
+  // Measured in the bundle rather than read off the source: what the dev
+  // flag guards has to leave the build, not merely go unrendered.
+  step("the built page carries no board", () =>
+    expect(System.readFile(bundle(), "utf8")->String.includes("close the board")).toBe(false)
+  )
 
   step("the {string} directory contains a file", (name: string) => {
     let dir = System.joined(place(), name)

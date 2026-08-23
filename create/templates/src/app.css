@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* The whole palette, and the only styling this file holds: everything else
+   is a utility class in a view. Light and dark, following the browser. */
+@theme {
+  --color-paper: #fbfbfa;
+  --color-ink: #17171a;
+  --color-quiet: #6f6f78;
+  --color-line: #e0e0dc;
+  --color-raised: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #131316;
+    --color-ink: #ececef;
+    --color-quiet: #8d8d99;
+    --color-line: #2b2b31;
+    --color-raised: #191920;
+  }
+}
+
+html {
+  color-scheme: light dark;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}

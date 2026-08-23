@@ -1,6 +1,6 @@
 {
   "name": "@epure/create",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0-beta.6",
   "description": "The method's tool: `epure init` scaffolds a project, `epure dev` starts it.",
   "type": "module",
   "bin": {
@@ -17,18 +17,11 @@
     "test": "vitest run",
     "sync": "node bin/sync.mjs"
   },
-  "peerDependencies": {
-    "rescript": "*",
-    "vite": "*"
-  },
   "devDependencies": {
     "@epure/vitest": "1.1.0-beta.20260727T084407",
     "rescript": "^12.3.0",
     "semver": "^7.6.0",
     "vitest": "^3.2.4"
-  },
-  "publishConfig": {
-    "registry": "http://localhost:4873"
   },
   "dependencies": {
     "@rescript/runtime": "^12.3.0"

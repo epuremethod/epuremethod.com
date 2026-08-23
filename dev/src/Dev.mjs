@@ -3,11 +3,14 @@
 import * as System from "./System.mjs";
 import * as Nodefs from "node:fs";
 import * as Nodepath from "node:path";
+import * as Stdlib_Array from "@rescript/runtime/lib/es6/Stdlib_Array.js";
 import * as Stdlib_Option from "@rescript/runtime/lib/es6/Stdlib_Option.js";
 import * as Stdlib_Nullable from "@rescript/runtime/lib/es6/Stdlib_Nullable.js";
 import * as Nodechild_process from "node:child_process";
 
 let lapaPort = "8081";
+
+let appPort = "8080";
 
 let stopping = {
   contents: false
@@ -43,6 +46,56 @@ function watch(name, one) {
     let code$1 = Stdlib_Nullable.getOr(code, 1);
     process.exit(code$1 === 0 ? 1 : code$1);
   });
+}
+
+function sessionOf(line) {
+  return Stdlib_Array.findMap(line.split(" "), word => {
+    if (word.startsWith("session=")) {
+      return word.slice("session=".length);
+    }
+  });
+}
+
+function settle(ms) {
+  return new Promise((resolve, param) => {
+    setTimeout(() => resolve(), ms);
+  });
+}
+
+async function announce(token) {
+  let address = `http://localhost:` + appPort + `/`;
+  let probes = [
+    `http://127.0.0.1:` + appPort + `/`,
+    `http://[::1]:` + appPort + `/`
+  ];
+  let reached = async probe => {
+    try {
+      await fetch(probe);
+      return true;
+    } catch (exn) {
+      return false;
+    }
+  };
+  let waits = async left => {
+    if (left <= 0) {
+      return;
+    }
+    let answered = await Stdlib_Array.reduce(probes, Promise.resolve(false), async (found, probe) => {
+      if (await found) {
+        return true;
+      } else {
+        return await reached(probe);
+      }
+    });
+    if (answered) {
+      process.stdout.write(`\n` + Nodepath.basename(process.cwd()) + `  ` + address + `?lapa-session=` + token + `\n\n`);
+      return;
+    } else {
+      await settle(100);
+      return await waits(left - 1 | 0);
+    }
+  };
+  return await waits(300);
 }
 
 function main() {
@@ -85,9 +138,13 @@ function main() {
   };
   let hear = text => {
     process.stdout.write(text);
-    if (!seen.contents && text.split("\n").some(line => line.startsWith("dev "))) {
+    if (seen.contents) {
+      return;
+    }
+    let line = text.split("\n").find(line => line.startsWith("dev "));
+    if (line !== undefined) {
       seen.contents = true;
-      return watch("vite", Nodechild_process.spawn(vite, [], {
+      watch("vite", Nodechild_process.spawn(vite, [], {
         cwd: process.cwd(),
         stdio: [
           "ignore",
@@ -95,6 +152,9 @@ function main() {
           "inherit"
         ]
       }));
+      return Stdlib_Option.forEach(sessionOf(line), token => {
+        announce(token);
+      });
     }
   };
   served.stdout.setEncoding("utf8");
@@ -108,10 +168,14 @@ function main() {
 
 export {
   lapaPort,
+  appPort,
   stopping,
   children,
   stopAll,
   watch,
+  sessionOf,
+  settle,
+  announce,
   main,
 }
 /* node:fs Not a pure module */

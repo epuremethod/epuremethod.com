@@ -27,11 +27,12 @@ type rows<'query, 'row> = {
 type t<'query, 'row> = {
   /** The engine: `one`, `array`, `upsert`, `status`, `tick`. */
   query: TiliaQuery.t<'query, 'row>,
-  /** Wire this into the client config's `received`. */
-  received: array<(Id.t, Entity.t)> => unit,
+  /** Stop hearing the client. An app that lives as long as its tab never
+      calls this. */
+  closes: unit => unit,
 }
 
-let make = (~client: Client.t<'a>, ~rows: rows<'query, 'row>): t<'query, 'row> => {
+let make = (~client: Client.t, ~rows: rows<'query, 'row>): t<'query, 'row> => {
   // The engine's remote is the client, and the client always answers:
   // its front holds what the wire cannot take yet. Connectivity is the
   // client's business, so the engine never goes offline.
@@ -105,12 +106,16 @@ let make = (~client: Client.t<'a>, ~rows: rows<'query, 'row>): t<'query, 'row> =
       },
     },
   })
-  let received = pairs => {
+  // The engine hears the client itself: `receives` takes a hook at any moment,
+  // so nothing has to hand one to the client before it exists.
+  let receiving = client.receives(delivery => {
     let changed =
-      pairs->Array.filterMap(((class, entity)) => class == rows.class ? rows.row(entity) : None)
+      delivery.entities->Array.filterMap(((class, entity)) =>
+        class == rows.class ? rows.row(entity) : None
+      )
     if changed->Array.length > 0 {
       engine.receive.changed(changed)
     }
-  }
-  {query: engine, received}
+  })
+  {query: engine, closes: receiving.cancel}
 }
