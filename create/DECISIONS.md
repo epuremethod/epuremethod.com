@@ -303,3 +303,21 @@ the short form.
 Costs a rename in every script and paper that named the package, and an
 unscoped entry in the local registry's package rules so the name never
 proxies to a stranger's future package.
+
+## 2026-08-24 — Sketches compile from `src/croquis`, a dev source
+
+The template's `rescript.json` names `src/croquis` beside `src/design`,
+`type: "dev"`, subdirs on. A sketch is an ordinary module: a view mounts
+it behind `Env.dev`, like the board, and the flag drops it from a build.
+Measured in a scaffold before wiring: the mount compiles from `src/view`
+— the compiler does not stop a project's own sources from reaching a dev
+module — and the built bundle carries no trace of the sketch. Empty, the
+folder costs nothing: the `.gitkeep` holds the directory `rescript.json`
+names, and the standing check stays green.
+
+Refused: a plain source block. `type: "dev"` states what the mode
+promises — nothing ships depending on a sketch — and keeps sketches out
+of any consumer's compile.
+
+Costs a mount line the croquis adds in `src/view` and removes at its
+close: a compiled reference cannot outlive the module it names.

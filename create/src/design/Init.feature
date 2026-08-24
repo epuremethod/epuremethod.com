@@ -50,6 +50,7 @@ Feature: Initialize an epure project
     And "adventure/CONTRIBUTING.md" contains "Two modes"
     And "adventure/src/croquis/.gitkeep" exists
     And "adventure/.gitignore" contains "src/croquis/*"
+    And "adventure/rescript.json" contains "src/croquis"
     And "adventure/src/view/Page.res" exists
     And "adventure/src/service/Live.res" exists
     And "adventure/src/app.css" exists
