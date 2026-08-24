@@ -55,6 +55,14 @@ VERSION=$(node -p '
 
 pnpm res:build
 
+# The agreement sends an assistant to `node_modules/<package>/llms.txt`, so a
+# tarball without the reference must not publish. Asked of the pack list, not
+# the checkout: a `.npmignore` can drop a file the checkout holds.
+if ! npm pack --dry-run 2>&1 | grep -qE ' llms\.txt$'; then
+  echo "@epure/dev would publish without llms.txt: the reference is missing from the tarball."
+  exit 1
+fi
+
 npm --no-git-tag-version version "$VERSION" >/dev/null
 pnpm publish --tag beta --access public --no-git-checks --registry "$REGISTRY"
 

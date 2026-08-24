@@ -4,6 +4,7 @@ open TestCli
 type file = {file: string}
 type dependency = {dependency: string, \"type": string}
 type layer = {directory: string}
+type package = {package: string}
 
 @module("node:fs") external stat: string => {..} = "statSync"
 @module("node:fs") external readDir: string => array<string> = "readdirSync"
@@ -151,6 +152,18 @@ given("an empty working directory", ({step}, context: testContext) => {
           row.file,
           true,
         )),
+    )
+  )
+
+  step("the installed packages carry a reference", (table: array<array<string>>) =>
+    toRecords(table)->Array.forEach(
+      (row: package) => {
+        let reference = System.joined(
+          project(),
+          System.joined("node_modules", System.joined(row.package, "llms.txt")),
+        )
+        expect((row.package, System.exists(reference))).toEqual((row.package, true))
+      },
     )
   )
 

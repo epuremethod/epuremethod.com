@@ -65,6 +65,22 @@ Feature: Initialize an epure project
       | service            |
       | view               |
 
+  # The agreement sends an assistant to `node_modules/<package>/llms.txt`.
+  # Asserted on the install so the promise covers what a registry really
+  # ships, not what a checkout holds.
+  Scenario: Every method package the scaffold installs ships its reference
+    When Theo initializes a project named "adventure"
+    Then the installed packages carry a reference
+      | package       |
+      | tilia         |
+      | @tilia/query  |
+      | @tilia/react  |
+      | @lapa/db      |
+      | @lapa/board   |
+      | @lapa/server  |
+      | @epure/dev    |
+      | @epure/vitest |
+
   Scenario: The project builds after initialization
     When Theo initializes a project named "adventure"
     Then the project dependencies are installed

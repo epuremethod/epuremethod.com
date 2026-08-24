@@ -154,6 +154,18 @@ Vitest$1.Given("an empty working directory", (param, context) => {
       ]);
     });
   });
+  step("the installed packages carry a reference", table => {
+    Vitest$1.toRecords(table).forEach(row => {
+      let reference = Nodepath.join(TestCli.golden().project, Nodepath.join("node_modules", Nodepath.join(row.package, "llms.txt")));
+      Vitest.expect([
+        row.package,
+        Nodefs.existsSync(reference)
+      ]).toEqual([
+        row.package,
+        true
+      ]);
+    });
+  });
   step("{string} contains the stack dependencies", (param, table) => {
     let held_0 = section("dependencies");
     let held_1 = section("devDependencies");
