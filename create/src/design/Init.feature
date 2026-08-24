@@ -35,6 +35,8 @@ Feature: Initialize an epure project
     And "adventure/.mcp.json" contains "http://localhost:8080/_lapa/mcp"
     And "adventure/.mcp.json" contains "Authorization"
     And "adventure/AGENTS.md" contains "pnpm dev"
+    And "adventure/README.md" contains "# adventure"
+    And "adventure/README.md" contains "pnpm dev"
     # pnpm stops on a build script it was not told about and tells the person
     # to run `pnpm approve-builds` — from a directory they are not in, after an
     # install that scrolled past. Asserted on the file rather than on the
