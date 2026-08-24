@@ -20,7 +20,7 @@
     "vite": "*"
   },
   "devDependencies": {
-    "@epure/create": "workspace:*",
+    "create-epure": "workspace:*",
     "@epure/vitest": "1.1.0-beta.20260727T084407",
     "rescript": "^12.3.0",
     "vitest": "^3.2.4"

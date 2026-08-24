@@ -7,7 +7,7 @@ let usage = "epure init <name> [--registry <url>] [--with package=spec]\n"
 // word for that reason.
 let moved = "dev moved to @epure/dev. Run `pnpm dev` in a project, or `epure-dev` by hand.\n"
 
-// `pnpm create @epure <name>` runs the bin as `epure <name>`: npm's create
+// `pnpm create epure <name>` runs the bin as `epure <name>`: npm's create
 // convention passes no subcommand. A first word that is neither a command nor
 // a flag is the project's name.
 let names = (word: string) => word != "init" && word != "dev" && !(word->String.startsWith("-"))

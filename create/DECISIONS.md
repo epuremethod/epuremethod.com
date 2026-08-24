@@ -285,3 +285,21 @@ proxy reading `dev.json` — a second process for what one header does.
 
 Costs an install that boots lapa once, and a `.data` store that exists
 before dev has ever served.
+
+## 2026-08-24 — The package is `create-epure`
+
+`@epure/create` becomes `create-epure`, the unscoped package pnpm maps
+`pnpm create epure` to — the short form is what a person types from
+memory. The trap the scope guarded against does not apply: during
+development every install routes to the local registry, whatever the
+name's scope, and the registry forwards what it does not hold — no
+install falls through to npmjs by accident. The bin stays `epure`.
+`create-epure` is free on npmjs (checked 2026-08-24) and publishes the
+day epure publishes for real.
+
+Refused: keeping `@epure/create`. The scope bought no safety and cost
+the short form.
+
+Costs a rename in every script and paper that named the package, and an
+unscoped entry in the local registry's package rules so the name never
+proxies to a stranger's future package.

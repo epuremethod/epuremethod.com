@@ -4,7 +4,7 @@
 # publish whether the registry is local or remote. The version stays in
 # package.json, so what was published is what is committed.
 #
-# Publish this before `@epure/create`: the template names `@epure/dev`, and
+# Publish this before `create-epure`: the template names `@epure/dev`, and
 # `pnpm sync` asks the registry what version to write.
 
 set -e

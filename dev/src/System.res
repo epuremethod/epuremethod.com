@@ -1,4 +1,4 @@
-// The node surface the dev server needs, and nothing beyond it. `@epure/create`
+// The node surface the dev server needs, and nothing beyond it. `create-epure`
 // carries its own: two small lists of externals are cheaper to read than one
 // shared package neither of them would own.
 

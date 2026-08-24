@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Publish @epure/create on its own beta counter, `0.1.0-beta.N`, raised on
+# Publish create-epure on its own beta counter, `0.1.0-beta.N`, raised on
 # every publish whether the registry is local or remote. The version stays in
 # package.json, so what was published is what is committed.
 #
@@ -63,7 +63,7 @@ pnpm publish --tag beta --access public --no-git-checks --registry "$REGISTRY"
 # `latest` too, while every version is a prerelease: npm sets it on the first
 # publish whatever the tag says and never moves it again, and `pnpm create`
 # reads it. See sylva's bin/publish.sh for the whole of it.
-npm dist-tag add "@epure/create@$VERSION" latest --registry "$REGISTRY"
+npm dist-tag add "create-epure@$VERSION" latest --registry "$REGISTRY"
 
 echo
-echo "Published @epure/create@$VERSION to $REGISTRY"
+echo "Published create-epure@$VERSION to $REGISTRY"

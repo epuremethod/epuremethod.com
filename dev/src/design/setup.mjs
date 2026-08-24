@@ -2,7 +2,7 @@
 // because of its install, and every scenario here reads the same result.
 //
 // The dev server is tested over a real scaffold, so this reaches for
-// `@epure/create` — a devDependency, never a runtime one. That direction is
+// `create-epure` — a devDependency, never a runtime one. That direction is
 // the whole point of the split: the scaffolder knows about the dev server
 // because the template names it, and the dev server knows about the
 // scaffolder only in its tests.
