@@ -1,5 +1,5 @@
-// `epure-dev`: `rescript watch`, `lapa dev .data --port 8081` and vite,
-// three processes as one. The template's vite.config.mjs holds the ports
+// `epure-dev`: `rescript watch`, `lapa dev` on `.data` and vite, three
+// processes as one. The template's vite.config.mjs holds the ports
 // and the proxy; this file only starts, watches and stops. The `lapa`
 // binary comes from PATH, or from EPURE_LAPA_BIN for a checkout
 // (SESSION.md).
@@ -13,6 +13,11 @@ open System
 
 let lapaPort = "8081"
 let appPort = "8080"
+
+/** Where the desk writes the app's generated ReScript model: the template's
+    entity layer. `lapa dev` writes it again after every definition change,
+    so the model on disk never trails the definitions. */
+let modelDir = "src/domain/api/entity"
 
 let stopping = ref(false)
 let children: array<child> = []
@@ -200,7 +205,7 @@ let serve = () => {
   )
   let served = run(
     lapa,
-    ["dev", ".data", "--port", lapaPort],
+    ["dev", ".data", "--port", lapaPort, "--types", modelDir],
     {"cwd": cwd(), "stdio": ["ignore", "pipe", "pipe"]},
   )
   let seen = ref(false)

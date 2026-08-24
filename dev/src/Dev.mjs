@@ -12,6 +12,8 @@ let lapaPort = "8081";
 
 let appPort = "8080";
 
+let modelDir = "src/domain/api/entity";
+
 let stopping = {
   contents: false
 };
@@ -229,7 +231,9 @@ function serve() {
     "dev",
     ".data",
     "--port",
-    lapaPort
+    lapaPort,
+    "--types",
+    modelDir
   ], {
     cwd: process.cwd(),
     stdio: [
@@ -291,6 +295,7 @@ function main() {
 export {
   lapaPort,
   appPort,
+  modelDir,
   stopping,
   children,
   stopAll,

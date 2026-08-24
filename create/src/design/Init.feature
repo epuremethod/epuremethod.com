@@ -45,12 +45,16 @@ Feature: Initialize an epure project
     And "adventure/pnpm-workspace.yaml" contains "esbuild: true"
     And "adventure/.gitignore" contains ".data"
     And "adventure/.gitignore" contains ".mcp.json"
+    And "adventure/CONTRIBUTING.md" contains "Two modes"
+    And "adventure/src/croquis/.gitkeep" exists
+    And "adventure/.gitignore" contains "src/croquis/*"
     And "adventure/src/view/Page.res" exists
     And "adventure/src/service/Live.res" exists
     And "adventure/src/app.css" exists
     And "adventure/src/Page.res" does not exist
     And "adventure/src" contains the diagonal layout
       | directory          |
+      | croquis            |
       | design             |
       | domain/api/entity  |
       | domain/api/feature |

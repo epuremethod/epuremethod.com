@@ -10,6 +10,10 @@ Feature: epure-dev
   the founder's as bearer on `/_lapa/mcp`. Stopping dev stops both, and
   either process dying takes the other with it.
 
+  Dev names `src/domain/api/entity` to `lapa dev` as the model directory.
+  The desk writes the app's ReScript model there, and writes it again
+  after every definition change. Nobody runs a types command by hand.
+
   Dev prints one link, and clicking it opens the app on the founder's
   session. Dev also writes `.mcp.json`: the desk's address with the session
   as its authorization, so an agent started in the project reads the file
@@ -116,6 +120,11 @@ Feature: epure-dev
     When the agent makes an entity at "/_lapa/mcp"
     Then the client hears a stamp
     And the client's pull answers the entity
+
+  Scenario: A definition the agent makes writes the model's ReScript
+    Given a running dev
+    When the agent makes an entity at "/_lapa/mcp"
+    Then the model under "src/domain/api/entity" names "Adventure"
 
   Scenario: An edit to the page compiles in dev
     Given a running dev

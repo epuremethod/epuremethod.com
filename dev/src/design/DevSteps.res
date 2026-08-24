@@ -6,6 +6,7 @@ open TestCli
 // exercised on the real processes.
 
 @val external later: (unit => unit, int) => unit = "setTimeout"
+@module("node:fs") external readdir: string => array<string> = "readdirSync"
 @val external encode: string => string = "encodeURIComponent"
 @val external assign: (dict<string>, dict<string>) => dict<string> = "Object.assign"
 @val @scope("process") external processEnv: dict<string> = "env"
@@ -65,8 +66,14 @@ given("a project created by init that nothing serves", ({step}, context: testCon
   let project = where.project
   let data = System.joined(project, ".data")
   let mcp = System.joined(project, ".mcp.json")
+  let model = System.joined(project, "src/domain/api/entity")
+  // The desk owns the .res files in the model directory; anything else
+  // there — the scaffold's .gitkeep — stands.
+  let written = () => readdir(model)->Array.filter(name => name->String.endsWith(".res"))
+  let unwrites = () => written()->Array.forEach(name => System.forget(System.joined(model, name)))
   System.forget(data)
   System.forget(mcp)
+  unwrites()
 
   let current: ref<option<served>> = ref(None)
   let listening: ref<option<(socket, array<string>)>> = ref(None)
@@ -95,6 +102,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     }
     System.forget(data)
     System.forget(mcp)
+    unwrites()
   })
 
   let starts = async () => {
@@ -478,6 +486,14 @@ given("a project created by init that nothing serves", ({step}, context: testCon
       ),
     )
     expect(lastStatus.contents).toBe(200)
+  })
+
+  step("the model under {string} names {string}", async (dir: string, wanted: string) => {
+    let at = System.joined(project, dir)
+    let holds = name => System.readFile(System.joined(at, name), "utf8")->String.includes(wanted)
+    await until(async () =>
+      readdir(at)->Array.some(name => name->String.endsWith(".res") && holds(name))
+    )
   })
 
   step("the client hears a stamp", async () => {

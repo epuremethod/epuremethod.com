@@ -39,6 +39,9 @@ state manager, is the one exception. The tools named here are the
 reference stack — a project may swap them; the boundaries and the
 promises stay.
 
+- **croquis/** — the sketches of the croquis mode (see "Two modes"). It may
+  use every layer below it, nothing ships depending on it, and git ignores
+  everything in it except its `.gitkeep`.
 - **design/** — the executable scenarios, their steps, and the test
   assembly. The steps that bind scenarios to code are code: reviewed like
   code, because a wrong step makes passing meaningless.
@@ -67,6 +70,27 @@ want → scenario, agreed in the domain's words → build (pure functions,
 carved features) → green → next want.
 
 A bug is a missing scenario: write the scenario that fails, then fix the code.
+
+## Two modes
+
+A session works in one of two modes and names its mode in `SESSION.md`.
+
+**Croquis** is finding out what to build, named for the quick freehand
+sketch drawn before the épure. The agent defines the model at the desk, the
+board shows it live, and the views are sketches in `src/croquis/` — no
+scenarios, no stages, no stops. A sketch is cheap to make and cheap to
+throw away. Two things survive a croquis: the model, which is data, and the
+reasons worth keeping, which go to `DECISIONS.md`. Git never sees a sketch:
+everything in `src/croquis/` is ignored except the `.gitkeep` that keeps
+the folder.
+
+**Build** is the loop above: a bounded want, its scenarios agreed first, a
+stop after each stage, green as the handshake.
+
+One rule joins the modes: the standing check stays green. A croquis adds
+beside what is proven and never changes a behavior a scenario covers — to
+change one, work in build. At a build session's close, `src/croquis/` is
+empty.
 
 ## If you are an AI assistant
 

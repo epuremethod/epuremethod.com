@@ -1,5 +1,7 @@
 node_modules/
 lib/
+src/croquis/*
+!src/croquis/.gitkeep
 *.res.mjs
 .data/
 .mcp.json

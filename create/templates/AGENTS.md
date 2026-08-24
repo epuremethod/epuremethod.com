@@ -21,8 +21,15 @@ and types cannot express. Keep them beside what they describe. Do not comment
 fixtures or test data. Put lasting rationale in `DECISIONS.md`. Delete stale
 comments after changing code.
 
-Stop after each session stage. Show the completed stage and wait for agreement.
-Do not write steps or build before the feature is agreed.
+The session works in one of two modes, named in `SESSION.md`: croquis or
+build (`CONTRIBUTING.md`, "Two modes").
+
+In build, stop after each session stage. Show the completed stage and wait
+for agreement. Do not write steps or build before the feature is agreed.
+
+In croquis, do not stop. Define the model at the desk and sketch views in
+`src/croquis/`; write no scenarios. Never change a behavior a scenario
+covers — to change one, work in build. The standing check stays green.
 
 Agents commit only when asked. Never run `git push`, `git merge`,
 `git rebase`, or `git reset`. Otherwise leave changes in the working tree.

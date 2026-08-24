@@ -64,8 +64,14 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
   let project = where.project;
   let data = Nodepath.join(project, ".data");
   let mcp = Nodepath.join(project, ".mcp.json");
+  let model = Nodepath.join(project, "src/domain/api/entity");
+  let written = () => Nodefs.readdirSync(model).filter(name => name.endsWith(".res"));
+  let unwrites = () => {
+    written().forEach(name => TestCli.System.forget(Nodepath.join(model, name)));
+  };
   TestCli.System.forget(data);
   TestCli.System.forget(mcp);
+  unwrites();
   let current = {
     contents: undefined
   };
@@ -103,7 +109,8 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
       await quiet;
     }
     TestCli.System.forget(data);
-    return TestCli.System.forget(mcp);
+    TestCli.System.forget(mcp);
+    return unwrites();
   });
   let starts = async () => {
     let env = Object.assign({}, process.env);
@@ -475,6 +482,16 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
       ]
     ]));
     return Vitest.expect(lastStatus.contents).toBe(200);
+  });
+  step("the model under {string} names {string}", async (dir, wanted) => {
+    let at = Nodepath.join(project, dir);
+    return await until(async () => Nodefs.readdirSync(at).some(name => {
+      if (name.endsWith(".res")) {
+        return Nodefs.readFileSync(Nodepath.join(at, name), "utf8").includes(wanted);
+      } else {
+        return false;
+      }
+    }), undefined);
   });
   step("the client hears a stamp", async () => {
     let listener = listening.contents;
