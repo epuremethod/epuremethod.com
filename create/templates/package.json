@@ -18,8 +18,10 @@
   "dependencies": {
     "@lapa/board": "beta",
     "@lapa/db": "beta",
+    "@lapa/tilia": "beta",
     "@tilia/query": "beta",
     "@tilia/react": "beta",
+    "lapa": "beta",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tilia": "beta"
@@ -29,9 +31,9 @@
     "@epure/vitest": "beta",
     "@lapa/server": "beta",
     "@rescript/react": "^0.15.0",
-    "@rescript/runtime": "^12.3.0",
+    "@rescript/runtime": "^12.3.1",
     "@tailwindcss/vite": "^4.3.3",
-    "rescript": "^12.3.0",
+    "rescript": "^12.3.1",
     "tailwindcss": "^4.3.3",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"

@@ -29,7 +29,7 @@ export default function setup() {
     join(tmpdir(), "epure-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(sylva, "server/bin/lapa.mjs"),
+      lapa: join(sylva, "packages/server/bin/lapa.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });

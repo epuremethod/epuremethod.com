@@ -34,11 +34,15 @@ let sylva = path !== undefined && path !== "" ? path : Nodepath.resolve($$packag
 
 let links = [
   "--with",
-  `@lapa/db=link:` + Nodepath.join(sylva, "lapa"),
+  `lapa=link:` + Nodepath.join(sylva, "packages/lapa"),
   "--with",
-  `@lapa/server=link:` + Nodepath.join(sylva, "server"),
+  `@lapa/db=link:` + Nodepath.join(sylva, "packages/db"),
   "--with",
-  `@lapa/board=link:` + Nodepath.join(sylva, "board"),
+  `@lapa/tilia=link:` + Nodepath.join(sylva, "packages/tilia"),
+  "--with",
+  `@lapa/server=link:` + Nodepath.join(sylva, "packages/server"),
+  "--with",
+  `@lapa/board=link:` + Nodepath.join(sylva, "packages/board"),
   "--with",
   `@epure/dev=link:` + Nodepath.resolve($$package, "../dev")
 ];

@@ -1,5 +1,3 @@
-open Lapa.Data
-
 open Tilia
 
 // THROWAWAY. The scaffold's hello world, here so a new project shows
@@ -18,7 +16,7 @@ type t = {
   /** The title being edited, before it is saved. */
   mutable draft: string,
   /** The note the person opened, by id. */
-  mutable chosen: option<Id.t>,
+  mutable chosen: option<Lapa.id>,
   /** That note, or None while none is open. */
   opened: option<Notes.note>,
   /** The notes the filter leaves. */
@@ -28,7 +26,7 @@ type t = {
   /** Whether the first answer has come back. */
   ready: bool,
   /** Open a note, or shut the one already open. */
-  opens: Id.t => unit,
+  opens: Lapa.id => unit,
   /** Save the draft into the note that is open. */
   renames: unit => unit,
   /** Add the entry as a note, and clear the box. */
@@ -54,31 +52,36 @@ let make = (~notes: Notes.t): t =>
     opened: derived((self: t) =>
       self.chosen->Option.flatMap(id => notes.all()->Array.find(one => one.id == id))
     ),
-    shown: derived((self: t) => notes.all()->Array.filter(one => matches(~filter=self.filter, one))),
+    shown: derived((self: t) =>
+      notes.all()->Array.filter(one => matches(~filter=self.filter, one))
+    ),
     counted: computed(() => notes.all()->Array.length),
     ready: computed(() => notes.ready()),
-    opens: derived((self: t) => id =>
-      if self.chosen == Some(id) {
-        self.chosen = None
-      } else {
-        self.chosen = Some(id)
-        self.draft = notes.all()->Array.find(one => one.id == id)->Option.mapOr("", one => one.title)
-      }
-    ),
-    renames: derived((self: t) => () =>
-      switch (self.opened, self.draft->String.trim) {
-      | (Some(note), title) if title != "" && title != note.title =>
-        notes.saves({...note, title})
-      | _ => ()
-      }
-    ),
-    adds: derived((self: t) => () =>
-      switch self.entry->String.trim {
-      | "" => ()
-      | title => {
-          notes.adds(title)
-          self.entry = ""
+    opens: derived((self: t) =>
+      id =>
+        if self.chosen == Some(id) {
+          self.chosen = None
+        } else {
+          self.chosen = Some(id)
+          self.draft =
+            notes.all()->Array.find(one => one.id == id)->Option.mapOr("", one => one.title)
         }
-      }
+    ),
+    renames: derived((self: t) =>
+      () =>
+        switch (self.opened, self.draft->String.trim) {
+        | (Some(note), title) if title != "" && title != note.title => notes.saves({...note, title})
+        | _ => ()
+        }
+    ),
+    adds: derived((self: t) =>
+      () =>
+        switch self.entry->String.trim {
+        | "" => ()
+        | title => {
+            notes.adds(title)
+            self.entry = ""
+          }
+        }
     ),
   })

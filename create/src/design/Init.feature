@@ -22,7 +22,9 @@ Feature: Initialize an epure project
       | DECISIONS.md    |
     And "adventure/package.json" contains the stack dependencies
       | dependency    | type           |
+      | lapa          | dependency     |
       | @lapa/db      | dependency     |
+      | @lapa/tilia   | dependency     |
       | tilia         | dependency     |
       | @tilia/query  | dependency     |
       | @tilia/react  | dependency     |
@@ -52,7 +54,6 @@ Feature: Initialize an epure project
     And "adventure/.gitignore" contains "src/croquis/*"
     And "adventure/rescript.json" contains "src/croquis"
     And "adventure/src/view/Page.res" exists
-    And "adventure/src/service/Live.res" exists
     And "adventure/src/app.css" exists
     And "adventure/src/Page.res" does not exist
     And "adventure/src" contains the diagonal layout
@@ -76,7 +77,9 @@ Feature: Initialize an epure project
       | tilia         |
       | @tilia/query  |
       | @tilia/react  |
+      | lapa          |
       | @lapa/db      |
+      | @lapa/tilia   |
       | @lapa/board   |
       | @lapa/server  |
       | @epure/dev    |

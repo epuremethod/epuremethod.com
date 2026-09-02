@@ -45,7 +45,9 @@ Feature: Sync the template's versions
     When the template is synced
     Then the template names each dependency at a published version
       | dependency       | type           |
+      | lapa             | dependency     |
       | @lapa/db         | dependency     |
+      | @lapa/tilia      | dependency     |
       | tilia            | dependency     |
       | @tilia/query     | dependency     |
       | @tilia/react     | dependency     |

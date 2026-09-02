@@ -1,5 +1,5 @@
-open Lapa.App
-open Lapa.Data
+open LapaDb.App
+open LapaDb.Data
 
 // The app's one entry, and the only file that knows how the world is made:
 // the session, the client over it, the services over the client, and the app

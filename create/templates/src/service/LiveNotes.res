@@ -1,42 +1,31 @@
-open Lapa.App
-open Lapa.Data
+open LapaDb.App
+open LapaDb.Data
 
-// `Notes.t` over a lapa client: the engine reads, the client's front writes,
-// and the gate makes. This is the only file that knows both halves.
+// `Notes.t` over a lapa client: `@lapa/tilia` reads, the client writes, and
+// the operations make. This is the only file that knows both halves.
 //
 // A note is a plain `Record` with a title, so a scaffold shows something
-// before it has a model of its own. Once `lapa types` has written classes of
-// your own, this is the file that changes: `class` names one of them and
-// `read` becomes its generated guard.
+// before it has a model of its own. `Record` below is what `lapa types` would
+// write for that class, by hand. Once the generator has written classes of
+// your own, this is the file that changes: one of them takes `Record`'s place,
+// and `read` reads its own fields.
 
-/** The engine's queries. One for now: every note. The filtering the app
-    does is over the answer, not over the wire. */
-type query = All
-
-let field = (entity: Entity.t, facet, field) =>
-  entity->Dict.get(facet)->Option.flatMap(part => part->Dict.get(field))
-
-let read = (entity: Entity.t) =>
-  switch (
-    field(entity, Root.entity, Root.Entity.id),
-    field(entity, Root.titled, Root.Titled.title),
-  ) {
-  | (Some(Value.String(id)), Some(Value.String(title))) => Some({Notes.id, title, entity})
-  | _ => None
+/** A `Record` as the binding hands it back: the bookkeeping part, the title
+    every one carries, and `_rest` for what the model does not name, written
+    back whole on a save. */
+module Record = {
+  type t = {
+    entity: Lapa.Root.Entity.t,
+    mutable titled: Lapa.Root.Titled.t,
+    _rest: Lapa.rest,
   }
 
-// The copy goes one facet deep: the titled part is the only one written, and
-// everything else the server sent rides back untouched.
-let entity = (note: Notes.note) => {
-  let next = note.entity->Dict.toArray->Dict.fromArray
-  let part = switch note.entity->Dict.get(Root.titled) {
-  | Some(part) => part->Dict.toArray->Dict.fromArray
-  | None => Dict.make()
-  }
-  part->Dict.set(Root.Titled.title, Value.String(note.title))
-  next->Dict.set(Root.titled, part)
-  next
+  let class: Lapa.class<t> = Lapa.class("record.class")
+  let all = Lapa.all(class)
+  external record: t => Lapa.record = "%identity"
 }
+
+let read = (row: Record.t): Notes.note => {id: row.entity.id, title: row.titled.title}
 
 /** The Personal node this session reaches: where a note the app makes
     hangs. The client pulls it on boot, so it is in the store by the time
@@ -45,7 +34,7 @@ let place = (client: Client.t) =>
   Promise.make((resolve, reject) => {
     let found = ref(None)
     client.store.seek(
-      {field: Root.Entity.class, test: Is(Value.Ref(Root.personal))},
+      {field: Root.Entity.class, test: Is(Ref(Root.personal))},
       {
         entry: id =>
           switch found.contents {
@@ -64,38 +53,59 @@ let place = (client: Client.t) =>
 
 let over = async (~client: Client.t): Notes.t => {
   let personal = await place(client)
-  let live = Live.make(
-    ~client,
-    ~rows={
-      class: Root.record,
-      row: read,
-      entity,
-      id: (note: Notes.note) => note.id,
-      matches: (_, _) => true,
-      key: _ => "all",
-    },
+  // A conflict is told and nothing more: the merged row stays on screen as a
+  // resolution draft, and what to do with one is the app's next decision.
+  let db = LapaTilia.make(~client, ~conflicts=(id, found) =>
+    Console.error2(`conflict on ${id}`, found)
   )
-  {
-    all: () =>
-      switch live.query.array(All) {
-      | Loaded({data}) => data
-      | _ => []
+  let rows = () =>
+    switch db.array(Record.all) {
+    | Loaded({data}) => data
+    | _ => []
+    }
+  // The client answers `status()` as a plain value, and nothing on it fires
+  // when a push lands. So it is read into a signal: on every write, and on
+  // every delivery, because a landed push pulls.
+  let (waiting, waits) = Tilia.signal(0)
+  let asks = () =>
+    waits(
+      switch client.status() {
+      | Pending => 1
+      | Clear | Refused(_) => 0
       },
+    )
+  let _ = client.receives(_ => asks())
+  {
+    all: () => rows()->Array.map(read),
     ready: () =>
-      switch live.query.array(All) {
+      switch db.array(Record.all) {
       | Loaded(_) => true
       | _ => false
       },
-    saves: note => live.query.upsert(note),
+    saves: note =>
+      rows()
+      ->Array.find(row => row.entity.id == note.id)
+      ->Option.forEach(row => {
+        row.titled.title = note.title
+        db.upsert(Record.record(row))
+        asks()
+      }),
     // A note is born with its place and its access, so making one is the
-    // gate's business and not the engine's. The engine hears it arrive on
-    // the pull that follows the push.
+    // operations' business and not the binding's. The binding hears it
+    // arrive on the pull that follows the push.
     adds: title =>
-      client.gate.create(
+      client.ops.create(
         ~actor=client.actor,
-        [{GateType.class: Root.record, title, parts: [], hangs: [(personal, Access.admin)]}],
-        {ok: _ => (), error: message => Console.error(message)},
+        [
+          {
+            OperationsType.class: Root.record,
+            title,
+            parts: [],
+            hangs: [(personal, Lapa.Access.admin)],
+          },
+        ],
+        {ok: _ => asks(), error: message => Console.error(message)},
       ),
-    waiting: () => live.query.status.pending,
+    waiting: () => waiting.value,
   }
 }

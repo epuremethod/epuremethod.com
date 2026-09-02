@@ -46,11 +46,15 @@ let sylva = switch environment->Dict.get("SYLVA") {
 // scenarios that run their own must link the same things.
 let links = [
   "--with",
-  `@lapa/db=link:${System.joined(sylva, "lapa")}`,
+  `lapa=link:${System.joined(sylva, "packages/lapa")}`,
   "--with",
-  `@lapa/server=link:${System.joined(sylva, "server")}`,
+  `@lapa/db=link:${System.joined(sylva, "packages/db")}`,
   "--with",
-  `@lapa/board=link:${System.joined(sylva, "board")}`,
+  `@lapa/tilia=link:${System.joined(sylva, "packages/tilia")}`,
+  "--with",
+  `@lapa/server=link:${System.joined(sylva, "packages/server")}`,
+  "--with",
+  `@lapa/board=link:${System.joined(sylva, "packages/board")}`,
   "--with",
   `@epure/dev=link:${System.resolved(package, "../dev")}`,
 ]

@@ -33,7 +33,9 @@
     "version": 4
   },
   "dependencies": [
+    "lapa",
     "@lapa/db",
+    "@lapa/tilia",
     "tilia",
     "@tilia/query",
     "@tilia/react",

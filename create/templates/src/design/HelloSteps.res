@@ -21,7 +21,6 @@ given("the notes {string}", ({step}, given: string) => {
     listed(given)->Array.mapWithIndex((title, at) => {
       Notes.id: `note-${at->Int.toString}`,
       title,
-      entity: Dict.make(),
     }),
   )
   let (answered, answers) = Tilia.signal(true)

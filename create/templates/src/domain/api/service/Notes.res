@@ -1,16 +1,12 @@
-open Lapa.Data
-
 // What the app asks of the world, and the whole seam between a feature and
 // the machinery: no client, no store and no wire reach past this file. The
 // mount injects one made over a lapa client; a scenario hands one made of
 // arrays, and the feature cannot tell the difference.
 
-/** A note: a `Record` entity read down to what the app draws. The entity
-    rides along whole, so a save writes back everything the server sent. */
+/** A note: a `Record` entity read down to what the app draws. */
 type note = {
-  id: Id.t,
+  id: Lapa.id,
   title: string,
-  entity: Entity.t,
 }
 
 type t = {

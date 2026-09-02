@@ -321,3 +321,21 @@ of any consumer's compile.
 
 Costs a mount line the croquis adds in `src/view` and removes at its
 close: a compiled reference cannot outlive the module it names.
+
+## 2026-09-02 — The binding is lapa's; the template ships the seam
+
+`Live.res` is gone. The scaffold depends on `lapa`, `@lapa/db` and
+`@lapa/tilia`, and `LiveNotes.res` fills `Notes.t` over `LapaTilia.make`.
+`Notes.note` is an id and a title: the record's `_rest` writes the server's
+other parts back, so the seam carries no entity. `@tilia/query` stays a
+dependency, because the app matches `Loaded` on the loadable the binding
+answers and ReScript sees only what a project names. This supersedes the
+2026-08-20 rule above: the seam still travels, the binding no longer does.
+
+Refused: a `waiting` that counts writes. The client keeps no count, and the
+engine's `status.pending` went with the engine/store split; `LiveNotes` reads
+the client's status into a signal on every write and every delivery.
+
+Costs the golden init linking `lapa` and `@lapa/tilia` beside the three it
+linked, from `packages/`, and one hand-written `Record` module in
+`LiveNotes.res` standing in for a generated file until a model exists.
