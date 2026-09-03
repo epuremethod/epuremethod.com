@@ -55,8 +55,10 @@ let over = async (~client: Client.t): Notes.t => {
   let personal = await place(client)
   // A conflict is told and nothing more: the merged row stays on screen as a
   // resolution draft, and what to do with one is the app's next decision.
-  let db = LapaTilia.make(~client, ~conflicts=(id, found) =>
-    Console.error2(`conflict on ${id}`, found)
+  let db = LapaTilia.make(
+    ~client,
+    ~conflicts=(id, found) => Console.error2(`conflict on ${id}`, found),
+    ~clock=SystemClock.make(),
   )
   let rows = () =>
     switch db.array(Record.all) {

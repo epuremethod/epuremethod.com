@@ -16,5 +16,6 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - "@epure/*"
   - "@lapa/*"
+  - lapa
   - tilia
   - "@tilia/*"
