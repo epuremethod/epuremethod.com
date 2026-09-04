@@ -1,6 +1,6 @@
 {
   "name": "create-epure",
-  "version": "0.1.0-beta.18",
+  "version": "0.1.0-beta.21",
   "description": "The method's scaffolder: `epure init` creates a project on the method's files and the reference stack.",
   "type": "module",
   "bin": {
