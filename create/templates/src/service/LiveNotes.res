@@ -20,8 +20,9 @@ module Record = {
     _rest: Lapa.rest,
   }
 
-  let class: Lapa.class<t> = Lapa.class("record.class")
+  let class: Lapa.class_<t> = Lapa.class_("record.class")
   let all = Lapa.all(class)
+  let from = Lapa.from(class)
   external record: t => Lapa.record = "%identity"
 }
 
@@ -34,7 +35,7 @@ let place = (client: Client.t) =>
   Promise.make((resolve, reject) => {
     let found = ref(None)
     client.store.seek(
-      {field: Root.Entity.class, test: Is(Ref(Root.personal))},
+      {field: Root.Entity.class_, test: Is(Relation(Root.personal))},
       {
         entry: id =>
           switch found.contents {
@@ -60,9 +61,14 @@ let over = async (~client: Client.t): Notes.t => {
     ~conflicts=(id, found) => Console.error2(`conflict on ${id}`, found),
     ~clock=SystemClock.make(),
   )
+  // A class seek answers the class and everything below it, and the session's
+  // own nodes — Personal, Inbox, the Authors and Domains — descend from
+  // `Record` too. `from` keeps only what the app's model names, so the
+  // untaught descendants drop out, exactly as they would through a generated
+  // file.
   let rows = () =>
     switch db.array(Record.all) {
-    | Loaded({data}) => data
+    | Loaded({data}) => data->Array.filterMap(row => Record.from(Record.record(row)))
     | _ => []
     }
   // The client answers `status()` as a plain value, and nothing on it fires

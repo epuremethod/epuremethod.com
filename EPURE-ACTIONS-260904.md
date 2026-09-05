@@ -156,28 +156,28 @@ record names every field.
 
 Ranked. Each is one session or less unless marked.
 
-- **A1 — Self-heal the stale browser store.** On boot, the client writes a
+- [x] **A1 — Self-heal the stale browser store.** On boot, the client writes a
   founding mark (the store's app id) into its kv. When the mark and the
   server disagree, forget the local database and pull fresh instead of
   merging. An offline edit against a re-founded store is meaningless, so
   nothing of value is lost. This fixes the report's §2.2 at the root;
   the template rename (E2) only narrows it. Ties into `BEFORE-BETA.md`'s
   "a scenario over `IndexedDbKv`".
-- **A2 — Name the actionable cure in the error path.** Until A1 lands,
+- [x] **A2 — Name the actionable cure in the error path.** Until A1 lands,
   `invalidAncestors` reaching a client boot should say what to do:
   "the browser holds definitions from another store — clear this site's
   data." Cheap, and worth keeping even after A1 as the last-resort message.
-- **A3 — Write the header id as base64.** `Typing.res` `header` uses
+- [ ] **A3 — Write the header id as base64.** `Typing.res` `header` uses
   `escaped(app)`; use `btoa(app)` like every id in the teaching call. No
   standing files to keep owning: `wrote` checks the one spelling. The line
   that decides file ownership becomes legible.
-- **A4 — Ship `Lapa.spell` and `Lapa.parse`.** The base64 pass the desk
+- [ ] **A4 — Ship `Lapa.spell` and `Lapa.parse`.** The base64 pass the desk
   already uses, as public API. One paragraph in `packages/lapa/llms.txt`:
   an id is raw bytes; never put one in the DOM, a URL, JSON, or a React
   `key`; spell it first. Rejected on merits, not on compatibility: making
   `Lapa.id` abstract — an id is a dict key throughout the API, and dict
   keys are strings.
-- **A5 — One kind vocabulary everywhere: `text`, `number`, `time`, `bool`,
+- [x] **A5 — One kind vocabulary everywhere: `text`, `number`, `time`, `bool`,
   `access`, `relation`, `relations`.** Nothing runs the db, so rename
   outright, no dual read and no mapping table. The desk's `define` schema
   and `scalars` say the new words; `kindOf` reads only them; dev stores are
@@ -185,23 +185,23 @@ Ranked. Each is one session or less unless marked.
   `Value.kind` constructors become `Text`, `Relation`, `Relations` too, so
   the desk, the stored field, the handle and the value constructor spell
   one concept one way. `String`/`Ref`/`Refs` disappear.
-- **A6 — Say where instances hang.** One sentence in the desk `make` tool
+- [ ] **A6 — Say where instances hang.** One sentence in the desk `make` tool
   description: an app's own create usually hangs under Personal, so rows
   made here live in a different part of the graph than rows the app makes.
-- **A7 — Answer `indexed` at define time.** In the `define` tool's field
+- [ ] **A7 — Answer `indexed` at define time.** In the `define` tool's field
   schema and in `packages/lapa/llms.txt`: the client holds every row it
   reaches, so an app filters in memory until it does not fit; `indexed` is
   for seeks, and a seek is for what the client should not hold; the honest
   default is to index nothing. Say plainly that the flag cannot change later
   (`changedIndexed`), and open a `docs/NEXT.md` line for making it
   changeable, which is a reindex sweep and its own session.
-- **A8 — A worked `loadable` switch.** In `packages/tilia/llms.txt`: one
+- [ ] **A8 — A worked `loadable` switch.** In `packages/tilia/llms.txt`: one
   `switch` over every state with the recommended treatment of each, and one
   sentence each on `tick` ("lapa answers the store's half with nothing, so
   an app over lapa never calls it" — if that is true; verify) and `dispose`
   (when it matters). The staleness model is documented but not usable from
   the reference alone.
-- **A9 — Document the nullable-part rule.** Where the generator is
+- [ ] **A9 — Document the nullable-part rule.** Where the generator is
   described (`packages/server/llms.txt`, type-generation block): a class
   whose fields are all optional has a `Nullable` part, so marking any one
   field required changes how every other field on the class is read.
@@ -210,7 +210,7 @@ Ranked. Each is one session or less unless marked.
 
 ## 4. Actions in epuremethod.com
 
-- **E1 — The cold desk, in two steps.**
+- [ ] **E1 — The cold desk, in two steps.**
   *Now:* a paragraph in `create/templates/AGENTS.md`: on a cold session the
   desk MCP is not connected, because the desk answers only while dev runs.
   Start dev, then ask the person to reconnect the MCP client. Until it is
@@ -221,11 +221,11 @@ Ranked. Each is one session or less unless marked.
   with the `.data` lock as the guard. Costs a process that outlives the
   terminal and a stop story; decide only if cold sessions stay painful
   after the documentation lands.
-- **E2 — Name the browser database after the project.** `{{name}}` instead
+- [ ] **E2 — Name the browser database after the project.** `{{name}}` instead
   of `"app"` in `create/templates/src/view/Page.res:67`, and improve the
   `Page.res` failure text: "if you re-founded `.data`, clear this site's
   data." Narrows §2.2 until sylva's A1 removes it.
-- **E3 — Enforce the croquis boundary at build.** A small vite plugin in
+- [ ] **E3 — Enforce the croquis boundary at build.** A small vite plugin in
   the template: `pnpm build` fails when a module under `src/croquis/` is
   reached from the entry. `pnpm dev` stays permissive — the blessed mount
   line works while sketching, and a forgotten one fails the build loudly
@@ -233,19 +233,19 @@ Ranked. Each is one session or less unless marked.
   where a scaffolded project can see it (`templates/README.md`, "Two
   modes"), including that nobody repoints `index.html`. Today the
   convention lives only in `create/DECISIONS.md`.
-- **E4 — Stop `pnpm test` and by-hand `rescript` from killing dev.**
+- [ ] **E4 — Stop `pnpm test` and by-hand `rescript` from killing dev.**
   Verify the collision first: `pretest` runs `rescript` while the watcher
   holds the build. Then either have `pretest` skip the build when the
   watcher runs (the watcher keeps `lib/bs` current), or have `epure-dev`
   refuse a second compiler with one clear sentence instead of dying on a
   Rust panic. Say it in `dev/llms.txt` and `templates/AGENTS.md` either
   way: read `lib/bs/.compiler.log` to check compilation while dev runs.
-- **E5 — Show the refused state in the scaffold.** `LiveNotes` collapses
+- [ ] **E5 — Show the refused state in the scaffold.** `LiveNotes` collapses
   `Refused` into "not saving", and flood copied that faithfully. One member
   of `Notes.t` carries it, one line of `HelloView` shows it. The scaffold is
   the teacher; this is where the lesson lands. (Sylva's `BEFORE-BETA.md`
   already lists it; it is the template half of that item.)
-- **E6 — The stale-template install.** Already filed as `EPURE_BUG.md`:
+- [ ] **E6 — The stale-template install.** Already filed as `EPURE_BUG.md`:
   `epure init` checks the registry's `latest` for `create-epure` and stops
   with the exact-version command when it is behind; print the scaffolded
   version either way. Keeping it here so the list is complete.
@@ -256,24 +256,24 @@ Ranked. Each is one session or less unless marked.
 
 **`@epure/vitest`** (separate repo; the template pins a beta tarball):
 
-- **V1 — Document tables and placeholders exactly.** The step text includes
+- [ ] **V1 — Document tables and placeholders exactly.** The step text includes
   the trailing colon; the table arrives as the step's single argument as
   `array<array<string>>`; `toRecords` field names must be valid ReScript
   record fields, so a column named `for` cannot work. Replace "such as
   `{string}` and `{number}`" with "only". Every `{number}` arrives as
   `float`.
-- **V2 — Consider an optional-suffix form** (`task(s)`) — and say in the
+- [ ] **V2 — Consider an optional-suffix form** (`task(s)`) — and say in the
   reference, until it exists, that singular and plural are two
   registrations. Note from flood: `"{number} task is loose"` vs
   `"{number} tasks are loose"` differ by the verb too, so a suffix matcher
   alone does not close the gap; weigh that before building it.
-- **V3 — Nest `Todo`/`Skip`/`Only` under `Mode`** (or rename `Todo`).
+- [ ] **V3 — Nest `Todo`/`Skip`/`Only` under `Mode`** (or rename `Todo`).
   The package is itself a beta with the template as its consumer, so nest
   now rather than waiting for a major.
 
 **tilia** (checkout beside this repo):
 
-- **T1 — Answer "a derived value per row of a dynamic list".** The report's
+- [ ] **T1 — Answer "a derived value per row of a dynamic list".** The report's
   single open modelling question (§5.2), and a common shape. If tilia has an
   idiom, it belongs in `tilia/llms.txt` with a worked example; if not, that
   is a real gap worth an issue. The flood pattern — a `computed` returning a
@@ -283,28 +283,28 @@ Ranked. Each is one session or less unless marked.
 
 ## 6. Method and workflow changes
 
-- **W1 — A fake may only show states its live service can produce.** New
+- [ ] **W1 — A fake may only show states its live service can produce.** New
   sentence for the agreement (`docs/content/agreement.md`, promise 3
   territory): when a live service replaces a fake, every state a scenario
   asserts must be one the live service can reach. Flood's `waiting: 2`
   scenarios pass against a service that can only answer `0` or `1`, and
   nothing in the method catches it. This is the one finding that touches
   the method itself rather than its edges.
-- **W2 — Fix the domain-exception sentence.** The agreement says "tilia is
+- [ ] **W2 — Fix the domain-exception sentence.** The agreement says "tilia is
   the one exception" while every generated entity file and the seam types
   name `Lapa.id`. Amend to the report's wording: tilia and lapa are the
   exceptions — one is the state manager, the other is the vocabulary.
-- **W3 — Say who restores what at a croquis close.** The agreement says
+- [ ] **W3 — Say who restores what at a croquis close.** The agreement says
   "at a build session's close, `src/croquis/` is empty"; add the other
   half: the mount line the croquis added is removed by the same close, and
   E3's build check is what verifies it.
-- **W4 — Keep the report ritual.** The report was worth more than the app.
+- [ ] **W4 — Keep the report ritual.** The report was worth more than the app.
   One line in the template's `AGENTS.md`: on a first session with a new
   stack, or when asked, close by writing what confused, what was guessed,
   and what was never exercised, as `EPURE-REPORT-<date>.md`. The "what I
   did not exercise" section (§6 of the report) is the part to insist on —
   it is what kept the report honest.
-- **W5 — Decide what `CONVENTIONS.md` is for.** Flood never filled its
+- [ ] **W5 — Decide what `CONVENTIONS.md` is for.** Flood never filled its
   stub, and nothing prompted it to. Either the template's session order
   names the moment a convention is recorded, or the stub is dropped.
 

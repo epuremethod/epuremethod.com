@@ -24,9 +24,11 @@ export default function setup() {
       join(create, "bin/epure.mjs"),
       "init",
       "adventure",
-      "--with", `@lapa/db=link:${join(sylva, "lapa")}`,
-      "--with", `@lapa/server=link:${join(sylva, "server")}`,
-      "--with", `@lapa/board=link:${join(sylva, "board")}`,
+      "--with", `lapa=link:${join(sylva, "packages/lapa")}`,
+      "--with", `@lapa/db=link:${join(sylva, "packages/db")}`,
+      "--with", `@lapa/tilia=link:${join(sylva, "packages/tilia")}`,
+      "--with", `@lapa/server=link:${join(sylva, "packages/server")}`,
+      "--with", `@lapa/board=link:${join(sylva, "packages/board")}`,
       "--with", `@epure/dev=link:${here}`,
     ],
     { cwd: root, stdio: "inherit" },
@@ -36,7 +38,7 @@ export default function setup() {
     join(tmpdir(), "epure-dev-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(sylva, "server/bin/lapa.mjs"),
+      lapa: join(sylva, "packages/server/bin/lapa.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });
