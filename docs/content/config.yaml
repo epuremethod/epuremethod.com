@@ -16,7 +16,7 @@ var:
           <nav class="idx" aria-label="Sections">
             <a href="{{homeHref}}#principles">Principles</a>
             <a href="{{homeHref}}#window">The window</a>
-            <a href="{{homeHref}}#projects">The toolset</a>
+            <a href="{{homeHref}}#projects">The instruments</a>
             <a href="./agreement.html"{{agreementCurrentAttr}}>The agreement</a>
           </nav>
         </header>

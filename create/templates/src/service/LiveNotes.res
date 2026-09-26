@@ -1,8 +1,8 @@
 open LapaDb.App
 open LapaDb.Data
 
-// `Notes.t` over a lapa client: `@lapa/tilia` reads, the client writes, and
-// the operations make. This is the only file that knows both halves.
+// `Notes.t` over a lapa client: `@lapa/tilia` reads and writes, and `make`
+// drafts. This is the only file that knows both halves.
 //
 // A note is a plain `Record` with a title, so a scaffold shows something
 // before it has a model of its own. `Record` below is what `lapa types` would
@@ -20,10 +20,16 @@ module Record = {
     _rest: Lapa.rest,
   }
 
-  let class: Lapa.class_<t> = Lapa.class_("record.class")
-  let all = Lapa.all(class)
-  let from = Lapa.from(class)
+  let class_: Lapa.class_<t> = Lapa.class_("record.class")
+  let all = Lapa.all(class_)
+  let from = Lapa.from(class_)
   external record: t => Lapa.record = "%identity"
+
+  let make = (~persona, ~under, ~titled): t => {
+    entity: Lapa.entity(persona, class_, ~under),
+    titled,
+    _rest: Lapa.rest(),
+  }
 }
 
 let read = (row: Record.t): Notes.note => {id: row.entity.id, title: row.titled.title}
@@ -98,22 +104,13 @@ let over = async (~client: Client.t): Notes.t => {
         db.upsert(Record.record(row))
         asks()
       }),
-    // A note is born with its place and its access, so making one is the
-    // operations' business and not the binding's. The binding hears it
-    // arrive on the pull that follows the push.
-    adds: title =>
-      client.ops.create(
-        ~actor=client.actor,
-        [
-          {
-            OperationsType.class: Root.record,
-            title,
-            parts: [],
-            hangs: [(personal, Lapa.Access.admin)],
-          },
-        ],
-        {ok: _ => asks(), error: message => Console.error(message)},
-      ),
+    // A note is born with its place: `make` sets `addUnder`, and the save
+    // stages the hang at `admin` and spends it.
+    adds: title => {
+      let note = Record.make(~persona=db.persona(), ~under=personal, ~titled={title: title})
+      db.upsert(Record.record(note))
+      asks()
+    },
     waiting: () => waiting.value,
   }
 }

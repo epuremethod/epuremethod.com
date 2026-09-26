@@ -52,8 +52,8 @@ importers:
   docs:
     dependencies:
       '@epure/minidoc':
-        specifier: 0.1.0-beta.20260726T234354
-        version: 0.1.0-beta.20260726T234354(rescript@12.3.0)
+        specifier: ^0.1.0
+        version: 0.1.0(rescript@12.3.0)
       live-server:
         specifier: ^1.2.2
         version: 1.2.2
@@ -66,8 +66,8 @@ packages:
   '@cucumber/messages@27.2.0':
     resolution: {integrity: sha512-f2o/HqKHgsqzFLdq6fAhfG1FNOQPdBdyMGpKwhb7hZqg0yZtx9BVqkTyuoNk83Fcvk3wjMVfouFXXHNEk4nddA==}
 
-  '@epure/minidoc@0.1.0-beta.20260726T234354':
-    resolution: {integrity: sha512-vZjgnE/tIbv73o9XlflYt7Jfq+3nF/ne2V4atXSuZgBnuKJOWQNNgBQg9TooUR1bx+bYJ1LrFNf8N+HjzjafHg==}
+  '@epure/minidoc@0.1.0':
+    resolution: {integrity: sha512-l8LDwBIWRrZFqPu8CDMkaAFLXbDw1ia8JjiGSjowLT8Zu3abABZnjxc/wKdwxw16Nbjhw8bZK9Lseqs4urfXtg==}
     engines: {node: '>=22'}
 
   '@epure/vitest@1.1.0-beta.20260727T084407':
@@ -1377,7 +1377,7 @@ snapshots:
       reflect-metadata: 0.2.2
       uuid: 11.0.5
 
-  '@epure/minidoc@0.1.0-beta.20260726T234354(rescript@12.3.0)':
+  '@epure/minidoc@0.1.0(rescript@12.3.0)':
     dependencies:
       '@rescript/runtime': 12.3.0
       marked: 18.0.10

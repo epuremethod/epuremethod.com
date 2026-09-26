@@ -21,18 +21,24 @@ The running app shows the board behind an icon at the bottom right, in dev
 only. The board reads the same client as the app, so what the agent defines
 appears in both at the same moment. A build carries no board.
 
-## Two modes
+## Three modes
 
-Every session works in one mode, named in `SESSION.md`:
+Every session works in one mode, named in `SESSION.md`. They are ordered by
+the cost of being wrong — a sketch is wrong in minutes, a paragraph in an
+hour, a signed scenario in a meeting, code in the build:
 
 - **Croquis** — finding out what to build. The agent defines the model at
   the desk and sketches views in `src/croquis/`. No scenarios, no stops.
   Git never sees a sketch. Two things survive a croquis: the model, and the
   reasons worth keeping, which go to `DECISIONS.md`.
+- **Cahier** — finding out whether it holds. The thing is thought through
+  in prose and diagrams in `docs/wip.md` until the words are settled, and
+  the scenarios are written from it. No code. Croquis and cahier are the
+  same stage: move between them freely.
 - **Build** — a bounded want, its scenarios agreed first, a stop after each
   stage, green as the handshake.
 
-In both modes the standing check stays green. `CONTRIBUTING.md`, "Two
+In all three the standing check stays green. `CONTRIBUTING.md`, "Three
 modes", holds the rule.
 
 ## The shape

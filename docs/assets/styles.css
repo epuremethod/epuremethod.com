@@ -424,89 +424,160 @@ section + section { border-top: 1.5px solid var(--ink); }
 .bound-list li:last-child { border-bottom: 1px solid var(--line); }
 .bound-list .actor { min-width: 104px; text-align: center; margin-top: 0; }
 
-/* ---------- projects ---------- */
-.tools {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
-}
-.tool {
-  position: relative;
+/* ---------- instruments (the shadow board) ---------- */
+/* a board per sheet: every hook labeled for its job, the silhouette of the
+   workshop tool painted behind whatever hangs there; an empty hook shows */
+.boards { margin-top: 8px; }
+.board + .board { margin-top: 44px; }
+.board-head {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--ink);
+}
+.board-head .verb {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.board-head .gloss { font-size: 13.5px; color: var(--muted); }
+.board-head .rule { flex: 1; height: 1px; background: var(--line); }
+.board-head .sheetno {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.hooks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-left: 1px solid var(--line);
+  /* the pegboard */
+  background-image: radial-gradient(circle, var(--line) 1.3px, transparent 1.9px);
+  background-size: 32px 32px;
+  background-position: 16px 16px;
+}
+.hook {
+  position: relative;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 6;
+  padding: 16px 18px 22px;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: var(--paper);
 }
-.tool:hover { background: var(--card); }
-.tool-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 22px;
-  border-bottom: 1px solid var(--line);
+.hook:has(a.hook-link):hover { background: var(--card); }
+/* without subgrid, hooks stack on their own and captions get three lines */
+@supports not (grid-template-rows: subgrid) {
+  .hook { display: flex; flex-direction: column; }
+  .hook-fig figcaption { min-height: calc(3 * 1.45em); }
 }
-.tool-head .sheetno {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  color: var(--faint);
-}
-.tool-head .role {
+.hook-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.hook-top .job {
   font-family: var(--mono);
   font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--ink);
+  padding: 4px 9px;
+}
+.hook.absent .hook-top .job { color: var(--muted); background: transparent; border: 1px dashed var(--faint); padding: 3px 8px; }
+.hook-top .slot { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; color: var(--faint); }
+
+.hook-fig { display: grid; grid-template-rows: subgrid; grid-row: span 2; margin: 12px 0 0; }
+.hook-fig svg {
+  display: block;
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  margin: 0 auto;
+  color: var(--ink);
+  overflow: visible;
+}
+.hook-fig .peg { fill: var(--paper); stroke: var(--faint); stroke-width: 1.5; }
+.hook-fig use { stroke-linejoin: round; stroke-linecap: round; }
+/* the silhouette painted on the board: the same drawing, fattened and flat */
+.hook-fig .shadow {
+  color: var(--line);
+  --fill: var(--line);
+  --thin: 7;
+  --wash: var(--line);
+  --wash-dark: var(--line);
+  stroke: currentColor;
+  stroke-width: 7;
+  transform: translate(3px, 4px);
+}
+/* the tool itself, hanging in front */
+.hook-fig .tool {
+  --fill: none;
+  --thin: 1.1;
+  --wash: var(--line);
+  --wash-dark: color-mix(in srgb, var(--line) 72%, var(--faint));
+  --hi: var(--accent2);
+  stroke: currentColor;
+  stroke-width: 1.75;
+  transition: transform 0.25s ease-out;
+}
+.hook-fig .hi { stroke: var(--hi, currentColor); }
+.hook:hover .hook-fig .tool { transform: translate(-1.5px, -2px); }
+
+.hook-fig figcaption {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--faint);
+}
+.hook-fig figcaption .term { font-family: var(--mono); font-weight: 500; color: var(--muted); }
+.hook-fig figcaption .ipa { font-family: var(--mono); }
+
+.hook-name {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+}
+.hook-desc { margin-top: 6px; font-size: 13.5px; color: var(--muted); flex: 1; }
+.hook-desc code { font-family: var(--mono); font-size: 0.92em; color: var(--ink); }
+/* work still on the bench says so at the end of its line */
+.status {
+  display: inline-block;
+  margin-left: 2px;
+  vertical-align: 1px;
+  font-family: var(--mono);
+  font-size: 9.5px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--accent);
   border: 1px solid currentColor;
-  padding: 3px 8px;
+  padding: 2px 7px;
 }
-.tool-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
-.tool-body h3 {
+.hook-link {
+  margin-top: 16px;
   font-family: var(--mono);
-  font-weight: 500;
-  font-size: 19px;
-  letter-spacing: -0.01em;
-  margin-bottom: 10px;
-}
-.tool-body > p { font-size: 14.5px; color: var(--muted); margin-bottom: 40px; }
-p.tool-def {
-  font-size: 12.5px;
-  color: var(--faint);
-  margin: -4px 0 14px;
-}
-.tool-def .term { font-family: var(--mono); font-weight: 500; color: var(--muted); }
-.tool-def .ipa { font-family: var(--mono); }
-.tool-def .gram { font-style: italic; }
-.spec { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); }
-.spec li {
-  list-style: none;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  color: var(--muted);
-  padding: 8px 0;
-  border-bottom: 1px solid var(--line);
-}
-.spec { padding: 0; margin-left: 0; margin-bottom: 0; }
-.tool-link {
-  display: block;
-  padding: 14px 22px;
-  border-top: 1px solid var(--line);
-  font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--ink);
 }
-/* the link covers the whole card, so any part of it is clickable */
-.tool-link::after { content: ""; position: absolute; inset: 0; }
-.tool:hover .tool-link { color: var(--accent); }
-.tool-link:focus-visible { outline: none; }
-.tool-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: -3px; }
-.tool-link .arrow { color: var(--accent); }
+/* the link covers the whole hook, so any part of it is clickable */
+a.hook-link::after { content: ""; position: absolute; inset: 0; }
+.hook:hover a.hook-link { color: var(--accent); }
+a.hook-link:focus-visible { outline: none; }
+a.hook-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: -3px; }
+.hook-link .arrow { color: var(--accent); }
 
 /* ---------- the agreement ---------- */
 .ag-head { margin-bottom: clamp(28px, 4vw, 40px); }
@@ -565,13 +636,15 @@ p.tool-def {
 @media (max-width: 920px) {
   .hero { grid-template-columns: 1fr; }
   .hero-fig { max-width: 520px; margin: 0 auto; }
-  .tools { grid-template-columns: 1fr; }
+  .hooks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .board-head { flex-wrap: wrap; gap: 6px 16px; }
 }
 @media (max-width: 680px) {
   .grid4 { grid-template-columns: 1fr; }
   .station { grid-template-columns: 44px minmax(0, 1fr); }
   .station .actor { grid-column: 2; justify-self: start; }
   .win-edge .note { margin-left: 0; width: 100%; }
+  .hooks { grid-template-columns: 1fr; }
   .tb-row, .tb-row.crew { grid-template-columns: 1fr 1fr; }
   .tb-cell { border-bottom: 1px solid var(--line); }
   .idx a:not(:last-child) { display: none; }

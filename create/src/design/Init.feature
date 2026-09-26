@@ -49,7 +49,7 @@ Feature: Initialize an epure project
     And "adventure/pnpm-workspace.yaml" contains "esbuild: true"
     And "adventure/.gitignore" contains ".data"
     And "adventure/.gitignore" contains ".mcp.json"
-    And "adventure/CONTRIBUTING.md" contains "Two modes"
+    And "adventure/CONTRIBUTING.md" contains "Three modes"
     And "adventure/src/croquis/.gitkeep" exists
     And "adventure/.gitignore" contains "src/croquis/*"
     And "adventure/rescript.json" contains "src/croquis"

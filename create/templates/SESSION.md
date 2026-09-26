@@ -6,7 +6,7 @@ session closes; lasting reasons go to `DECISIONS.md`.
 
 ## Mode
 
-(croquis or build — `CONTRIBUTING.md`, "Two modes")
+(croquis, cahier or build — `CONTRIBUTING.md`, "Three modes")
 
 ## Intention
 
