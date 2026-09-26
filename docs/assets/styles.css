@@ -509,7 +509,7 @@ section + section { border-top: 1.5px solid var(--ink); }
 .hook-fig .shadow {
   color: var(--line);
   --fill: var(--line);
-  --thin: 7;
+  --thin: 7.6;
   --wash: var(--line);
   --wash-dark: var(--line);
   stroke: currentColor;
@@ -519,7 +519,7 @@ section + section { border-top: 1.5px solid var(--ink); }
 /* the tool itself, hanging in front */
 .hook-fig .tool {
   --fill: none;
-  --thin: 1.1;
+  --thin: 0.85;
   --wash: var(--line);
   --wash-dark: color-mix(in srgb, var(--line) 72%, var(--faint));
   --hi: var(--accent2);
