@@ -1,12 +1,12 @@
-open LapaDb.App
-open LapaDb.Data
+open RadifDb.App
+open RadifDb.Data
 
 // The app's one entry, and the only file that knows how the world is made:
 // the session, the client over it, the services over the client, and the app
 // they carve. Everything below takes what it needs as an argument, so a
 // scenario builds the same app over services of its own.
 //
-// The session arrives in the address — `?lapa-session=…` — put there by
+// The session arrives in the address — `?radif-session=…` — put there by
 // `epure dev`. It is kept for the next visit and taken out of the address at
 // once, so it does not survive into bookmarks, screenshots or shared links.
 
@@ -27,10 +27,10 @@ type params
 @new external params: string => params = "URLSearchParams"
 @send external asked: (params, string) => Nullable.t<string> = "get"
 
-let sessionKey = "lapa:session"
+let sessionKey = "radif:session"
 
 let session = () =>
-  switch params(search)->asked("lapa-session")->Nullable.toOption {
+  switch params(search)->asked("radif-session")->Nullable.toOption {
   | Some(token) => {
       keep(sessionKey, token)
       replaces(Nullable.null, "", here)
@@ -66,16 +66,16 @@ let shows = element =>
 // it — the whole package drops out of the bundle.
 let opens = async token => {
   let indexed = await outcome(reply => IndexedDbKv.make(~name="app", reply))
-  let client = await Client.make({base: "/_lapa", token, kv: indexed.kv})
+  let client = await Client.make({base: "/_radif", token, kv: indexed.kv})
   // One engine per client, shared by the app and the board. Its tick ages
   // the claim and evicts the plans nobody reads.
-  let engine = LapaTilia.make(~client, ~clock=SystemClock.make())
+  let engine = RadifTilia.make(~client, ~clock=SystemClock.make())
   setInterval(engine.tick, 10000)->ignore
   let notes = await LiveNotes.over(~client, ~engine)
   shows(
     <AppView.Provider value={Some(App.make(~notes))}>
       <HelloView />
-      {Env.dev ? <LapaBoard client engine /> : React.null}
+      {Env.dev ? <RadifBoard client engine /> : React.null}
     </AppView.Provider>,
   )
 }

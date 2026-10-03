@@ -8,7 +8,7 @@ import * as Stdlib_Option from "@rescript/runtime/lib/es6/Stdlib_Option.js";
 import * as Stdlib_Nullable from "@rescript/runtime/lib/es6/Stdlib_Nullable.js";
 import * as Nodechild_process from "node:child_process";
 
-let lapaPort = "8081";
+let radifPort = "8081";
 
 let appPort = "8080";
 
@@ -32,8 +32,8 @@ function watch(name, one) {
   one.on("error", error => {
     if (!stopping.contents) {
       process.stderr.write(name + ` could not start: ` + error.message + `\n`);
-      if (name === "lapa") {
-        process.stderr.write("install @lapa/server, or set EPURE_LAPA_BIN to a checkout's server/bin/lapa.mjs\n");
+      if (name === "radif") {
+        process.stderr.write("install @radif/server, or set EPURE_RADIF_BIN to a checkout's server/bin/radif.mjs\n");
       }
       stopAll();
       return System.failsWhenDone(1);
@@ -103,7 +103,7 @@ function connect(token) {
       ],
       [
         "url",
-        `http://localhost:` + appPort + `/_lapa/mcp`
+        `http://localhost:` + appPort + `/_radif/mcp`
       ],
       [
         "headers",
@@ -147,7 +147,7 @@ async function announce(token) {
       }
     });
     if (answered) {
-      process.stdout.write(`\n` + Nodepath.basename(process.cwd()) + `  ` + address + `?lapa-session=` + token + `\n\n`);
+      process.stdout.write(`\n` + Nodepath.basename(process.cwd()) + `  ` + address + `?radif-session=` + token + `\n\n`);
       return;
     } else {
       await settle(100);
@@ -158,8 +158,8 @@ async function announce(token) {
 }
 
 function prepare() {
-  let lapa = Stdlib_Option.getOr(process.env["EPURE_LAPA_BIN"], "lapa");
-  let served = Nodechild_process.spawn(lapa, [
+  let radif = Stdlib_Option.getOr(process.env["EPURE_RADIF_BIN"], "radif");
+  let served = Nodechild_process.spawn(radif, [
     "dev",
     ".data",
     "--port",
@@ -179,10 +179,10 @@ function prepare() {
     process.stderr.write(`prepare skipped: ` + message + `\n`);
     return process.exit(0);
   };
-  served.on("error", param => skip("lapa could not start"));
+  served.on("error", param => skip("radif could not start"));
   served.on("close", param => {
     if (!seen.contents) {
-      return skip("lapa stopped before it spoke");
+      return skip("radif stopped before it spoke");
     }
   });
   served.stdout.setEncoding("utf8");
@@ -204,7 +204,7 @@ function prepare() {
   setTimeout(() => {
     if (!seen.contents) {
       served.kill("SIGTERM");
-      return skip("lapa said nothing");
+      return skip("radif said nothing");
     }
   }, 30000).unref();
 }
@@ -216,7 +216,7 @@ function serve() {
     process.stderr.write("dev needs the project installed; run pnpm install\n");
     process.exit(1);
   }
-  let lapa = Stdlib_Option.getOr(process.env["EPURE_LAPA_BIN"], "lapa");
+  let radif = Stdlib_Option.getOr(process.env["EPURE_RADIF_BIN"], "radif");
   process.on("SIGTERM", () => stopAll());
   process.on("SIGINT", () => stopAll());
   watch("rescript", Nodechild_process.spawn(rescript, ["watch"], {
@@ -227,11 +227,11 @@ function serve() {
       "inherit"
     ]
   }));
-  let served = Nodechild_process.spawn(lapa, [
+  let served = Nodechild_process.spawn(radif, [
     "dev",
     ".data",
     "--port",
-    lapaPort,
+    radifPort,
     "--types",
     modelDir
   ], {
@@ -273,7 +273,7 @@ function serve() {
   served.stderr.on("data", prim => {
     process.stderr.write(prim);
   });
-  watch("lapa", served);
+  watch("radif", served);
 }
 
 function main() {
@@ -293,7 +293,7 @@ function main() {
 }
 
 export {
-  lapaPort,
+  radifPort,
   appPort,
   modelDir,
   stopping,

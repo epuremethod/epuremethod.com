@@ -1,7 +1,7 @@
 {
   "name": "@epure/dev",
   "version": "0.1.0-beta.15",
-  "description": "The method's dev server: rescript watch, lapa dev and vite, three processes as one.",
+  "description": "The method's dev server: rescript watch, radif dev and vite, three processes as one.",
   "type": "module",
   "bin": {
     "epure-dev": "bin/epure-dev.mjs"

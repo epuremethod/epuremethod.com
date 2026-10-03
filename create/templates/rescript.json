@@ -33,14 +33,14 @@
     "version": 4
   },
   "dependencies": [
-    "lapa",
-    "@lapa/db",
-    "@lapa/tilia",
+    "@radif/types",
+    "@radif/db",
+    "@radif/tilia",
     "tilia",
     "@tilia/query",
     "@tilia/react",
     "@rescript/react",
-    "@lapa/board"
+    "@radif/board"
   ],
   "dev-dependencies": [
     "@epure/vitest"

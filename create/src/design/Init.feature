@@ -22,19 +22,19 @@ Feature: Initialize an epure project
       | DECISIONS.md    |
     And "adventure/package.json" contains the stack dependencies
       | dependency    | type           |
-      | lapa          | dependency     |
-      | @lapa/db      | dependency     |
-      | @lapa/tilia   | dependency     |
+      | @radif/types  | dependency     |
+      | @radif/db     | dependency     |
+      | @radif/tilia  | dependency     |
       | tilia         | dependency     |
       | @tilia/query  | dependency     |
       | @tilia/react  | dependency     |
-      | @lapa/board   | dependency     |
+      | @radif/board  | dependency     |
       | tailwindcss   | dev dependency |
       | @epure/vitest | dev dependency |
       | @epure/dev    | dev dependency |
       | rescript      | dev dependency |
       | vite          | dev dependency |
-    And "adventure/.mcp.json" contains "http://localhost:8080/_lapa/mcp"
+    And "adventure/.mcp.json" contains "http://localhost:8080/_radif/mcp"
     And "adventure/.mcp.json" contains "Authorization"
     And "adventure/AGENTS.md" contains "pnpm dev"
     And "adventure/README.md" contains "# adventure"
@@ -77,11 +77,11 @@ Feature: Initialize an epure project
       | tilia         |
       | @tilia/query  |
       | @tilia/react  |
-      | lapa          |
-      | @lapa/db      |
-      | @lapa/tilia   |
-      | @lapa/board   |
-      | @lapa/server  |
+      | @radif/types  |
+      | @radif/db     |
+      | @radif/tilia  |
+      | @radif/board  |
+      | @radif/server |
       | @epure/dev    |
       | @epure/vitest |
 
@@ -100,7 +100,7 @@ Feature: Initialize an epure project
 
   Scenario: The board mounts in the app, and only in dev
     When Theo initializes a project named "adventure"
-    Then "adventure/src/view/Page.res" contains "<LapaBoard client engine />"
+    Then "adventure/src/view/Page.res" contains "<RadifBoard client engine />"
     And "adventure/src/view/Page.res" contains "Env.dev"
     And the built page carries no board
 

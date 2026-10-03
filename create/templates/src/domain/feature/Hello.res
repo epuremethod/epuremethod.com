@@ -16,7 +16,7 @@ type t = {
   /** The title being edited, before it is saved. */
   mutable draft: string,
   /** The note the person opened, by id. */
-  mutable chosen: option<Lapa.id>,
+  mutable chosen: option<Radif.id>,
   /** That note, or None while none is open. */
   opened: option<Notes.note>,
   /** The notes the filter leaves. */
@@ -26,7 +26,7 @@ type t = {
   /** Whether the first answer has come back. */
   ready: bool,
   /** Open a note, or shut the one already open. */
-  opens: Lapa.id => unit,
+  opens: Radif.id => unit,
   /** Save the draft into the note that is open. */
   renames: unit => unit,
   /** Add the entry as a note, and clear the box. */

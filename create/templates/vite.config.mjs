@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 
 // The app is the one exposed port. The proxy carries the wire, /listen and
-// /mcp to `lapa dev` under /_lapa/ and forwards Authorization untouched.
+// /mcp to `radif dev` under /_radif/ and forwards Authorization untouched.
 //
 // The host is named. Vite's default is `localhost`, which is not one address:
 // it binds whichever family that resolves to, and other processes resolve it
@@ -16,9 +16,9 @@ export default defineConfig({
     port: 8080,
     strictPort: true,
     proxy: {
-      "/_lapa/": {
+      "/_radif/": {
         target: "http://127.0.0.1:8081",
-        rewrite: path => path.replace(/^\/_lapa/, ""),
+        rewrite: path => path.replace(/^\/_radif/, ""),
         ws: true,
       },
     },

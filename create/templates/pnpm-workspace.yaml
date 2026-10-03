@@ -15,7 +15,6 @@ allowBuilds:
 # they are published, so they are exempt. Remove each as its line releases.
 minimumReleaseAgeExclude:
   - "@epure/*"
-  - "@lapa/*"
-  - lapa
+  - "@radif/*"
   - tilia
   - "@tilia/*"

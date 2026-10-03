@@ -1,6 +1,6 @@
 # @epure/dev
 
-> The épure dev server, bin `epure-dev`: `rescript watch`, `lapa dev` and
+> The épure dev server, bin `epure-dev`: `rescript watch`, `radif dev` and
 > vite, three processes as one. A scaffolded project devDepends on it and
 > runs it as `pnpm dev`; `epure-dev prepare` runs at install and writes the
 > desk entry in `.mcp.json`. There is no importable API — the package is
@@ -11,7 +11,7 @@
 These files are authoritative. If prose differs, follow them.
 
 - The bin: `./bin/epure-dev.mjs`, its logic in `./src/Dev.res`.
-- The ports and the `/_lapa/` proxy live in the project's own
+- The ports and the `/_radif/` proxy live in the project's own
   `vite.config.mjs`, not here. Dev only starts, watches and stops.
 
 ## Key facts
@@ -19,22 +19,22 @@ These files are authoritative. If prose differs, follow them.
 - Run `pnpm dev` in the background and leave it running. It is a
   long-running process; never wait for it to exit.
 - Once the app answers, dev prints one clickable line — the project's
-  name, two spaces, `http://localhost:8080/?lapa-session=<token>`. Give
+  name, two spaces, `http://localhost:8080/?radif-session=<token>`. Give
   that link to the person: the app opens only on a session. The app keeps
   the token in `localStorage` and strips it from the address.
-- The app is on port 8080 only (`strictPort`), host `127.0.0.1`. lapa is
-  on 8081 behind vite's `/_lapa/` proxy, so no app route may take
-  `/_lapa/`. Vite starts only after lapa has said `dev`, so the store is
+- The app is on port 8080 only (`strictPort`), host `127.0.0.1`. radif is
+  on 8081 behind vite's `/_radif/` proxy, so no app route may take
+  `/_radif/`. Vite starts only after radif has said `dev`, so the store is
   served before the app can answer.
 - Dev writes the `desk` entry of the project's `.mcp.json` on every
-  serve: url `http://localhost:8080/_lapa/mcp`, the session in the
+  serve: url `http://localhost:8080/_radif/mcp`, the session in the
   `Authorization` header. Other entries in the file are kept; a file that
   does not parse is left with a warning. The file is owner-only and
   gitignored — an agent reads it to reach the desk, and the desk answers
   only while dev runs.
-- `epure-dev prepare` is the template's `postinstall`: it boots `lapa dev`
+- `epure-dev prepare` is the template's `postinstall`: it boots `radif dev`
   once on an ephemeral port, founds the `.data` store if it is new,
-  writes `.mcp.json`, and stops. When lapa is missing, dies early, or
+  writes `.mcp.json`, and stops. When radif is missing, dies early, or
   says nothing — most often because a running `pnpm dev` holds `.data` —
   it warns and exits zero: the install stays whole, and the running dev
   maintains the file itself.
@@ -42,11 +42,11 @@ These files are authoritative. If prose differs, follow them.
   `.mcp.json`. An agent holding a stale token must be restarted so its
   MCP client re-reads the file.
 - One child dying takes dev down, and dev exits nonzero after every child
-  has closed. A missing lapa is named with its cure: install
-  `@lapa/server`, or set `EPURE_LAPA_BIN` to a checkout's
-  `server/bin/lapa.mjs`.
+  has closed. A missing radif is named with its cure: install
+  `@radif/server`, or set `EPURE_RADIF_BIN` to a checkout's
+  `server/bin/radif.mjs`.
 - The desk writes the app's generated model into `src/domain/api/entity`
-  through `lapa dev --types`. Nobody runs a types command by hand, and
+  through `radif dev --types`. Nobody runs a types command by hand, and
   nobody edits the generated files.
 - `rescript` and `vite` are peer dependencies at `*`: dev runs the
   project's own bins and pulls nothing. `epure-dev` needs the project
@@ -56,5 +56,5 @@ These files are authoritative. If prose differs, follow them.
 ## Around it
 
 - The method and the working agreement: the project's `CONTRIBUTING.md`.
-- The database the store serves: `node_modules/@lapa/db/llms.txt`.
-- The wire and the desk: `node_modules/@lapa/server/llms.txt`.
+- The database the store serves: `node_modules/@radif/db/llms.txt`.
+- The wire and the desk: `node_modules/@radif/server/llms.txt`.

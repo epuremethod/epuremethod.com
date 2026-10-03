@@ -33,17 +33,17 @@ let package = System.resolved(System.parent(fileOf(importUrl)), "../..")
     command. */
 let entry = System.joined(package, "bin/epure-dev.mjs")
 
-type golden = {project: string, lapa: string}
+type golden = {project: string, radif: string}
 
-/** The scaffold `setup.mjs` built once for the whole run, and the lapa binary
+/** The scaffold `setup.mjs` built once for the whole run, and the radif binary
     it is served by. */
 let golden = () =>
   switch JSON.parseOrThrow(
     System.readFile(System.joined(System.tempRoot(), "epure-dev-golden.json"), "utf8"),
   ) {
   | JSON.Object(fields) =>
-    switch (fields->Dict.get("project"), fields->Dict.get("lapa")) {
-    | (Some(JSON.String(project)), Some(JSON.String(lapa))) => {project, lapa}
+    switch (fields->Dict.get("project"), fields->Dict.get("radif")) {
+    | (Some(JSON.String(project)), Some(JSON.String(radif))) => {project, radif}
     | _ => JsError.throwWithMessage("the shared init names no project")
     }
   | _ => JsError.throwWithMessage("no shared init was built")

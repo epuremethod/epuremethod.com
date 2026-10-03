@@ -28,7 +28,7 @@ export default function setup() {
     join(tmpdir(), "epure-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(root, "adventure/node_modules/@lapa/server/bin/lapa.mjs"),
+      radif: join(root, "adventure/node_modules/@radif/server/bin/radif.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });

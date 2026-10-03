@@ -1,11 +1,11 @@
 // What the app asks of the world, and the whole seam between a feature and
 // the machinery: no client, no store and no wire reach past this file. The
-// mount injects one made over a lapa client; a scenario hands one made of
+// mount injects one made over a radif client; a scenario hands one made of
 // arrays, and the feature cannot tell the difference.
 
 /** A note: a `Record` entity read down to what the app draws. */
 type note = {
-  id: Lapa.id,
+  id: Radif.id,
   title: string,
 }
 

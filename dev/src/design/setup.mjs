@@ -15,8 +15,8 @@ import { fileURLToPath } from "node:url";
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const create = resolve(here, "../create");
 
-// The lapa packages install from the registry at the template's `beta`, as a
-// scaffold gets them: run sylva's bin/publish.sh before testing a change to
+// The radif packages install from the registry at the template's `beta`, as a
+// scaffold gets them: run radif's bin/publish.sh before testing a change to
 // them here. Linking a checkout instead brings its own copy of `tilia`, and
 // ReScript refuses a package it finds twice.
 export default function setup() {
@@ -36,7 +36,7 @@ export default function setup() {
     join(tmpdir(), "epure-dev-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(root, "adventure/node_modules/@lapa/server/bin/lapa.mjs"),
+      radif: join(root, "adventure/node_modules/@radif/server/bin/radif.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });

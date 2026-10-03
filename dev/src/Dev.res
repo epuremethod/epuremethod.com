@@ -1,7 +1,7 @@
-// `epure-dev`: `rescript watch`, `lapa dev` on `.data` and vite, three
+// `epure-dev`: `rescript watch`, `radif dev` on `.data` and vite, three
 // processes as one. The template's vite.config.mjs holds the ports
-// and the proxy; this file only starts, watches and stops. The `lapa`
-// binary comes from PATH, or from EPURE_LAPA_BIN for a checkout
+// and the proxy; this file only starts, watches and stops. The `radif`
+// binary comes from PATH, or from EPURE_RADIF_BIN for a checkout
 // (SESSION.md).
 //
 // This is its own package because a scaffolded app runs it every day and runs
@@ -11,11 +11,11 @@
 
 open System
 
-let lapaPort = "8081"
+let radifPort = "8081"
 let appPort = "8080"
 
 /** Where the desk writes the app's generated ReScript model: the template's
-    entity layer. `lapa dev` writes it again after every definition change,
+    entity layer. `radif dev` writes it again after every definition change,
     so the model on disk never trails the definitions. */
 let modelDir = "src/domain/api/entity"
 
@@ -32,8 +32,8 @@ let watch = (name: string, one: child) => {
   one->whenFailed(error =>
     if !stopping.contents {
       warn(`${name} could not start: ${error["message"]}\n`)
-      if name == "lapa" {
-        warn("install @lapa/server, or set EPURE_LAPA_BIN to a checkout's server/bin/lapa.mjs\n")
+      if name == "radif" {
+        warn("install @radif/server, or set EPURE_RADIF_BIN to a checkout's server/bin/radif.mjs\n")
       }
       stopAll()
       failsWhenDone(1)
@@ -49,7 +49,7 @@ let watch = (name: string, one: child) => {
   )
 }
 
-/** The session out of `lapa dev`'s first line: `dev <path> on <port>
+/** The session out of `radif dev`'s first line: `dev <path> on <port>
     session=<token> code=<code>`. */
 let sessionOf = line =>
   line
@@ -93,7 +93,7 @@ let connect = token => {
         JSON.Object(
           Dict.fromArray([
             ("type", JSON.String("http")),
-            ("url", JSON.String(`http://localhost:${appPort}/_lapa/mcp`)),
+            ("url", JSON.String(`http://localhost:${appPort}/_radif/mcp`)),
             ("headers", JSON.Object(Dict.fromArray([("Authorization", JSON.String(token))]))),
           ]),
         ),
@@ -106,7 +106,7 @@ let connect = token => {
 /** The one line a person clicks. It waits for vite rather than for a line vite
     prints, so it is true the moment it is written: an address printed before
     the app answers would open on nothing. `http://` so a terminal linkifies
-    it, and the session rides as `lapa-session` because the address bar belongs
+    it, and the session rides as `radif-session` because the address bar belongs
     to the app. */
 let announce = async token => {
   // The link says `localhost`, which is what vite prints and what a browser
@@ -127,7 +127,7 @@ let announce = async token => {
         (await found) || (await reached(probe))
       )
       if answered {
-        say(`\n${named(cwd())}  ${address}?lapa-session=${token}\n\n`)
+        say(`\n${named(cwd())}  ${address}?radif-session=${token}\n\n`)
       } else {
         await settle(100)
         await waits(left - 1)
@@ -136,17 +136,17 @@ let announce = async token => {
   await waits(300)
 }
 
-/** `epure-dev prepare`: the desk file with no serving. It boots `lapa dev`
-    once on an ephemeral port, writes `.mcp.json` from the line lapa
+/** `epure-dev prepare`: the desk file with no serving. It boots `radif dev`
+    once on an ephemeral port, writes `.mcp.json` from the line radif
     prints, and stops it. The template's install runs this, so the file
-    exists before any agent starts. A lapa that cannot start or answer —
+    exists before any agent starts. A radif that cannot start or answer —
     missing, or the store already held by a running dev — fails nothing
     here: the install stays whole, and a running dev writes the file
     itself. */
 let prepare = () => {
-  let lapa = env->Dict.get("EPURE_LAPA_BIN")->Option.getOr("lapa")
+  let radif = env->Dict.get("EPURE_RADIF_BIN")->Option.getOr("radif")
   let served = run(
-    lapa,
+    radif,
     ["dev", ".data", "--port", "0"],
     {"cwd": cwd(), "stdio": ["ignore", "pipe", "pipe"]},
   )
@@ -155,10 +155,10 @@ let prepare = () => {
     warn(`prepare skipped: ${message}\n`)
     exit(0)
   }
-  served->whenFailed(_ => skip("lapa could not start"))
+  served->whenFailed(_ => skip("radif could not start"))
   served->whenGone(_ =>
     if !seen.contents {
-      skip("lapa stopped before it spoke")
+      skip("radif stopped before it spoke")
     }
   )
   served->out->reads("utf8")
@@ -182,7 +182,7 @@ let prepare = () => {
   delay(() =>
     if !seen.contents {
       served->signal("SIGTERM")->ignore
-      skip("lapa said nothing")
+      skip("radif said nothing")
     }
   , 30000)->unref
 }
@@ -194,7 +194,7 @@ let serve = () => {
     warn("dev needs the project installed; run pnpm install\n")
     exit(1)
   }
-  let lapa = env->Dict.get("EPURE_LAPA_BIN")->Option.getOr("lapa")
+  let radif = env->Dict.get("EPURE_RADIF_BIN")->Option.getOr("radif")
 
   whenSignalled("SIGTERM", () => stopAll())
   whenSignalled("SIGINT", () => stopAll())
@@ -204,8 +204,8 @@ let serve = () => {
     run(rescript, ["watch"], {"cwd": cwd(), "stdio": ["ignore", "inherit", "inherit"]}),
   )
   let served = run(
-    lapa,
-    ["dev", ".data", "--port", lapaPort, "--types", modelDir],
+    radif,
+    ["dev", ".data", "--port", radifPort, "--types", modelDir],
     {"cwd": cwd(), "stdio": ["ignore", "pipe", "pipe"]},
   )
   let seen = ref(false)
@@ -228,7 +228,7 @@ let serve = () => {
   served->out->hears("data", hear)
   served->err->reads("utf8")
   served->err->hears("data", warn)
-  watch("lapa", served)
+  watch("radif", served)
 }
 
 let main = () => {

@@ -36,23 +36,23 @@ let entry = System.joined(package, "bin/epure.mjs")
 
 @val @scope("process") external environment: dict<string> = "env"
 
-// What an init in this suite links. The lapa packages install from the
-// registry at the template's `beta`, as a scaffold gets them: run sylva's
+// What an init in this suite links. The radif packages install from the
+// registry at the template's `beta`, as a scaffold gets them: run radif's
 // bin/publish.sh before testing a change to them here. Linking a checkout
 // instead brings its own copy of `tilia`, and ReScript refuses a package it
 // finds twice. One list: the shared init and the scenarios that run their own
 // must link the same things.
 let links = ["--with", `@epure/dev=link:${System.resolved(package, "../dev")}`]
 
-type golden = {project: string, lapa: string}
+type golden = {project: string, radif: string}
 
 let golden = () =>
   switch JSON.parseOrThrow(
     System.readFile(System.joined(System.tempRoot(), "epure-golden.json"), "utf8"),
   ) {
   | JSON.Object(fields) =>
-    switch (fields->Dict.get("project"), fields->Dict.get("lapa")) {
-    | (Some(JSON.String(project)), Some(JSON.String(lapa))) => {project, lapa}
+    switch (fields->Dict.get("project"), fields->Dict.get("radif")) {
+    | (Some(JSON.String(project)), Some(JSON.String(radif))) => {project, radif}
     | _ => JsError.throwWithMessage("the shared init names no project")
     }
   | _ => JsError.throwWithMessage("no shared init was built")

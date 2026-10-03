@@ -3,7 +3,7 @@ Feature: Hello
   For whoever reads this scaffold first.
 
   The app's rules live in `Hello`, a carve over `Notes.t`. `Notes.t` is the
-  seam: the mount fills it in over a lapa client, and this file fills it in
+  seam: the mount fills it in over a radif client, and this file fills it in
   over an array. So every rule below is proven with no server, no client and
   no browser — which is the reason the seam is there. Write the next feature
   the same way, and delete this one with `Hello.res`.

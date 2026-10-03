@@ -19,44 +19,44 @@ Feature: Sync the template's versions
     Then the template names "react" at "^19.2.3"
 
   Scenario: Sync writes the tag when the published version is a beta
-    Given "@lapa/db" is published at "0.1.0-beta.3"
+    Given "@radif/db" is published at "0.1.0-beta.3"
     When the template is synced
-    Then the template names "@lapa/db" at "beta"
+    Then the template names "@radif/db" at "beta"
 
   Scenario: Sync rewrites a beta range to the tag
-    Given the template already names "@lapa/db" at "^0.1.0-beta"
-    And "@lapa/db" is published at "0.1.0-beta.6"
+    Given the template already names "@radif/db" at "^0.1.0-beta"
+    And "@radif/db" is published at "0.1.0-beta.6"
     When the template is synced
-    Then the template names "@lapa/db" at "beta"
+    Then the template names "@radif/db" at "beta"
 
   Scenario: The tag stays as the line moves
-    Given the template already names "@lapa/db" at "beta"
-    And "@lapa/db" is published at "0.2.0-beta.1"
+    Given the template already names "@radif/db" at "beta"
+    And "@radif/db" is published at "0.2.0-beta.1"
     When the template is synced
-    Then the template names "@lapa/db" at "beta"
+    Then the template names "@radif/db" at "beta"
 
   Scenario: Leaving a beta line is a hand edit, and sync keeps it
-    Given the template already names "@lapa/db" at "^0.1.0"
-    And "@lapa/db" is published at "0.1.4" as "latest"
+    Given the template already names "@radif/db" at "^0.1.0"
+    And "@radif/db" is published at "0.1.4" as "latest"
     When the template is synced
-    Then the template names "@lapa/db" at "^0.1.4"
+    Then the template names "@radif/db" at "^0.1.4"
 
   Scenario: Sync reads every dependency, whichever section it is in
     When the template is synced
     Then the template names each dependency at a published version
-      | dependency       | type           |
-      | lapa             | dependency     |
-      | @lapa/db         | dependency     |
-      | @lapa/tilia      | dependency     |
-      | tilia            | dependency     |
-      | @tilia/query     | dependency     |
-      | @tilia/react     | dependency     |
-      | react            | dependency     |
-      | @lapa/server     | dev dependency |
-      | @epure/dev       | dev dependency |
-      | @epure/vitest    | dev dependency |
-      | rescript         | dev dependency |
-      | vite             | dev dependency |
+      | dependency    | type           |
+      | @radif/types  | dependency     |
+      | @radif/db     | dependency     |
+      | @radif/tilia  | dependency     |
+      | tilia         | dependency     |
+      | @tilia/query  | dependency     |
+      | @tilia/react  | dependency     |
+      | react         | dependency     |
+      | @radif/server | dev dependency |
+      | @epure/dev    | dev dependency |
+      | @epure/vitest | dev dependency |
+      | rescript      | dev dependency |
+      | vite          | dev dependency |
 
   Scenario: Sync changes nothing but the versions
     When the template is synced
@@ -80,15 +80,15 @@ Feature: Sync the template's versions
     Then the template names "react" at "^19.2.3"
 
   Scenario: Sync takes what there is when the line it wants is empty
-    Given the template already names "@lapa/db" at "^0.0.0"
-    And "@lapa/db" is published at "0.1.0-beta.3" as "beta" only
+    Given the template already names "@radif/db" at "^0.0.0"
+    And "@radif/db" is published at "0.1.0-beta.3" as "beta" only
     When the template is synced
-    Then the template names "@lapa/db" at "beta"
+    Then the template names "@radif/db" at "beta"
 
   # ── Refusals ───────────────────────────────────────────────────────────
 
   Scenario: Sync refuses whole when a dependency is not published
-    Given "@lapa/db" is published at "0.1.0-beta.3"
+    Given "@radif/db" is published at "0.1.0-beta.3"
     And "@tilia/query" is not published
     When the template is synced
     Then sync fails and reports "@tilia/query"

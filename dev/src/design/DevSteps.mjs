@@ -116,7 +116,7 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
   });
   let starts = async () => {
     let env = Object.assign({}, process.env);
-    env["EPURE_LAPA_BIN"] = where.lapa;
+    env["EPURE_RADIF_BIN"] = where.radif;
     let server_child = Nodechild_process.spawn("node", [TestCli.entry], {
       cwd: project,
       env: env
@@ -265,7 +265,7 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
     return Vitest.expect(lastBody.contents).toContain("adventure");
   });
   step("dev prints the code", () => Vitest.expect(running().code.contents.length > 0).toBe(true));
-  let linesWithLink = () => running().said.contents.split("\n").filter(line => line.includes("?lapa-session="));
+  let linesWithLink = () => running().said.contents.split("\n").filter(line => line.includes("?radif-session="));
   let awaitsLink = async () => {
     await until(async () => linesWithLink().length !== 0, undefined);
     return linesWithLink()[0];
@@ -353,7 +353,7 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
   };
   let prepares = async () => {
     let env = Object.assign({}, process.env);
-    env["EPURE_LAPA_BIN"] = where.lapa;
+    env["EPURE_RADIF_BIN"] = where.radif;
     let child = Nodechild_process.spawn("node", [
       TestCli.entry,
       "prepare"
@@ -376,8 +376,8 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
   });
   step("a client pulling with that session answers the boot's rows", async () => {
     let address = await link();
-    let token = address.split("lapa-session=")[1].split("&")[0];
-    return await asks(`/_lapa/query?under=` + encodeURIComponent(meta("workspace")), undefined, token, undefined);
+    let token = address.split("radif-session=")[1].split("&")[0];
+    return await asks(`/_radif/query?under=` + encodeURIComponent(meta("workspace")), undefined, token, undefined);
   });
   step("a client pulls through {string} with the founder's session", async prefix => await asks(prefix + `query?under=` + encodeURIComponent(meta("workspace")), undefined, running().session.contents, undefined));
   step("the pull answers the boot's rows", () => {
@@ -516,7 +516,7 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
     return await until(async () => heard.length !== 0, undefined);
   });
   step("the client's pull answers the entity", async () => {
-    await asks(`/_lapa/query?under=` + encodeURIComponent(meta("workspace")), undefined, running().session.contents, undefined);
+    await asks(`/_radif/query?under=` + encodeURIComponent(meta("workspace")), undefined, running().session.contents, undefined);
     Vitest.expect(lastStatus.contents).toBe(200);
     return Vitest.expect(lastBody.contents).toContain("Raft Run");
   });
@@ -540,9 +540,9 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
       return false;
     }
   }, undefined));
-  step("Theo runs dev without a lapa binary", async () => {
+  step("Theo runs dev without a radif binary", async () => {
     let env = Object.assign({}, process.env);
-    Stdlib_Dict.$$delete(env, "EPURE_LAPA_BIN");
+    Stdlib_Dict.$$delete(env, "EPURE_RADIF_BIN");
     let child = Nodechild_process.spawn("node", [TestCli.entry], {
       cwd: project,
       env: env
@@ -560,9 +560,9 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
     lastStatus.contents = exit;
     lastBody.contents = complained.contents;
   });
-  step("dev exits and says lapa is missing", () => {
+  step("dev exits and says radif is missing", () => {
     Vitest.expect(lastStatus.contents === 0).toBe(false);
-    Vitest.expect(lastBody.contents).toContain("lapa");
+    Vitest.expect(lastBody.contents).toContain("radif");
   });
   step("the compiler is not left running", () => {
     let built = Nodechild_process.spawnSync(Nodepath.join(project, "node_modules/.bin/rescript"), ["build"], {
@@ -638,7 +638,7 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
   });
   step("the app port no longer answers", async () => await until(async () => Stdlib_Option.isNone(await answers("/")), undefined));
   step("the data directory is free to serve again", async () => {
-    let probe = Nodechild_process.spawn(where.lapa, [
+    let probe = Nodechild_process.spawn(where.radif, [
       "dev",
       ".data",
       "--port",
@@ -660,21 +660,21 @@ Vitest$1.Given("a project created by init that nothing serves", param => {
     probe.kill("SIGTERM");
     return await quiet;
   });
-  step("lapa dev dies", async () => {
+  step("radif dev dies", async () => {
     Nodechild_process.spawnSync("pkill", [
       "-9",
       "-f",
-      "lapa.mjs dev .data"
+      "radif.mjs dev .data"
     ], {
       stdio: "ignore"
     });
     let server = running();
     return await until(async () => server.gone.contents, undefined);
   });
-  step("dev exits and says lapa stopped", () => {
+  step("dev exits and says radif stopped", () => {
     Vitest.expect(running().gone.contents).toBe(true);
     Vitest.expect(running().exit.contents === 0).toBe(false);
-    Vitest.expect(running().complained.contents).toContain("lapa stopped");
+    Vitest.expect(running().complained.contents).toContain("radif stopped");
   });
 });
 

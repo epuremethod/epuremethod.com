@@ -33,7 +33,7 @@ esac
 # will. curl tries every loopback family, so it answers for a registry npm
 # cannot reach, which reads as a registry that lost its packages.
 if ! npm ping --registry "$REGISTRY" >/dev/null 2>&1; then
-  echo "npm cannot reach $REGISTRY. Run sylva's bin/registry.sh first."
+  echo "npm cannot reach $REGISTRY. Run radif's bin/registry.sh first."
   echo "If it is running, npm and verdaccio may disagree on what localhost"
   echo "means; name the address in bin/registry.sh's listen: and here."
   exit 1
@@ -68,7 +68,7 @@ pnpm publish --tag beta --access public --no-git-checks --registry "$REGISTRY"
 
 # `latest` too, while every version is a prerelease: npm sets it on the first
 # publish whatever the tag says and never moves it again, so a plain install
-# would get the first beta forever. See sylva's bin/publish.sh for the whole
+# would get the first beta forever. See radif's bin/publish.sh for the whole
 # of it.
 npm dist-tag add "@epure/dev@$VERSION" latest --registry "$REGISTRY"
 

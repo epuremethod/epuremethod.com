@@ -6,7 +6,7 @@ open Tilia
 // so a view repaints on what it read and on nothing else.
 //
 // The world arrives injected. `make` names services, never a client: the
-// mount builds them over lapa, and a scenario builds them out of arrays.
+// mount builds them over radif, and a scenario builds them out of arrays.
 
 type t = {
   hello: Hello.t,

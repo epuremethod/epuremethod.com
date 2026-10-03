@@ -60,7 +60,7 @@ let make = leaf(() => {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight"> {text("Hello")} </h1>
         <p className="mt-1 text-sm text-quiet">
-          {text("Notes, kept by lapa. Ask the agent for a model of your own.")}
+          {text("Notes, kept by radif. Ask the agent for a model of your own.")}
         </p>
       </div>
       {app.saving ? <span className="text-xs text-quiet"> {text("saving…")} </span> : React.null}

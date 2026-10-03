@@ -2,7 +2,7 @@ open EpureVitest
 open TestCli
 
 // Dev.feature drives the real pair: `epure-dev` spawned over the shared
-// scaffold, lapa reached only through vite's proxy, and death and stopping
+// scaffold, radif reached only through vite's proxy, and death and stopping
 // exercised on the real processes.
 
 @val external later: (unit => unit, int) => unit = "setTimeout"
@@ -111,7 +111,7 @@ given("a project created by init that nothing serves", ({step, test: context}) =
 
   let starts = async () => {
     let env = assign(Dict.make(), processEnv)
-    env->Dict.set("EPURE_LAPA_BIN", where.lapa)
+    env->Dict.set("EPURE_RADIF_BIN", where.radif)
     let server = {
       child: System.run("node", [entry], {"cwd": project, "env": env}),
       said: ref(""),
@@ -219,7 +219,7 @@ given("a project created by init that nothing serves", ({step, test: context}) =
   let linesWithLink = () =>
     running().said.contents
     ->String.split("\n")
-    ->Array.filter(line => line->String.includes("?lapa-session="))
+    ->Array.filter(line => line->String.includes("?radif-session="))
 
   let awaitsLink = async () => {
     await until(async () => linesWithLink()->Array.length > 0)
@@ -333,7 +333,7 @@ given("a project created by init that nothing serves", ({step, test: context}) =
 
   let prepares = async () => {
     let env = assign(Dict.make(), processEnv)
-    env->Dict.set("EPURE_LAPA_BIN", where.lapa)
+    env->Dict.set("EPURE_RADIF_BIN", where.radif)
     let child = System.run("node", [entry, "prepare"], {"cwd": project, "env": env})
     prepared :=
       (
@@ -367,11 +367,11 @@ given("a project created by init that nothing serves", ({step, test: context}) =
     let address = await link()
     let token =
       address
-      ->String.split("lapa-session=")
+      ->String.split("radif-session=")
       ->Array.getUnsafe(1)
       ->String.split("&")
       ->Array.getUnsafe(0)
-    await asks(`/_lapa/query?under=${encode(meta("workspace"))}`, ~token)
+    await asks(`/_radif/query?under=${encode(meta("workspace"))}`, ~token)
   })
 
   step("a client pulls through {string} with the founder's session", async (prefix: string) =>
@@ -519,7 +519,7 @@ given("a project created by init that nothing serves", ({step, test: context}) =
   })
 
   step("the client's pull answers the entity", async () => {
-    await asks(`/_lapa/query?under=${encode(meta("workspace"))}`, ~token=running().session.contents)
+    await asks(`/_radif/query?under=${encode(meta("workspace"))}`, ~token=running().session.contents)
     expect(lastStatus.contents).toBe(200)
     expect(lastBody.contents).toContain("Raft Run")
   })
@@ -548,9 +548,9 @@ given("a project created by init that nothing serves", ({step, test: context}) =
     )
   )
 
-  step("Theo runs dev without a lapa binary", async () => {
+  step("Theo runs dev without a radif binary", async () => {
     let env = assign(Dict.make(), processEnv)
-    env->Dict.delete("EPURE_LAPA_BIN")
+    env->Dict.delete("EPURE_RADIF_BIN")
     let child = System.run("node", [entry], {"cwd": project, "env": env})
     let complained = ref("")
     open System
@@ -563,9 +563,9 @@ given("a project created by init that nothing serves", ({step, test: context}) =
     lastBody := complained.contents
   })
 
-  step("dev exits and says lapa is missing", () => {
+  step("dev exits and says radif is missing", () => {
     expect(lastStatus.contents == 0).toBe(false)
-    expect(lastBody.contents).toContain("lapa")
+    expect(lastBody.contents).toContain("radif")
   })
 
   step("the compiler is not left running", () => {
@@ -665,7 +665,7 @@ given("a project created by init that nothing serves", ({step, test: context}) =
   )
 
   step("the data directory is free to serve again", async () => {
-    let probe = System.run(where.lapa, ["dev", ".data", "--port", "0"], {"cwd": project})
+    let probe = System.run(where.radif, ["dev", ".data", "--port", "0"], {"cwd": project})
     let said = ref("")
     open System
     probe->out->reads("utf8")
@@ -676,15 +676,15 @@ given("a project created by init that nothing serves", ({step, test: context}) =
     await quiet
   })
 
-  step("lapa dev dies", async () => {
-    System.runSync("pkill", ["-9", "-f", "lapa.mjs dev .data"], {"stdio": "ignore"})->ignore
+  step("radif dev dies", async () => {
+    System.runSync("pkill", ["-9", "-f", "radif.mjs dev .data"], {"stdio": "ignore"})->ignore
     let server = running()
     await until(async () => server.gone.contents)
   })
 
-  step("dev exits and says lapa stopped", () => {
+  step("dev exits and says radif stopped", () => {
     expect(running().gone.contents).toBe(true)
     expect(running().exit.contents == 0).toBe(false)
-    expect(running().complained.contents).toContain("lapa stopped")
+    expect(running().complained.contents).toContain("radif stopped")
   })
 })

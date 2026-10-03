@@ -39,11 +39,11 @@ function golden() {
     return Stdlib_JsError.throwWithMessage("no shared init was built");
   }
   let match = fields["project"];
-  let match$1 = fields["lapa"];
+  let match$1 = fields["radif"];
   if (typeof match === "string" && typeof match$1 === "string") {
     return {
       project: match,
-      lapa: match$1
+      radif: match$1
     };
   } else {
     return Stdlib_JsError.throwWithMessage("the shared init names no project");
