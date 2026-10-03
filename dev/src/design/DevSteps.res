@@ -61,7 +61,7 @@ let wordAfter = (words, name) =>
       : None
   )
 
-given("a project created by init that nothing serves", ({step}, context: testContext) => {
+given("a project created by init that nothing serves", ({step, test: context}) => {
   let where = golden()
   let project = where.project
   let data = System.joined(project, ".data")
@@ -73,6 +73,10 @@ given("a project created by init that nothing serves", ({step}, context: testCon
   let unwrites = () => written()->Array.forEach(name => System.forget(System.joined(model, name)))
   System.forget(data)
   System.forget(mcp)
+  // `rescript watch` never removes its lock, and trusts it while the PID
+  // stands. Where nothing reaps an orphan, the stopped watch stays a zombie
+  // and its PID stands for good.
+  System.forget(System.joined(project, "lib/watch.lock"))
   unwrites()
 
   let current: ref<option<served>> = ref(None)
@@ -317,9 +321,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     System.writeFile(mcp, planted.contents)
   })
 
-  step(".mcp.json is unchanged", () =>
-    expect(System.readFile(mcp, "utf8")).toBe(planted.contents)
-  )
+  step(".mcp.json is unchanged", () => expect(System.readFile(mcp, "utf8")).toBe(planted.contents))
 
   step("dev warns that .mcp.json is not JSON", async () =>
     await until(async () => running().complained.contents->String.includes(".mcp.json is not JSON"))
@@ -335,8 +337,8 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     let child = System.run("node", [entry, "prepare"], {"cwd": project, "env": env})
     prepared :=
       (
-        await Promise.make(
-          (resolve, _reject) => child->System.whenGone(code => resolve(code->Nullable.getOr(-1))),
+        await Promise.make((resolve, _reject) =>
+          child->System.whenGone(code => resolve(code->Nullable.getOr(-1)))
         )
       )
   }
@@ -429,7 +431,26 @@ given("a project created by init that nothing serves", ({step}, context: testCon
     await until(async () => opened.contents)
   })
 
+  // A tool's refusal answers 200 too, flagged `isError` in the result.
+  let answered = () => {
+    expect(lastStatus.contents).toBe(200)
+    if lastBody.contents->String.includes(`"isError":true`) {
+      raise(`the tool refused: ${lastBody.contents}`)
+    }
+  }
+
   step("the agent makes an entity at {string}", async (route: string) => {
+    await calls(
+      route,
+      "app",
+      JSON.Object(
+        Dict.fromArray([
+          ("title", JSON.String("Adventures")),
+          ("description", JSON.String("Outdoor adventures and what they cost.")),
+        ]),
+      ),
+    )
+    answered()
     await calls(
       route,
       "define",
@@ -459,7 +480,7 @@ given("a project created by init that nothing serves", ({step}, context: testCon
         ]),
       ),
     )
-    expect(lastStatus.contents).toBe(200)
+    answered()
     await calls(
       route,
       "make",
@@ -471,28 +492,21 @@ given("a project created by init that nothing serves", ({step}, context: testCon
             "parts",
             JSON.Object(
               Dict.fromArray([
-                (
-                  "Adventure",
-                  JSON.Object(
-                    Dict.fromArray([
-                      ("price", JSON.Object(Dict.fromArray([("n", JSON.Number(12.0))]))),
-                    ]),
-                  ),
-                ),
+                ("Adventure", JSON.Object(Dict.fromArray([("price", JSON.Number(12.0))]))),
               ]),
             ),
           ),
         ]),
       ),
     )
-    expect(lastStatus.contents).toBe(200)
+    answered()
   })
 
   step("the model under {string} names {string}", async (dir: string, wanted: string) => {
     let at = System.joined(project, dir)
     let holds = name => System.readFile(System.joined(at, name), "utf8")->String.includes(wanted)
-    await until(async () =>
-      readdir(at)->Array.some(name => name->String.endsWith(".res") && holds(name))
+    await until(
+      async () => readdir(at)->Array.some(name => name->String.endsWith(".res") && holds(name)),
     )
   })
 
@@ -595,24 +609,24 @@ given("a project created by init that nothing serves", ({step}, context: testCon
       // The console is usually empty here — that is the shape of the bug —
       // so what was on it goes out either way rather than into an assertion.
       Console.error(browser().complaints->Array.join("\n"))
-      Console.error(
-        browser().sockets->Array.map(((_, url, _)) => url)->Array.join("\n"),
-      )
+      Console.error(browser().sockets->Array.map(((_, url, _)) => url)->Array.join("\n"))
     }
     expect(drawn == "").toBe(false)
     expect(drawn).toContain("Hello")
   })
 
   step("the browser reports nothing wrong", () =>
-    expect(browser().complaints->Array.filter(one => !(one->String.includes("favicon")))).toEqual([])
+    expect(
+      browser().complaints->Array.filter(one => !(one->String.includes("favicon"))),
+    ).toEqual([])
   )
 
   step("the app opens one socket under {string}", async (prefix: string) => {
     let page = browser()
     // Vite opens a socket of its own for reload; the app's is the one
     // carrying a session.
-    await until(async () =>
-      page.sockets->Array.some(((_, url, _)) => url->String.includes("session="))
+    await until(
+      async () => page.sockets->Array.some(((_, url, _)) => url->String.includes("session=")),
     )
     let wire =
       page.sockets

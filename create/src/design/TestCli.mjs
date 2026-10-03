@@ -28,21 +28,7 @@ let $$package = Nodepath.resolve(Nodepath.dirname(Nodeurl.fileURLToPath(import.m
 
 let entry = Nodepath.join($$package, "bin/epure.mjs");
 
-let path = process.env["SYLVA"];
-
-let sylva = path !== undefined && path !== "" ? path : Nodepath.resolve($$package, "../../sylva");
-
 let links = [
-  "--with",
-  `lapa=link:` + Nodepath.join(sylva, "packages/lapa"),
-  "--with",
-  `@lapa/db=link:` + Nodepath.join(sylva, "packages/db"),
-  "--with",
-  `@lapa/tilia=link:` + Nodepath.join(sylva, "packages/tilia"),
-  "--with",
-  `@lapa/server=link:` + Nodepath.join(sylva, "packages/server"),
-  "--with",
-  `@lapa/board=link:` + Nodepath.join(sylva, "packages/board"),
   "--with",
   `@epure/dev=link:` + Nodepath.resolve($$package, "../dev")
 ];
@@ -96,7 +82,6 @@ export {
   System,
   $$package,
   entry,
-  sylva,
   links,
   golden,
   runs,

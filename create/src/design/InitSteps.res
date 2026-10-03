@@ -39,7 +39,7 @@ let ranPage: string => promise<string> = %raw(`async path => {
 
 @val @scope("process") external processEnv: dict<string> = "env"
 
-given("an empty working directory", ({step}, context: testContext) => {
+given("an empty working directory", ({step, test: context}) => {
   let scratch: ref<option<string>> = ref(None)
   let last: ref<option<ran>> = ref(None)
 

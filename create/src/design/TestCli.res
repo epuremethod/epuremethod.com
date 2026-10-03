@@ -36,28 +36,13 @@ let entry = System.joined(package, "bin/epure.mjs")
 
 @val @scope("process") external environment: dict<string> = "env"
 
-let sylva = switch environment->Dict.get("SYLVA") {
-| Some(path) if path != "" => path
-| _ => System.resolved(package, "../../sylva")
-}
-
-// The checkouts an init in this suite links, so it installs what is here
-// rather than what a registry holds. One list: the shared init and the
-// scenarios that run their own must link the same things.
-let links = [
-  "--with",
-  `lapa=link:${System.joined(sylva, "packages/lapa")}`,
-  "--with",
-  `@lapa/db=link:${System.joined(sylva, "packages/db")}`,
-  "--with",
-  `@lapa/tilia=link:${System.joined(sylva, "packages/tilia")}`,
-  "--with",
-  `@lapa/server=link:${System.joined(sylva, "packages/server")}`,
-  "--with",
-  `@lapa/board=link:${System.joined(sylva, "packages/board")}`,
-  "--with",
-  `@epure/dev=link:${System.resolved(package, "../dev")}`,
-]
+// What an init in this suite links. The lapa packages install from the
+// registry at the template's `beta`, as a scaffold gets them: run sylva's
+// bin/publish.sh before testing a change to them here. Linking a checkout
+// instead brings its own copy of `tilia`, and ReScript refuses a package it
+// finds twice. One list: the shared init and the scenarios that run their own
+// must link the same things.
+let links = ["--with", `@epure/dev=link:${System.resolved(package, "../dev")}`]
 
 type golden = {project: string, lapa: string}
 

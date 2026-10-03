@@ -10,7 +10,6 @@ import { fileURLToPath } from "node:url";
 import { links } from "./TestCli.mjs";
 
 const create = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const sylva = process.env.SYLVA ?? resolve(create, "../../sylva");
 
 export default function setup() {
   const root = mkdtempSync(join(tmpdir(), "epure-"));
@@ -29,7 +28,7 @@ export default function setup() {
     join(tmpdir(), "epure-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(sylva, "packages/server/bin/lapa.mjs"),
+      lapa: join(root, "adventure/node_modules/@lapa/server/bin/lapa.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });

@@ -14,8 +14,11 @@ import { fileURLToPath } from "node:url";
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const create = resolve(here, "../create");
-const sylva = process.env.SYLVA ?? resolve(here, "../../sylva");
 
+// The lapa packages install from the registry at the template's `beta`, as a
+// scaffold gets them: run sylva's bin/publish.sh before testing a change to
+// them here. Linking a checkout instead brings its own copy of `tilia`, and
+// ReScript refuses a package it finds twice.
 export default function setup() {
   const root = mkdtempSync(join(tmpdir(), "epure-dev-"));
   const ran = spawnSync(
@@ -24,11 +27,6 @@ export default function setup() {
       join(create, "bin/epure.mjs"),
       "init",
       "adventure",
-      "--with", `lapa=link:${join(sylva, "packages/lapa")}`,
-      "--with", `@lapa/db=link:${join(sylva, "packages/db")}`,
-      "--with", `@lapa/tilia=link:${join(sylva, "packages/tilia")}`,
-      "--with", `@lapa/server=link:${join(sylva, "packages/server")}`,
-      "--with", `@lapa/board=link:${join(sylva, "packages/board")}`,
       "--with", `@epure/dev=link:${here}`,
     ],
     { cwd: root, stdio: "inherit" },
@@ -38,7 +36,7 @@ export default function setup() {
     join(tmpdir(), "epure-dev-golden.json"),
     JSON.stringify({
       project: join(root, "adventure"),
-      lapa: join(sylva, "packages/server/bin/lapa.mjs"),
+      lapa: join(root, "adventure/node_modules/@lapa/server/bin/lapa.mjs"),
     }),
   );
   return () => rmSync(root, { recursive: true, force: true });

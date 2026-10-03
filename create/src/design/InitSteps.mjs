@@ -33,7 +33,7 @@ let ranPage = (async path => {
   return root.textContent;
 });
 
-Vitest$1.Given("an empty working directory", (param, context) => {
+Vitest$1.Given("an empty working directory", param => {
   let step = param.step;
   let scratch = {
     contents: undefined
@@ -41,7 +41,7 @@ Vitest$1.Given("an empty working directory", (param, context) => {
   let last = {
     contents: undefined
   };
-  context.onTestFinished(async param => Stdlib_Option.forEach(scratch.contents, TestCli.System.forget));
+  param.test.onTestFinished(async param => Stdlib_Option.forEach(scratch.contents, TestCli.System.forget));
   let place = () => {
     let root = scratch.contents;
     if (root !== undefined) {

@@ -51,7 +51,7 @@ function named(file, $$package) {
   }
 }
 
-Vitest$1.Given("a registry answering for the template's dependencies", (param, context) => {
+Vitest$1.Given("a registry answering for the template's dependencies", param => {
   let step = param.step;
   let scratch = TestCli.System.scratch();
   let template = Nodepath.join(scratch, "package.json");
@@ -118,7 +118,7 @@ Vitest$1.Given("a registry answering for the template's dependencies", (param, c
       code: 0
     }
   };
-  context.onTestFinished(async param => {
+  param.test.onTestFinished(async param => {
     if (answering.contents) {
       await new Promise((resolve, _reject) => {
         listener.close(() => resolve());

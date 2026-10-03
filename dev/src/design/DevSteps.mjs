@@ -58,7 +58,8 @@ function wordAfter(words, name) {
   });
 }
 
-Vitest$1.Given("a project created by init that nothing serves", (param, context) => {
+Vitest$1.Given("a project created by init that nothing serves", param => {
+  let context = param.test;
   let step = param.step;
   let where = TestCli.golden();
   let project = where.project;
@@ -71,6 +72,7 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
   };
   TestCli.System.forget(data);
   TestCli.System.forget(mcp);
+  TestCli.System.forget(Nodepath.join(project, "lib/watch.lock"));
   unwrites();
   let current = {
     contents: undefined
@@ -434,7 +436,24 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
     ];
     return await until(async () => opened.contents, undefined);
   });
+  let answered = () => {
+    Vitest.expect(lastStatus.contents).toBe(200);
+    if (lastBody.contents.includes(`"isError":true`)) {
+      return Stdlib_JsError.throwWithMessage(`the tool refused: ` + lastBody.contents);
+    }
+  };
   step("the agent makes an entity at {string}", async route => {
+    await calls(route, "app", Object.fromEntries([
+      [
+        "title",
+        "Adventures"
+      ],
+      [
+        "description",
+        "Outdoor adventures and what they cost."
+      ]
+    ]));
+    answered();
     await calls(route, "define", Object.fromEntries([[
         "classes",
         [Object.fromEntries([
@@ -457,7 +476,7 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
             ]
           ])]
       ]]));
-    Vitest.expect(lastStatus.contents).toBe(200);
+    answered();
     await calls(route, "make", Object.fromEntries([
       [
         "class",
@@ -473,15 +492,12 @@ Vitest$1.Given("a project created by init that nothing serves", (param, context)
             "Adventure",
             Object.fromEntries([[
                 "price",
-                Object.fromEntries([[
-                    "n",
-                    12.0
-                  ]])
+                12.0
               ]])
           ]])
       ]
     ]));
-    return Vitest.expect(lastStatus.contents).toBe(200);
+    return answered();
   });
   step("the model under {string} names {string}", async (dir, wanted) => {
     let at = Nodepath.join(project, dir);

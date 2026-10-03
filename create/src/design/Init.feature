@@ -100,7 +100,7 @@ Feature: Initialize an epure project
 
   Scenario: The board mounts in the app, and only in dev
     When Theo initializes a project named "adventure"
-    Then "adventure/src/view/Page.res" contains "<LapaBoard client />"
+    Then "adventure/src/view/Page.res" contains "<LapaBoard client engine />"
     And "adventure/src/view/Page.res" contains "Env.dev"
     And the built page carries no board
 

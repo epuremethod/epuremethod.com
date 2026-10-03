@@ -59,18 +59,23 @@ let shows = element =>
     ReactDOM.Client.createRoot(root)->ReactDOM.Client.Root.render(element)
   )
 
-// The board is an ordinary component over the app's own client: one store,
-// one socket, and what the agent makes shows in both at the same moment. It
+// The board is an ordinary component over the app's own client and engine:
+// one store, one socket, and what the agent makes shows in both at the same
+// moment. It
 // renders only under `import.meta.env.DEV`, so a built app carries none of
 // it — the whole package drops out of the bundle.
 let opens = async token => {
   let indexed = await outcome(reply => IndexedDbKv.make(~name="app", reply))
   let client = await Client.make({base: "/_lapa", token, kv: indexed.kv})
-  let notes = await LiveNotes.over(~client)
+  // One engine per client, shared by the app and the board. Its tick ages
+  // the claim and evicts the plans nobody reads.
+  let engine = LapaTilia.make(~client, ~clock=SystemClock.make())
+  setInterval(engine.tick, 10000)->ignore
+  let notes = await LiveNotes.over(~client, ~engine)
   shows(
     <AppView.Provider value={Some(App.make(~notes))}>
       <HelloView />
-      {Env.dev ? <LapaBoard client /> : React.null}
+      {Env.dev ? <LapaBoard client engine /> : React.null}
     </AppView.Provider>,
   )
 }

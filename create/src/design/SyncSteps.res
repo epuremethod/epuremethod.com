@@ -53,7 +53,7 @@ let named = (file, package) =>
   | None => raise(`the template names no ${package}`)
   }
 
-given("a registry answering for the template's dependencies", ({step}, context: testContext) => {
+given("a registry answering for the template's dependencies", ({step, test: context}) => {
   let scratch = System.scratch()
   let template = System.joined(scratch, "package.json")
   System.writeFile(

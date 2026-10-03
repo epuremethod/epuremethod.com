@@ -16,7 +16,7 @@ let listed = (text: string) =>
 
 let titles = (notes: array<Notes.note>) => notes->Array.map(one => one.title)->Array.join(", ")
 
-given("the notes {string}", ({step}, given: string) => {
+given1("the notes {string}", ({step}, given: string) => {
   let (held, holds) = Tilia.signal(
     listed(given)->Array.mapWithIndex((title, at) => {
       Notes.id: `note-${at->Int.toString}`,
